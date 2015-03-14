@@ -54,6 +54,14 @@ To keep image attributes in the output (e.g., to be processed by additional filt
     --filter pandoc-fignos -M fignos-keepattrs
 
 
+Details
+-------
+
+For tex/pdf output, LaTeX's native `\label` and `\ref` macros are used; for all others the numbers are hard-coded.
+
+Links are *not* constructed -- just the figure numbers.
+
+
 Installation
 ------------
 
@@ -72,11 +80,3 @@ as root.  The other packages will be automatically installed in the setup proces
 To install the pandoc-fignos library and filter script from source, execute the following (as root):
 
     $ python setup.py install
-
-
-Details
--------
-
-For tex/pdf output, LaTeX's native `\label` and `\ref` macros are used; for all others the numbers are hard-coded.
-
-Links are *not* constructed -- just the figure numbers.  A filter option may be used to keep image attributes in place so that further processing (e.g., by other filters) can be performed.
