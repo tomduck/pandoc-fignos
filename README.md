@@ -10,12 +10,12 @@ and then referenced with
 
     @fig:desc
 
+Demonstration files are given in the `demos` directory.  Using [`demos/demo.md`] as input gives output files in [pdf], 
+[tex]` `(fragment), [html], [epub], [md] and other formats.
+
 For tex/pdf output, LaTeX's native `\label` and `\ref` macros are used; for all others the numbers are hard-coded.
 
 Links are *not* constructed -- just the figure numbers.  A filter option may be used to keep image attributes in place so that further processing (e.g., by other filters) can be performed.
-
-Demonstration files are given in the `demos` directory.  Using [`demos/demo.md`] as input gives output files in [pdf], 
-[tex]` `(fragment), [html], [epub], [md] and other formats.
 
 This version of pandoc-fignos was tested using pandoc 1.13.2.
 
