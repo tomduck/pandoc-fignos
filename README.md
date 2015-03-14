@@ -25,7 +25,7 @@ This version of pandoc-fignos was tested using pandoc 1.13.2.
 [tex]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/out/demo.tex
 [html]: https://rawgit.com/tomduck/pandoc-fignos/master/demos/out/demo.html
 [epub]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/out/demo.epub
-[md]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/out/demo.md
+[md]: https://github.com/tomduck/pandoc-fignos/blob/master/demos/out/demo.md
 
 
 Markdown Syntax
