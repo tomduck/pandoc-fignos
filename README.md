@@ -19,12 +19,12 @@ Demonstration files are given in the `demos` directory.  Using [`demos/demo.md`]
 This version of pandoc-fignos was tested using pandoc 1.13.2.
 
 [pandoc]: http://pandoc.org/
-[`demos/demo.md`]: demos/demo.md 
-[pdf]: demos/out/demo.pdf
-[tex]: demos/out/demo.tex
-[html]: demos/out/demo.html
-[epub]: demos/out/demo.epub
-[md]: demos/out/demo.md
+[`demos/demo.md`]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/demo.md
+[pdf]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/out/demo.pdf
+[tex]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/out/demo.tex
+[html]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/out/demo.html
+[epub]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/out/demo.epub
+[md]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/out/demo.md
 
 
 Markdown Syntax

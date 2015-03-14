@@ -26,7 +26,7 @@ setup(
     long_description=long_description,
     license = 'GPL',
     keywords = 'pandoc figure numbers filter',
-    url='',
+    url='https://github.com/tomduck/pandoc-fignos',
 
     install_requires=['pandocfilters', 'pandoc-attributes'],
 
