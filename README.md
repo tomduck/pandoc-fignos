@@ -14,7 +14,8 @@ For tex/pdf output, LaTeX's native `\label` and `\ref` macros are used; for all 
 
 Links are *not* constructed -- just the figure numbers.  A filter option may be used to keep image attributes in place so that further processing (e.g., by other filters) can be performed.
 
-Demonstration files are given in the `demos` directory.  Using [`demos/demo.md`] as input gives output files in [pdf], [tex] (fragment), [html], [epub], [md] and other formats.
+Demonstration files are given in the `demos` directory.  Using [`demos/demo.md`] as input gives output files in [pdf], 
+[tex]` `(fragment), [html], [epub], [md] and other formats.
 
 This version of pandoc-fignos was tested using pandoc 1.13.2.
 
@@ -22,7 +23,7 @@ This version of pandoc-fignos was tested using pandoc 1.13.2.
 [`demos/demo.md`]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/demo.md
 [pdf]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/out/demo.pdf
 [tex]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/out/demo.tex
-[html]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/out/demo.html
+[html]: https://rawgit.com/tomduck/pandoc-fignos/master/demos/out/demo.html
 [epub]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/out/demo.epub
 [md]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/out/demo.md
 
