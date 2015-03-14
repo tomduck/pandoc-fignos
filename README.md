@@ -2,20 +2,10 @@
 pandoc-fignos
 =============
 
-*pandoc-fignos* is a [pandoc] filter for numbering figures and figure references.  Image attributes provide the basic mechanism.  e.g., In markdown, a figure is labeled using
-
-    ![Caption.](image.png) {#fig:desc}
-
-and then referenced with
-
-    @fig:desc
+*pandoc-fignos* is a [pandoc] filter for numbering figures and figure references.
 
 Demonstration files are given in the `demos` directory.  Using [`demos/demo.md`] as input gives output files in [pdf], 
 [tex]` `(fragment), [html], [epub], [md] and other formats.
-
-For tex/pdf output, LaTeX's native `\label` and `\ref` macros are used; for all others the numbers are hard-coded.
-
-Links are *not* constructed -- just the figure numbers.  A filter option may be used to keep image attributes in place so that further processing (e.g., by other filters) can be performed.
 
 This version of pandoc-fignos was tested using pandoc 1.13.2.
 
@@ -82,3 +72,11 @@ as root.  The other packages will be automatically installed in the setup proces
 To install the pandoc-fignos library and filter script from source, execute the following (as root):
 
     $ python setup.py install
+
+
+Details
+-------
+
+For tex/pdf output, LaTeX's native `\label` and `\ref` macros are used; for all others the numbers are hard-coded.
+
+Links are *not* constructed -- just the figure numbers.  A filter option may be used to keep image attributes in place so that further processing (e.g., by other filters) can be performed.
