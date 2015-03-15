@@ -68,7 +68,7 @@ Links are *not* constructed -- just the figure numbers.
 Installation
 ------------
 
-pandoc-figno is written in [python].  Its dependencies are:
+pandoc-fignos is written in [python].  Its dependencies are:
 
   - setuptools (for setup.py only)
   - pandocfilters
