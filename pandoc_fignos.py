@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
 # OVERVIEW
 #
 # The basic idea is to scan the AST twice in order to:
@@ -29,11 +30,13 @@
 #   2. Replace each reference with a figure number.  For LaTeX,
 #      replace with \ref{...} instead.
 #
-# 
+#
 
 import re
+import functools
 import itertools
 
+# pylint: disable=import-error
 import pandocfilters
 from pandocfilters import stringify, walk
 from pandocfilters import RawInline, Str, Space, Image, Para
@@ -43,24 +46,26 @@ from pandocattributes import PandocAttributes
 LABEL_PATTERN = re.compile(r'(fig:[\w/-]+)(.*)')
 REF_PATTERN = re.compile(r'@(fig:[\w/-]+)')
 
+# pylint: disable=invalid-name
 references = {}  # Global references tracker
 
 def is_attrimage(key, value):
     """True if this is an attributed image; False otherwise."""
     s = stringify(value[1:]).strip()
-    return key=='Para' and value[0]['t']=='Image' \
+    return key == 'Para' and value[0]['t'] == 'Image' \
       and s.startswith('{') and s.endswith('}')
 
 def parse_attrimage(value):
     """Parses an attributed image."""
     caption, target = value[0]['c']
     s = stringify(value[1:]).strip() # The attribute string
-    attributes = PandocAttributes(s,'markdown').to_pandoc()
-    return caption,target,attributes
+    # Extract attributes (label,classes,kvs)
+    attributes = PandocAttributes(s, 'markdown').to_pandoc()
+    return caption, target, attributes[0]
 
 def is_ref(key, value):
     """True if this is a figure reference; False otherwise."""
-    return key=='Cite' and REF_PATTERN.match(value[1][0]['c']) and \
+    return key == 'Cite' and REF_PATTERN.match(value[1][0]['c']) and \
             parse_ref(value)[1] in references
 
 def parse_ref(value):
@@ -73,30 +78,30 @@ def parse_ref(value):
 def ast(string):
     """Returns an AST representation of the string."""
     toks = [pandocfilters.Str(tok) for tok in string.split()]
-    spaces = [pandocfilters.Space()]*len(toks)
-    ast = list(itertools.chain(*zip(toks,spaces)))
-    if string[0]==' ':
-        ast = [pandocfilters.Space()] + ast
-    return ast if string[-1] == ' ' else ast[:-1]
+    spaces = [Space()]*len(toks)
+    ret = list(itertools.chain(*zip(toks, spaces)))
+    if string[0] == ' ':
+        ret = [Space()] + ret
+    return ret if string[-1] == ' ' else ret[:-1]
 
-def replace_attrimages(key, value, format, meta):
+def replace_attrimages(key, value, fmt, meta):
     """Replaces attributed images while storing reference labels."""
 
-    if is_attrimage(key,value):
+    if is_attrimage(key, value):
 
         # Parse the image
-        caption, target, (label,classes,kvs) = parse_attrimage(value)
+        caption, target, label = parse_attrimage(value)
 
         # Bail out if the label does not conform
         if not label or not LABEL_PATTERN.match(label):
             return None
-            
+
         # Save the reference
         references[label] = len(references) + 1
 
         # Adjust caption depending on the output format
-        if format=='latex':
-            caption = list(caption) + [RawInline('tex',r'\label{%s}'%label)]
+        if fmt == 'latex':
+            caption = list(caption) + [RawInline('tex', r'\label{%s}'%label)]
         else:
             caption = ast('Figure %d. '%references[label]) + list(caption)
 
@@ -108,46 +113,48 @@ def replace_attrimages(key, value, format, meta):
         # Required for pandoc to process the image
         target[1] = "fig:"
 
-        # Return the replacement            
-        return Para([Image(caption,target)] + attributes)
+        # Return the replacement
+        return Para([Image(caption, target)] + attributes)
 
-def replace_refs(key, value, format, meta):
+# pylint: disable=unused-argument
+def replace_refs(key, value, fmt, meta):
     """Replaces references to labelled images."""
 
     # Search for references in paras and remove curly braces around them
-    if key=='Para':
+    if key == 'Para':
         flag = False
         # Search
-        for i,elem in enumerate(value):
-            k,v = elem['t'], elem['c']
-            if is_ref(k,v) and i>0 and i<len(value)-1 \
-              and value[i-1]['t']=='Str' and value[i+1]['t']=='Str' \
+        for i, elem in enumerate(value):
+            k, v = elem['t'], elem['c']
+            if is_ref(k, v) and i > 0 and i < len(value)-1 \
+              and value[i-1]['t'] == 'Str' and value[i+1]['t'] == 'Str' \
               and value[i-1]['c'].endswith('{') \
               and value[i+1]['c'].startswith('}'):
                 flag = True  # Found reference
                 value[i-1]['c'] = value[i-1]['c'][:-1]
                 value[i+1]['c'] = value[i+1]['c'][1:]
         return Para(value) if flag else None
-    
+
     # Replace references
     if is_ref(key, value):
-        prefix,label,suffix = parse_ref(value)
+        prefix, label, suffix = parse_ref(value)
         # The replacement depends on the output format
-        if format=='latex':
-            return prefix +[RawInline('tex',r'\ref{%s}'%label)]+suffix
+        if fmt == 'latex':
+            return prefix +[RawInline('tex', r'\ref{%s}'%label)]+suffix
         else:
             return prefix + [Str('%d'%references[label])]+suffix
 
 def main():
-    
+    """Filters the document AST."""
+
     # Get the output format, document and metadata
-    format = pandocfilters.sys.argv[1] if len(pandocfilters.sys.argv)>1 else ''
+    fmt = pandocfilters.sys.argv[1] if len(pandocfilters.sys.argv) > 1 else ''
     doc = pandocfilters.json.loads(pandocfilters.sys.stdin.read())
     meta = doc[0]['unMeta']
 
     # Replace attributed images and references in the AST
-    altered = reduce(lambda x,action: walk(x, action, format, meta),
-                     [replace_attrimages,replace_refs], doc)
+    altered = functools.reduce(lambda x, action: walk(x, action, fmt, meta),
+                               [replace_attrimages, replace_refs], doc)
 
     # Dump the results
     pandocfilters.json.dump(altered, pandocfilters.sys.stdout)
