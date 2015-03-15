@@ -8,6 +8,9 @@ Demonstration: Using [`demo.md`] as input gives output files in [pdf], [tex], [h
 
 This version of pandoc-fignos was tested using pandoc 1.13.2.
 
+See also: [pandoc-eqnos]
+
+
 [pandoc]: http://pandoc.org/
 [`demo.md`]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/demo.md
 [pdf]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/out/demo.pdf
@@ -15,28 +18,29 @@ This version of pandoc-fignos was tested using pandoc 1.13.2.
 [html]: https://rawgit.com/tomduck/pandoc-fignos/master/demos/out/demo.html
 [epub]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/out/demo.epub
 [md]: https://github.com/tomduck/pandoc-fignos/blob/master/demos/out/demo.md
+[pandoc-eqnos]: https://github.com/tomduck/pandoc-eqnos
 
 
 Markdown Syntax
 ---------------
 
-To associate an image with the label `fig:desc`, append the label as an id attribute in curly braces:
+To associate an image with the label `fig:description`, append the label as an id attribute in curly braces:
 
-    ![Caption.](image.png) {#fig:desc}
+    ![Caption.](image.png) {#fig:description}
 
-The prefix `#fig:` is required whereas `desc` can be replaced with any combination of letters, numbers, dashes, slashes and underscores.
+The prefix `#fig:` is required whereas `description` can be replaced with any combination of letters, numbers, dashes, slashes and underscores.
 
 To reference the figure, use
 
-    @fig:desc
+    @fig:description
 
 or
 
-    {@fig:desc}
+    {@fig:description}
 
 Curly braces around a reference are stripped from the output.
 
-The syntax was taken from the discussion of [pandoc issue #813].
+The syntax emerged from the discussion of [pandoc issue #813].
 
 [pandoc issue #813]: https://github.com/jgm/pandoc/issues/813
 
@@ -64,12 +68,17 @@ Links are *not* constructed -- just the figure numbers.
 Installation
 ------------
 
-pandoc-figno's dependencies are:
+pandoc-figno is written in [python].  Its dependencies are:
 
   - setuptools (for setup.py only)
   - pandocfilters
   - pandoc-attributes
 
-Install using:
+If you already have setuptools, then the others will install automatically in the next step.
+
+Install pandoc-fignos using:
 
     $ python setup.py install
+
+
+[python]: https://python.org/
