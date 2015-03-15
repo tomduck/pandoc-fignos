@@ -59,9 +59,9 @@ def parse_attrimage(value):
     """Parses an attributed image."""
     caption, target = value[0]['c']
     s = stringify(value[1:]).strip() # The attribute string
-    # Extract attributes (label,classes,kvs)
-    attributes = PandocAttributes(s, 'markdown').to_pandoc()
-    return caption, target, attributes[0]
+    # Extract label from attributes (label, classes, kvs)
+    label = PandocAttributes(s, 'markdown').to_pandoc()[0]
+    return caption, target, label
 
 def is_ref(key, value):
     """True if this is a figure reference; False otherwise."""
@@ -140,9 +140,9 @@ def replace_refs(key, value, fmt, meta):
         prefix, label, suffix = parse_ref(value)
         # The replacement depends on the output format
         if fmt == 'latex':
-            return prefix +[RawInline('tex', r'\ref{%s}'%label)]+suffix
+            return prefix + [RawInline('tex', r'\ref{%s}'%label)] + suffix
         else:
-            return prefix + [Str('%d'%references[label])]+suffix
+            return prefix + [Str('%d'%references[label])] + suffix
 
 def main():
     """Filters the document AST."""
