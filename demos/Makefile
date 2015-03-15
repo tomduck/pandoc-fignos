@@ -22,6 +22,16 @@ out/demo.json: demo.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	pandoc $< -t json -o $@
 
+restore: clean
+	git checkout out/demo.epub
+	git checkout out/demo.html
+	git checkout out/demo.md
+	git checkout out/demo.pdf
+	git checkout out/demo.tex
+	git checkout out/img/earlier.png
+	git checkout out/img/today.png
+	git checkout out/img/yesterday.png
+
 
 .PHONY: clean
 
