@@ -74,7 +74,7 @@ pandoc-fignos is written in [python].  Its dependencies are:
   - pandocfilters
   - pandoc-attributes
 
-If you already have setuptools, then the others will install automatically in the next step.
+If you already have setuptools, then the others will install automatically.
 
 Install pandoc-fignos using:
 
