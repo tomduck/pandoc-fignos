@@ -1,4 +1,4 @@
-""" setup.py - install script for pandoc-fignos."""
+"""setup.py - install script for pandoc-fignos."""
 
 from setuptools import setup
 
