@@ -43,7 +43,7 @@ from pandocfilters import RawInline, Str, Space, Image, Para
 from pandocattributes import PandocAttributes
 
 # Patterns for matching labels and references
-LABEL_PATTERN = re.compile(r'(fig:[\w/-]+)(.*)')
+LABEL_PATTERN = re.compile(r'(fig:[\w/-]*)(.*)')
 REF_PATTERN = re.compile(r'@(fig:[\w/-]+)')
 
 # pylint: disable=invalid-name
@@ -61,6 +61,8 @@ def parse_attrimage(value):
     s = stringify(value[1:]).strip() # The attribute string
     # Extract label from attributes (label, classes, kvs)
     label = PandocAttributes(s, 'markdown').to_pandoc()[0]
+    if label == 'fig:': # Make up a unique description
+        label = label + '__'+str(hash(target[0]))+'__'
     return caption, target, label
 
 def is_ref(key, value):
