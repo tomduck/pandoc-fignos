@@ -52,6 +52,8 @@ To apply the filter, use the following option with pandoc:
 
     --filter pandoc-fignos
 
+Note that any use of the `--filter pandoc-citeproc` or `--bibliography=FILE` options with pandoc should come *after* the pandoc-fignos filter call.
+
 To keep image attributes in the output (e.g., to be processed by additional filters), use:
 
     --filter pandoc-fignos -M fignos-keepattrs

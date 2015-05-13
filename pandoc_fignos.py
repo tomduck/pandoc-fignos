@@ -51,9 +51,12 @@ references = {}  # Global references tracker
 
 def is_attrimage(key, value):
     """True if this is an attributed image; False otherwise."""
-    s = stringify(value[1:]).strip()
-    return key == 'Para' and value[0]['t'] == 'Image' \
-      and s.startswith('{') and s.endswith('}')
+    try:
+        s = stringify(value[1:]).strip()
+        return key == 'Para' and value[0]['t'] == 'Image' \
+            and s.startswith('{') and s.endswith('}')
+    except:
+        return False
 
 def parse_attrimage(value):
     """Parses an attributed image."""
