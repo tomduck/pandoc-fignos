@@ -40,7 +40,7 @@ or
 
 Curly braces around a reference are stripped from the output.
 
-This syntax was recommended in the discussion of [pandoc issue #813].
+This syntax was recommended in the discussion of [pandoc issue #813] by @scaramouche1.
 
 [pandoc issue #813]: https://github.com/jgm/pandoc/issues/813
 

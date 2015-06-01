@@ -1,5 +1,5 @@
 include demos/Makefile
 include demos/demo.md
-include demos/img/todays-data.png
-include demos/img/yesterdays-data.png
-include demos/img/earlier-data.png
+include demos/img/todays.png
+include demos/img/yesterday.png
+include demos/img/earlier.png
