@@ -1,12 +1,15 @@
 
-unreleased
+
+pandoc-fignos 0.2 (2015-06-01)
 
     * Permit generic figure labeling (e.g., {#fig:}).
     * Fixed crash that occurs when reference info is contained in
       the yaml header.
     * Updated documentation.
+    * Made release available through pypi.
+
 
 pandoc-fignos 0.1 (2015-03-14)
-	
+
     * initial release
 
