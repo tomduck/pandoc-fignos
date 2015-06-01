@@ -20,7 +20,7 @@ setup(
     license='GPL',
     keywords='pandoc figure numbers filter',
     url='https://github.com/tomduck/pandoc-fignos',
-    download_url = 'https://github.com/tomduck/pandoc-fignos/tarball/0.1',
+    download_url = 'https://github.com/tomduck/pandoc-fignos/tarball/0.2',
     
     install_requires=['pandocfilters', 'pandoc-attributes'],
 
