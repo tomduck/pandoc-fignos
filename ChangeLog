@@ -1,5 +1,10 @@
 
 
+unreleased
+
+    * Updated documentation.
+
+
 pandoc-fignos 0.2 (2015-06-01)
 
     * Permit generic figure labeling (e.g., {#fig:}).

@@ -10,7 +10,6 @@ This version of pandoc-fignos was tested using pandoc 1.14.0.1.
 
 See also: [pandoc-eqnos]
 
-
 [pandoc]: http://pandoc.org/
 [`demo.md`]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/demo.md
 [pdf]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/out/demo.pdf
@@ -21,10 +20,34 @@ See also: [pandoc-eqnos]
 [pandoc-eqnos]: https://github.com/tomduck/pandoc-eqnos
 
 
+Contents
+--------
+
+ 1. [Rationale](#rationale)
+ 2. [Markdown Syntax](#markdown-syntax)
+ 3. [Usage](#usage)
+ 4. [Details](#details)
+ 5. [Installation](#installation)
+
+
+Rationale
+---------
+
+Figure numbers and references are required for academic writing, but are not currently supported by pandoc.  It is anticipated that this will eventually change.  Pandoc-fignos is a transitional package for those who need figure numbers and references now.
+
+The syntax for figure numbers and references was worked out in [pandoc issue #813].  It seems likely that this will be close to what pandoc ultimately adopts.
+
+By doing one thing -- and one thing only -- my hope is that pandoc-fignos will permit a relatively painless switch for when pandoc provides native support.
+
+Installation of the filter is straight-forward, with minimal dependencies.  It is simple to use and has been tested extensively.
+
+[pandoc issue #813]: https://github.com/jgm/pandoc/issues/813
+
+
 Markdown Syntax
 ---------------
 
-To associate an image with the label `fig:description`, append the label as an id attribute in curly braces:
+To tag an image with the label `fig:description`, use
 
     ![Caption.](image.png) {#fig:description}
 
@@ -39,10 +62,6 @@ or
     {@fig:description}
 
 Curly braces around a reference are stripped from the output.
-
-This syntax was recommended in the discussion of [pandoc issue #813] by @scaramouche1.
-
-[pandoc issue #813]: https://github.com/jgm/pandoc/issues/813
 
 
 Usage
@@ -70,7 +89,7 @@ Links are *not* constructed -- just the figure numbers.
 Installation
 ------------
 
-Install pandoc-fignos using:
+Install pandoc-fignos at the bash ($) prompt with
 
     $ sudo pip install pandoc-fignos
 
