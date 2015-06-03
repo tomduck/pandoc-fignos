@@ -1,7 +1,8 @@
 
 
-unreleased
+pandoc-fignos 0.2.1 (2015-06-03)
 
+    * Included missing install dependency in MANIFEST.in.
     * Updated documentation.
 
 
