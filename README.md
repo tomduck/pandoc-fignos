@@ -91,9 +91,13 @@ Installation
 
 Install pandoc-fignos at the bash ($) prompt with
 
-    $ sudo pip install pandoc-fignos
+    $ sudo pip install pandoc-fignos 
 
 You will be prompted for your root password.  That's it!
+
+To upgrade to the most recent release, use
+
+    $ sudo pip install --upgrade pandoc-fignos 
 
 If you have any difficulties with it, please [file an issue] on github so that we can help.
 
