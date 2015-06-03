@@ -37,7 +37,7 @@ Figure numbers and references are required for academic writing, but are not cur
 
 The syntax for figure numbers and references was worked out in [pandoc issue #813].  It seems likely that this will be close to what pandoc ultimately adopts.
 
-By doing one thing -- and one thing only -- my hope is that pandoc-fignos will permit a relatively painless switch for when pandoc provides native support.
+By doing one thing -- and one thing only -- my hope is that pandoc-fignos will permit a relatively painless switch when pandoc provides native support for figure numbers and references.
 
 Installation of the filter is straight-forward, with minimal dependencies.  It is simple to use and has been tested extensively.
 
