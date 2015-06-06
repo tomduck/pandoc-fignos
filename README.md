@@ -28,6 +28,7 @@ Contents
  3. [Usage](#usage)
  4. [Details](#details)
  5. [Installation](#installation)
+ 6. [Getting Help](#getting-help)
 
 
 Rationale
@@ -83,7 +84,7 @@ Details
 
 For tex/pdf output, LaTeX's native `\label` and `\ref` macros are used; for all others the numbers are hard-coded.
 
-Links are *not* constructed -- just the figure numbers.
+Links are not constructed -- just the figure numbers.
 
 
 Installation
@@ -97,6 +98,17 @@ To upgrade to the most recent release, use
 
     pip install --upgrade pandoc-fignos 
 
-If you have any difficulties with it, please [file an issue] on github so that we can help.
+Pip is a script that downloads and installs modules from the Python Package Index, [PyPI].  It should come installed with your python distribution.  If you are running linux, pip may be bundled separately.  For example, on a Debian-based system (including Ubuntu), you can install it as root using
+
+    apt-get update
+    apt-get install python-pip
+
+[PyPI]: https://pypi.python.org/pypi
+
+
+Getting Help
+------------
+
+If you have any difficulties with pandoc-fignos, please feel welcome to [file an issue] on github so that we can help.
 
 [file an issue]: https://github.com/tomduck/pandoc-fignos/issues
