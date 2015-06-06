@@ -55,6 +55,7 @@ def is_attrimage(key, value):
         s = stringify(value[1:]).strip()
         return key == 'Para' and value[0]['t'] == 'Image' \
             and s.startswith('{') and s.endswith('}')
+    # pylint: disable=bare-except
     except:
         return False
 
