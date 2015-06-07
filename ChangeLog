@@ -1,4 +1,9 @@
 
+pandoc-fignos 0.2.2 (2015-06-07)
+
+    * Added README.md and LICENSE to MANIFEST.in so that they
+      get distributed via pip.
+
 
 pandoc-fignos 0.2.1 (2015-06-03)
 
