@@ -46,6 +46,11 @@ from pandocattributes import PandocAttributes
 LABEL_PATTERN = re.compile(r'(fig:[\w/-]*)(.*)')
 REF_PATTERN = re.compile(r'@(fig:[\w/-]+)')
 
+# Pandoc uses UTF-8 for both input and output; so must we
+import io, sys
+STDIN = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8', errors='strict')
+STDOUT = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='strict')
+
 # pylint: disable=invalid-name
 references = {}  # Global references tracker
 
@@ -155,7 +160,7 @@ def main():
 
     # Get the output format, document and metadata
     fmt = pandocfilters.sys.argv[1] if len(pandocfilters.sys.argv) > 1 else ''
-    doc = pandocfilters.json.loads(pandocfilters.sys.stdin.read())
+    doc = pandocfilters.json.loads(STDIN.read())
     meta = doc[0]['unMeta']
 
     # Replace attributed images and references in the AST
@@ -163,7 +168,7 @@ def main():
                                [replace_attrimages, replace_refs], doc)
 
     # Dump the results
-    pandocfilters.json.dump(altered, pandocfilters.sys.stdout)
+    pandocfilters.json.dump(altered, STDOUT)
 
 
 if __name__ == '__main__':
