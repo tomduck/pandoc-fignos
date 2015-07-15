@@ -3,6 +3,8 @@ To install the most recent sources from github using pip:
 
     # pip install git+https://github.com/tomduck/pandoc-fignos.git
 
+(to upgrade use the --upgrade flag).
+    
 
 To test pandoc-fignos using a specific version of python:
 
