@@ -96,7 +96,7 @@ def parse_ref(value):
 
 def ast(string):
     """Returns an AST representation of the string."""
-    toks = [pandocfilters.Str(tok) for tok in string.split()]
+    toks = [Str(tok) for tok in string.split()]
     spaces = [Space()]*len(toks)
     ret = list(itertools.chain(*zip(toks, spaces)))
     if string[0] == ' ':
@@ -167,7 +167,7 @@ def main():
     """Filters the document AST."""
 
     # Get the output format, document and metadata
-    fmt = pandocfilters.sys.argv[1] if len(pandocfilters.sys.argv) > 1 else ''
+    fmt = sys.argv[1] if len(sys.argv) > 1 else ''
     doc = pandocfilters.json.loads(STDIN.read())
     meta = doc[0]['unMeta']
 
