@@ -1,0 +1,12 @@
+
+To install the most recent sources from github using pip:
+
+    # pip install git+https://github.com/tomduck/pandoc-fignos.git
+
+
+Uploading to pypi:
+
+    $ python setup.py register -r pypi
+    $ python setup.py sdist upload -r pypi
+
+(from http://peterdowns.com/posts/first-time-with-pypi.html)
