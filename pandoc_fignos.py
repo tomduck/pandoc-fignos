@@ -48,12 +48,14 @@ from pandocattributes import PandocAttributes
 LABEL_PATTERN = re.compile(r'(fig:[\w/-]*)(.*)')
 REF_PATTERN = re.compile(r'@(fig:[\w/-]+)')
 
-# Pandoc uses UTF-8 for both input and output; so must we
+# Detect python 3
 PY3 = sys.version_info > (3,)
-if PY3:  # Force utf-8 decoding
+
+# Pandoc uses UTF-8 for both input and output; so must we
+if PY3:  # Force utf-8 decoding (decoding of input streams is automatic in py3)
     STDIN = io.TextIOWrapper(sys.stdin.buffer, 'utf-8', 'strict')
     STDOUT = io.TextIOWrapper(sys.stdout.buffer, 'utf-8', 'strict')
-else:    # No decoding; utf-8 strings in means utf-8 strings out
+else:    # No decoding; utf-8-encoded strings in means the same out
     STDIN = sys.stdin
     STDOUT = sys.stdout
 

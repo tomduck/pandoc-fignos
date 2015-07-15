@@ -4,6 +4,16 @@ To install the most recent sources from github using pip:
     # pip install git+https://github.com/tomduck/pandoc-fignos.git
 
 
+To test pandoc-fignos using a specific version of python:
+
+    a) Copy pandoc_fignos.py into the test directory;
+
+    b) Use a pipe chain on test.md as follows:
+
+       $ pandoc test.md -t json | python2.7 pandoc_fignos.py | \
+             pandoc -f json -o test.pdf
+
+    
 Uploading to pypi:
 
     $ python setup.py register -r pypi
