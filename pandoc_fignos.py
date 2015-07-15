@@ -35,6 +35,8 @@
 import re
 import functools
 import itertools
+import io
+import sys
 
 # pylint: disable=import-error
 import pandocfilters
@@ -47,9 +49,13 @@ LABEL_PATTERN = re.compile(r'(fig:[\w/-]*)(.*)')
 REF_PATTERN = re.compile(r'@(fig:[\w/-]+)')
 
 # Pandoc uses UTF-8 for both input and output; so must we
-import io, sys
-STDIN = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8', errors='strict')
-STDOUT = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='strict')
+PY3 = sys.version_info > (3,)
+if PY3:  # Force utf-8 decoding
+    STDIN = io.TextIOWrapper(sys.stdin.buffer, 'utf-8', 'strict')
+    STDOUT = io.TextIOWrapper(sys.stdout.buffer, 'utf-8', 'strict')
+else:    # No decoding; utf-8 strings in means utf-8 strings out
+    STDIN = sys.stdin
+    STDOUT = sys.stdout
 
 # pylint: disable=invalid-name
 references = {}  # Global references tracker
