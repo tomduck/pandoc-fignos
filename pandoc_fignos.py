@@ -103,6 +103,7 @@ def ast(string):
         ret = [Space()] + ret
     return ret if string[-1] == ' ' else ret[:-1]
 
+# pylint: disable=unused-argument
 def replace_attrimages(key, value, fmt, meta):
     """Replaces attributed images while storing reference labels."""
 
@@ -123,17 +124,16 @@ def replace_attrimages(key, value, fmt, meta):
             caption = list(caption) + [RawInline('tex', r'\label{%s}'%label)]
         else:
             caption = ast('Figure %d. '%references[label]) + list(caption)
-        
+
         # Required for pandoc to process the image
         target[1] = "fig:"
 
         # Return the replacement
         if fmt == 'html' or fmt == 'html5':
             anchor = RawInline('html', '<a name="%s"></a>'%label)
-            return [Plain([anchor]),
-                    Para([Image(caption, target)] + attributes)]
+            return [Plain([anchor]), Para([Image(caption, target)])]
         else:
-            return Para([Image(caption, target)] + attributes)
+            return Para([Image(caption, target)])
 
 # pylint: disable=unused-argument
 def replace_refs(key, value, fmt, meta):
