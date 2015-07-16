@@ -133,7 +133,7 @@ def replace_attrimages(key, value, fmt, meta):
         target[1] = "fig:"
 
         # Return the replacement
-        if fmt == 'html':
+        if fmt == 'html' or fmt == 'html5':
             anchor = RawInline('html', '<a name="%s"></a>'%label)
             return [Plain([anchor]),
                     Para([Image(caption, target)] + attributes)]
@@ -165,7 +165,7 @@ def replace_refs(key, value, fmt, meta):
         # The replacement depends on the output format
         if fmt == 'latex':
             return prefix + [RawInline('tex', r'\ref{%s}'%label)] + suffix
-        elif fmt == 'html':
+        elif fmt == 'html' or fmt == 'html5':
             link = '<a href="#%s">%s</a>' % (label, references[label])
             return prefix + [RawInline('html', link)] + suffix
         else:
