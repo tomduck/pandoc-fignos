@@ -123,12 +123,7 @@ def replace_attrimages(key, value, fmt, meta):
             caption = list(caption) + [RawInline('tex', r'\label{%s}'%label)]
         else:
             caption = ast('Figure %d. '%references[label]) + list(caption)
-
-        # Retain the attributes, if requested
-        keepattrs = meta['fignos-keepattrs']['c'] \
-          if 'fignos-keepattrs' in meta else False
-        attributes = value[1:] if keepattrs else []
-
+        
         # Required for pandoc to process the image
         target[1] = "fig:"
 

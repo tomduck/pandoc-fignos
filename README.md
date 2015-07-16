@@ -75,17 +75,13 @@ To apply the filter, use the following option with pandoc:
 
 Note that any use of the `--filter pandoc-citeproc` or `--bibliography=FILE` options with pandoc should come *after* the pandoc-fignos filter call.
 
-To keep image attributes in the output (e.g., to be processed by additional filters), use:
-
-    --filter pandoc-fignos -M fignos-keepattrs
-
 
 Details
 -------
 
 For tex/pdf output, LaTeX's native `\label` and `\ref` macros are used; for all others the numbers are hard-coded.
 
-Links are not constructed -- just the figure numbers.
+Links are also constructed for html and pdf output.
 
 
 Installation
