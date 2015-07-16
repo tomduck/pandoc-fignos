@@ -41,7 +41,7 @@ import sys
 # pylint: disable=import-error
 import pandocfilters
 from pandocfilters import stringify, walk
-from pandocfilters import RawInline, Str, Space, Image, Para
+from pandocfilters import RawInline, Str, Space, Image, Para, Plain
 from pandocattributes import PandocAttributes
 
 # Patterns for matching labels and references
@@ -127,13 +127,18 @@ def replace_attrimages(key, value, fmt, meta):
         # Retain the attributes, if requested
         keepattrs = meta['fignos-keepattrs']['c'] \
           if 'fignos-keepattrs' in meta else False
-        attributes = value[1:] if keepattrs else[]
+        attributes = value[1:] if keepattrs else []
 
         # Required for pandoc to process the image
         target[1] = "fig:"
 
         # Return the replacement
-        return Para([Image(caption, target)] + attributes)
+        if fmt == 'html':
+            anchor = RawInline('html', '<a name="%s"></a>'%label)
+            return [Plain([anchor]),
+                    Para([Image(caption, target)] + attributes)]
+        else:
+            return Para([Image(caption, target)] + attributes)
 
 # pylint: disable=unused-argument
 def replace_refs(key, value, fmt, meta):
@@ -160,6 +165,9 @@ def replace_refs(key, value, fmt, meta):
         # The replacement depends on the output format
         if fmt == 'latex':
             return prefix + [RawInline('tex', r'\ref{%s}'%label)] + suffix
+        elif fmt == 'html':
+            link = '<a href="#%s">%s</a>' % (label, references[label])
+            return prefix + [RawInline('html', link)] + suffix
         else:
             return prefix + [Str('%d'%references[label])] + suffix
 

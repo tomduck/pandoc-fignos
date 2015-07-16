@@ -11,7 +11,7 @@ pandoc-fignos is a pandoc filter for numbering figures and figure references.
 
 setup(
     name='pandoc-fignos',
-    version='0.3',
+    version='0.3.1',
 
     author='Thomas J. Duck',
     author_email='tomduck@tomduck.ca',
@@ -20,7 +20,7 @@ setup(
     license='GPL',
     keywords='pandoc figure numbers filter',
     url='https://github.com/tomduck/pandoc-fignos',
-    download_url = 'https://github.com/tomduck/pandoc-fignos/tarball/0.3',
+    download_url = 'https://github.com/tomduck/pandoc-fignos/tarball/0.3.1',
     
     install_requires=['pandocfilters', 'pandoc-attributes'],
 
