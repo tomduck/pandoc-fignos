@@ -160,7 +160,7 @@ def replace_refs(key, value, fmt, meta):
         # The replacement depends on the output format
         if fmt == 'latex':
             return prefix + [RawInline('tex', r'\ref{%s}'%label)] + suffix
-        elif fmt == 'html' or fmt == 'html5':
+        elif fmt in ('html','html5'):
             link = '<a href="#%s">%s</a>' % (label, references[label])
             return prefix + [RawInline('html', link)] + suffix
         else:
