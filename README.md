@@ -81,7 +81,7 @@ Details
 
 For tex/pdf output, LaTeX's native `\label` and `\ref` macros are used; for all others the numbers are hard-coded.
 
-Links are also constructed for html and pdf output.
+Links are constructed for html and pdf output.
 
 
 Installation

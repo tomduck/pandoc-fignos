@@ -129,7 +129,7 @@ def replace_attrimages(key, value, fmt, meta):
         target[1] = "fig:"
 
         # Return the replacement
-        if fmt == 'html' or fmt == 'html5':
+        if fmt in ('html', 'html5'):
             anchor = RawInline('html', '<a name="%s"></a>'%label)
             return [Plain([anchor]), Para([Image(caption, target)])]
         else:
