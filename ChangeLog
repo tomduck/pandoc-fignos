@@ -11,8 +11,10 @@ pandoc-fignos 0.5 (2015-12-30):
       not allow a space between an image and its attributes.  Please
       update your markdown accordingly.
 
+    * Fixed curly-brace references in lists (Issue #6).
 
-pandoc-fignos 0.4 (2015-07-16) 
+
+pandoc-fignos 0.4 (2015-07-16)
 
     * Construct links for html (Issue #5).
     * Removed fignos-keepattr option.
