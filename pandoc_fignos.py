@@ -46,8 +46,9 @@ from pandocattributes import PandocAttributes
 
 # Create our own pandoc image primitives to accommodate different pandoc
 # versions.
-Image = elt('Image',2)      # Pandoc < 1.16
-AttrImage = elt('Image',3)  # Pandoc >= 1.16
+# pylint: disable=invalid-name
+Image = elt('Image', 2)      # Pandoc < 1.16
+AttrImage = elt('Image', 3)  # Pandoc >= 1.16
 
 # Patterns for matching labels and references
 LABEL_PATTERN = re.compile(r'(fig:[\w/-]*)(.*)')
