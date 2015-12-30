@@ -41,8 +41,13 @@ import sys
 # pylint: disable=import-error
 import pandocfilters
 from pandocfilters import stringify, walk
-from pandocfilters import RawInline, Str, Space, Image, Para, Plain
+from pandocfilters import RawInline, Str, Space, Para, Plain, elt
 from pandocattributes import PandocAttributes
+
+# Create our own pandoc image primitives to accommodate different pandoc
+# versions.
+Image = elt('Image',2)      # Pandoc < 1.16
+AttrImage = elt('Image',3)  # Pandoc >= 1.16
 
 # Patterns for matching labels and references
 LABEL_PATTERN = re.compile(r'(fig:[\w/-]*)(.*)')
@@ -64,23 +69,49 @@ references = {}  # Global references tracker
 
 def is_attrimage(key, value):
     """True if this is an attributed image; False otherwise."""
+
     try:
-        s = stringify(value[1:]).strip()
-        return key == 'Para' and value[0]['t'] == 'Image' \
-            and s.startswith('{') and s.endswith('}')
+        if key == 'Para' and value[0]['t'] == 'Image':
+
+            # Old pandoc < 1.16
+            if len(value[0]['c']) == 2:
+                s = stringify(value[1:]).strip()
+                if s.startswith('{') and s.endswith('}'):
+                    return True
+                else:
+                    return False
+
+            # New pandoc >= 1.16
+            else:
+                assert len(value[0]['c']) == 3
+                return True  # Pandoc >= 1.16 has image attributes by default
+
     # pylint: disable=bare-except
     except:
         return False
 
 def parse_attrimage(value):
     """Parses an attributed image."""
-    caption, target = value[0]['c']
-    s = stringify(value[1:]).strip() # The attribute string
-    # Extract label from attributes (label, classes, kvs)
-    label = PandocAttributes(s, 'markdown').to_pandoc()[0]
-    if label == 'fig:': # Make up a unique description
-        label = label + '__'+str(hash(target[0]))+'__'
-    return caption, target, label
+
+    if len(value[0]['c']) == 2:  # Old pandoc < 1.16
+        attrs, (caption, target) = None, value[0]['c']
+        s = stringify(value[1:]).strip() # The attribute string
+        # Extract label from attributes (label, classes, kvs)
+        label = PandocAttributes(s, 'markdown').to_pandoc()[0]
+        if label == 'fig:': # Make up a unique description
+            label = label + '__'+str(hash(target[0]))+'__'
+        return attrs, caption, target, label
+
+    else:  # New pandoc >= 1.16
+        assert len(value[0]['c']) == 3
+        attrs, caption, target = value[0]['c']
+        s = stringify(value[1:]).strip() # The attribute string
+        # Extract label from attributes
+        label = attrs[0]
+        if label == 'fig:': # Make up a unique description
+            label = label + '__'+str(hash(target[0]))+'__'
+        return attrs, caption, target, label
+
 
 def is_ref(key, value):
     """True if this is a figure reference; False otherwise."""
@@ -110,7 +141,7 @@ def replace_attrimages(key, value, fmt, meta):
     if is_attrimage(key, value):
 
         # Parse the image
-        caption, target, label = parse_attrimage(value)
+        attrs, caption, target, label = parse_attrimage(value)
 
         # Bail out if the label does not conform
         if not label or not LABEL_PATTERN.match(label):
@@ -129,11 +160,17 @@ def replace_attrimages(key, value, fmt, meta):
         target[1] = "fig:"
 
         # Return the replacement
+        if len(value[0]['c']) == 2:  # Old pandoc < 1.16
+            img = Image(caption, target)
+        else:  # New pandoc >= 1.16
+            assert len(value[0]['c']) == 3
+            img = AttrImage(attrs, caption, target)
+
         if fmt in ('html', 'html5'):
             anchor = RawInline('html', '<a name="%s"></a>'%label)
-            return [Plain([anchor]), Para([Image(caption, target)])]
+            return [Plain([anchor]), Para([img])]
         else:
-            return Para([Image(caption, target)])
+            return Para([img])
 
 # pylint: disable=unused-argument
 def replace_refs(key, value, fmt, meta):

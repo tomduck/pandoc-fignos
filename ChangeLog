@@ -1,5 +1,18 @@
 
-pandoc-fignos 0.4 (2015-07-16)
+pandoc-fignos 0.5 (2015-12-30):
+
+    * Update to work with pandoc 1.16 that is currently in
+      development (Issue #7).
+
+      If you are using pandoc < 1.16 then everything should work
+      as it did before.
+
+      Pandoc 1.16 introduces image attributes.  The new syntax does
+      not allow a space between an image and its attributes.  Please
+      update your markdown accordingly.
+
+
+pandoc-fignos 0.4 (2015-07-16) 
 
     * Construct links for html (Issue #5).
     * Removed fignos-keepattr option.

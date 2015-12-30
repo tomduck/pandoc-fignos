@@ -1,4 +1,8 @@
 
+
+**NOTICE:** Pandoc 1.16 introduces image attributes.  The new syntax does not allow a space between an image and its attributes.  If you update to pandoc 1.16, then please update your markdown accordingly.
+
+
 pandoc-fignos
 =============
 
@@ -9,6 +13,7 @@ Demonstration: Using [`demo.md`] as input gives output files in [pdf], [tex], [h
 This version of pandoc-fignos was tested using pandoc 1.15.0.5 and is known to work under linux, Mac OS X and Windows.
 
 See also: [pandoc-eqnos], [pandoc-tablenos]
+
 
 [pandoc]: http://pandoc.org/
 [`demo.md`]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/demo.md
@@ -51,7 +56,7 @@ Markdown Syntax
 
 To tag an image with the label `fig:description`, use
 
-    ![Caption.](image.png) {#fig:description}
+    ![Caption.](image.png){#fig:description}
 
 The prefix `#fig:` is required whereas `description` can be replaced with any combination of letters, numbers, dashes, slashes and underscores.
 

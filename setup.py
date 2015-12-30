@@ -9,9 +9,11 @@ LONG_DESCRIPTION = """\
 pandoc-fignos is a pandoc filter for numbering figures and figure references.
 """
 
+VERSION = '0.5'
+
 setup(
     name='pandoc-fignos',
-    version='0.4',
+    version=VERSION,
 
     author='Thomas J. Duck',
     author_email='tomduck@tomduck.ca',
@@ -20,7 +22,7 @@ setup(
     license='GPL',
     keywords='pandoc figure numbers filter',
     url='https://github.com/tomduck/pandoc-fignos',
-    download_url = 'https://github.com/tomduck/pandoc-fignos/tarball/0.4',
+    download_url = 'https://github.com/tomduck/pandoc-fignos/tarball/'+VERSION,
     
     install_requires=['pandocfilters', 'pandoc-attributes'],
 
