@@ -177,7 +177,7 @@ def replace_attrimages(key, value, fmt, meta):
 def replace_refs(key, value, fmt, meta):
     """Replaces references to labelled images."""
 
-    # Search for references in paras and remove curly braces around them
+    # Search for references and remove curly braces around them
     if key in ('Para', 'Plain'):
         flag = False
         # Search
