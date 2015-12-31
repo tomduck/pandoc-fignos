@@ -15,7 +15,13 @@ To test pandoc-fignos using a specific version of python:
        $ pandoc test.md -t json | python2.7 pandoc_fignos.py | \
              pandoc -f json -o test.pdf
 
-    
+
+Tagging a release:
+
+    $ git tag -a <tag> -m <message>
+    $ git push origin <tag>
+
+
 Uploading to pypi:
 
     $ python setup.py register -r pypi
