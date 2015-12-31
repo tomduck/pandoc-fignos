@@ -1,6 +1,6 @@
 
 
-**NOTICE:** Pandoc 1.16 introduces image attributes.  The new syntax does not allow a space between an image and its attributes.  If you update to pandoc 1.16, then please update your markdown accordingly.
+**NOTICE:** Pandoc 1.16 introduces image attributes.  The new syntax does not allow a space between an image and its attributes.  If you are using pandoc 1.16, then please update your markdown accordingly.
 
 
 pandoc-fignos
@@ -103,6 +103,7 @@ To upgrade to the most recent release, use
     pip install --upgrade pandoc-fignos 
 
 Pip is a script that downloads and installs modules from the Python Package Index, [PyPI].  It should come installed with your python distribution.
+
 
 ### Installing on Linux ###
 
