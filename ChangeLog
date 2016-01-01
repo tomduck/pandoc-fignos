@@ -1,5 +1,5 @@
 
-pandoc-fignos 0.6
+pandoc-fignos 0.6 (2016-01-01)
 
     * Flush stdout before exiting (Issue #5).
 
