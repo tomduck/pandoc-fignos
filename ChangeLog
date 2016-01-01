@@ -1,4 +1,9 @@
 
+pandoc-fignos 0.6
+
+    * Flush stdout before exiting (Issue #5).
+
+
 pandoc-fignos 0.5 (2015-12-30):
 
     * Update to work with pandoc 1.16 that is currently in

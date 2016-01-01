@@ -222,6 +222,8 @@ def main():
     # Dump the results
     pandocfilters.json.dump(altered, STDOUT)
 
+    # Flush stdout
+    STDOUT.flush()
 
 if __name__ == '__main__':
     main()
