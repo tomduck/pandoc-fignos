@@ -54,7 +54,7 @@ Installation of the filter is straight-forward, with minimal dependencies.  It i
 Markdown Syntax
 ---------------
 
-To assign an image the label `fig:description`, use
+To assign the label `fig:description` to an image, use
 
     ![Caption.](image.png){#fig:description}
 
