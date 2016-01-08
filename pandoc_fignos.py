@@ -2,7 +2,7 @@
 
 """pandoc-fignos: a pandoc filter that inserts figure nos. and refs."""
 
-# Copyright 2015 Thomas J. Duck.
+# Copyright 2015, 2016 Thomas J. Duck.
 # All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@
 
 # OVERVIEW
 #
-# The basic idea is to scan the AST twice in order to:
+# The basic idea is to scan the AST two times in order to:
 #
 #   1. Insert text for the figure number in each figure caption.
 #      For LaTeX, insert \label{...} instead.  The figure labels
@@ -30,7 +30,7 @@
 #   2. Replace each reference with a figure number.  For LaTeX,
 #      replace with \ref{...} instead.
 #
-#
+# There is also an initial scan to do some preprocessing.
 
 import re
 import functools
@@ -41,7 +41,7 @@ import sys
 # pylint: disable=import-error
 import pandocfilters
 from pandocfilters import stringify, walk
-from pandocfilters import RawInline, Str, Space, Para, Plain, elt
+from pandocfilters import RawInline, Str, Space, Para, Plain, Cite, elt
 from pandocattributes import PandocAttributes
 
 # Create our own pandoc image primitives to accommodate different pandoc
@@ -113,11 +113,10 @@ def parse_attrimage(value):
             label = label + '__'+str(hash(target[0]))+'__'
         return attrs, caption, target, label
 
-
 def is_ref(key, value):
     """True if this is a figure reference; False otherwise."""
     return key == 'Cite' and REF_PATTERN.match(value[1][0]['c']) and \
-            parse_ref(value)[1] in references
+      parse_ref(value)[1] in references
 
 def parse_ref(value):
     """Parses a figure reference."""
@@ -134,6 +133,63 @@ def ast(string):
     if string[0] == ' ':
         ret = [Space()] + ret
     return ret if string[-1] == ' ' else ret[:-1]
+
+def is_broken_ref(key1, value1, key2, value2):
+    """True if this is a broken link; False otherwise."""
+    return key1 == 'Link' and value1[1][0]['c'] == '{@fig' \
+        and key2 == 'Str' and '}' in value2
+
+def repair_broken_refs(value):
+    """Repairs references broken by pandoc's --autolink_bare_uris."""
+
+    # autolink_bare_uris splits {@fig:label} at the ':' and treats
+    # the first half as if it is a mailto url and the second half as a string.
+    # Let's replace this mess with Cite and Str elements that we normally
+    # get.
+    flag = False
+    for i in range(len(value)-1):
+        if is_broken_ref(value[i]['t'], value[i]['c'],
+                         value[i+1]['t'], value[i+1]['c']):
+            flag = True  # Found broken reference
+            s = value[i+1]['c']  # Get the second half of the reference
+            ref = '@fig' + s[:s.index('}')]  # Join the reference
+            # Replace the link with a citation
+            value[i] = Cite(
+                [{"citationSuffix":[], "citationNoteNum":0,
+                  "citationMode":{"t":"AuthorInText", "c":[]},
+                  "citationPrefix":[], "citationId":ref[1:],
+                  "citationHash":0}],
+                [Str(ref)])
+            # Remove reference information from the string
+            value[i+1]['c'] = s[s.index('}')+1:]
+    return flag
+
+def is_braced_ref(i, value):
+    """Returns true if a reference is braced; otherwise False."""
+    return is_ref(value[i]['t'], value[i]['c']) \
+      and value[i-1]['t'] == 'Str' and value[i+1]['t'] == 'Str' \
+      and value[i-1]['c'].endswith('{') and value[i+1]['c'].startswith('}')
+
+def remove_braces(value):
+    """Search for references and remove curly braces around them."""
+    flag = False
+    for i in range(len(value)-1)[1:]:
+        if is_braced_ref(i, value):
+            flag = True  # Found reference
+            # Remove the braces
+            value[i-1]['c'] = value[i-1]['c'][:-1]
+            value[i+1]['c'] = value[i+1]['c'][1:]
+    return flag
+
+# pylint: disable=unused-argument
+def preprocess(key, value, fmt, meta):
+    """Preprocesses to correct for problems."""
+    if key in ('Para', 'Plain'):
+        if repair_broken_refs(value):
+            if key == 'Para':
+                return Para(value)
+            else:
+                return Plain(value)
 
 # pylint: disable=unused-argument
 def replace_attrimages(key, value, fmt, meta):
@@ -177,24 +233,15 @@ def replace_attrimages(key, value, fmt, meta):
 def replace_refs(key, value, fmt, meta):
     """Replaces references to labelled images."""
 
-    # Search for references and remove curly braces around them
+    # Remove braces around references
+    flag = False
     if key in ('Para', 'Plain'):
-        flag = False
-        # Search
-        for i, elem in enumerate(value):
-            k, v = elem['t'], elem['c']
-            if is_ref(k, v) and i > 0 and i < len(value)-1 \
-              and value[i-1]['t'] == 'Str' and value[i+1]['t'] == 'Str' \
-              and value[i-1]['c'].endswith('{') \
-              and value[i+1]['c'].startswith('}'):
-                flag = True  # Found reference
-                value[i-1]['c'] = value[i-1]['c'][:-1]
-                value[i+1]['c'] = value[i+1]['c'][1:]
-        if key == 'Para':
-            return Para(value) if flag else None
-        else:
-            return Plain(value) if flag else None
-
+        if remove_braces(value):
+            if key == 'Para':
+                return Para(value)
+            else:
+                return Plain(value)
+    
     # Replace references
     if is_ref(key, value):
         prefix, label, suffix = parse_ref(value)
@@ -217,7 +264,8 @@ def main():
 
     # Replace attributed images and references in the AST
     altered = functools.reduce(lambda x, action: walk(x, action, fmt, meta),
-                               [replace_attrimages, replace_refs], doc)
+                               [preprocess, replace_attrimages, replace_refs],
+                               doc)
 
     # Dump the results
     pandocfilters.json.dump(altered, STDOUT)

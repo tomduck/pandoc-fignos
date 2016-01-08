@@ -1,4 +1,9 @@
 
+pandoc-fignos 0.7
+
+    * Fix problems when --autolink_bare_uris is used (Issue #6.
+
+
 pandoc-fignos 0.6 (2016-01-01)
 
     * Flush stdout before exiting (Issue #5).
