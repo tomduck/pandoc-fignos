@@ -234,14 +234,13 @@ def replace_refs(key, value, fmt, meta):
     """Replaces references to labelled images."""
 
     # Remove braces around references
-    flag = False
     if key in ('Para', 'Plain'):
         if remove_braces(value):
             if key == 'Para':
                 return Para(value)
             else:
                 return Plain(value)
-    
+
     # Replace references
     if is_ref(key, value):
         prefix, label, suffix = parse_ref(value)
