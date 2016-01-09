@@ -1,4 +1,9 @@
 
+pandoc-fignos 0.7.1 (2016-01-09)
+
+    * Fixed corner-case problem in --autolink_bare_uris usage.
+
+
 pandoc-fignos 0.7 (2016-01-09)
 
     * Fixed problems when --autolink_bare_uris is used (Issue #6).
