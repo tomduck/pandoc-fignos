@@ -1,17 +1,9 @@
-Today's data are shown in Fig. 1, and yesterday's data are shown in Fig.
-2.
+Some data are shown in Fig. 1.
 
-![Figure 1. Today's $y=mx+b$ data.](img/today.png){#fig:today}
+![Figure 1. Some data.](img/plot1.png){#fig:data}
 
-![Figure 2. Yesterday's $y=mx+b$
-data.](img/yesterday.png){#fig:yesterday}
+![Figure 2. More data.](img/plot2.png){#fig:more}
 
-Earlier data are shown in Fig. 3:
+Figures 2a and 2b give more data.
 
-1.  Fig. 3a is for two days ago; and
-2.  Fig. 3b is for three days ago.
-
-![Figure 3. Data from a) two days ago, and b) three days
-ago.](img/earlier.png){#fig:earlier .wideimg}
-
-The curves in Figures 1--3 (1,2,3) have positive slopes.
+![Figure 3. Even more data.](img/plot3.png){#fig:}
