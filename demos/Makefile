@@ -28,9 +28,9 @@ restore: clean
 	git checkout out/demo.md
 	git checkout out/demo.pdf
 	git checkout out/demo.tex
-	git checkout out/img/earlier.png
-	git checkout out/img/today.png
-	git checkout out/img/yesterday.png
+	git checkout out/img/plot1.png
+	git checkout out/img/plot2.png
+	git checkout out/img/plot3.png
 
 
 .PHONY: clean
