@@ -2,7 +2,6 @@
 pandoc-fignos 0.7.x (2016-01-09)
 
     * Fixed problems when --autolink_bare_uris is used (Issue #6).
-    * Updated demo for testing purposes.
 
 
 pandoc-fignos 0.6 (2016-01-01)
