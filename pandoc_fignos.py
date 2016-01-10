@@ -153,20 +153,28 @@ def repair_broken_refs(value):
         if is_broken_ref(value[i]['t'], value[i]['c'],
                          value[i+1]['t'], value[i+1]['c']):
             flag = True  # Found broken reference
-            s1 = value[i]['c'][1][0]['c']  # Get the first half of the reference
-            s2 = value[i+1]['c']  # Get the second half of the reference
-            ref = '@fig' + s2[:s2.index('}')]  # Join the reference
-            # Replace the link with a citation
-            value[i] = Cite(
+            s1 = value[i]['c'][1][0]['c']  # Get the first half of the ref
+            s2 = value[i+1]['c']           # Get the second half of the ref
+            ref = '@fig' + s2[:s2.index('}')]  # Form the reference
+            prefix = s1[:s1.index('{@fig')]    # Get the prefix
+            suffix = s2[s2.index('}')+1:]      # Get the suffix
+            # We need to be careful with the prefix string because it might be
+            # part of another broken reference.  Simply put it back into the
+            # stream and repeat the preprocess() call.
+            if i > 0 and value[i-1]['t'] == 'Str':
+                value[i-1]['c'] = value[i-1]['c'] + prefix
+                value[i] = None
+            else:
+                value[i] = Str(prefix)
+            # Put fixed reference in as a citation that can be processed
+            value[i+1] = Cite(
                 [{"citationId":ref[1:],
-                  "citationPrefix":[Str(s1[:s1.index('{@fig')])],
-                  "citationSuffix":[Str(s2[s2.index('}')+1:])],
+                  "citationPrefix":[],
+                  "citationSuffix":[Str(suffix)],
                   "citationNoteNum":0,
                   "citationMode":{"t":"AuthorInText", "c":[]},
                   "citationHash":0}],
                 [Str(ref)])
-            # Delete the second half
-            value[i+1] = None
     if flag:
         return [v for v in value if v is not None]
 
@@ -191,12 +199,16 @@ def remove_braces(value):
 def preprocess(key, value, fmt, meta):
     """Preprocesses to correct for problems."""
     if key in ('Para', 'Plain'):
-        newval = repair_broken_refs(value)
-        if newval:
-            if key == 'Para':
-                return Para(newval)
+        while True:
+            newvalue = repair_broken_refs(value)
+            if newvalue:
+                value = newvalue
             else:
-                return Plain(newval)
+                break
+        if key == 'Para':
+            return Para(value)
+        else:
+            return Plain(value)
 
 # pylint: disable=unused-argument
 def replace_attrimages(key, value, fmt, meta):

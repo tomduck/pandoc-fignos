@@ -3,7 +3,7 @@
 **NOTICE:** Pandoc 1.16 introduces image attributes.  The new syntax does not allow a space between an image and its attributes.  If you are using pandoc 1.16, then please update your markdown accordingly.
 
 
-pandoc-fignos 0.7.1
+pandoc-fignos 0.7.2
 ===================
 
 *pandoc-fignos* is a [pandoc] filter for numbering figures and figure references in markdown documents.
