@@ -136,11 +136,13 @@ def ast(string):
 
 def is_broken_ref(key1, value1, key2, value2):
     """True if this is a broken link; False otherwise."""
-    try:     # Pandoc >= 1.16
-        return key1 == 'Link' and value1[1][0]['c'].endswith('{@eq') \
+    try:  # Pandoc >= 1.16
+        return key1 == 'Link' and value1[1][0]['t'] == 'Str' and \
+          value1[1][0]['c'].endswith('{@eq') \
             and key2 == 'Str' and '}' in value2
     except TypeError:  # Pandoc < 1.16
-        return key1 == 'Link' and value1[0][0]['c'].endswith('{@eq') \
+        return key1 == 'Link' and value1[0][0]['t'] == 'Str' and \
+          value1[0][0]['c'].endswith('{@eq') \
             and key2 == 'Str' and '}' in value2
 
 def repair_broken_refs(value):

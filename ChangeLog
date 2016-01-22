@@ -1,8 +1,13 @@
 
+pandoc-fignos 0.7.4 (2016-01-22)
+
+    * Fixed AttributeError bug that occurred for links
+      emphasized [*like this*](http://example.com/) (Issue #8).
+
+
 pandoc-fignos 0.7.3 (2016-01-13)
 
-    * Fixed TypeError bug that occurs with pandoc < 1.16.
-      This bug was inadvertently introduced with pandoc-fignos 0.7.2.
+    * Fixed TypeError bug that occurred with pandoc < 1.16.
 
 
 pandoc-fignos 0.7, 0.7.1 and 0.7.2 (2016-01-09)
