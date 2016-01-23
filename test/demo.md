@@ -1,16 +1,17 @@
 
-$$ y = f(x) $$ {#eq:1}
 
-$$ y = g(x) $$ {#eq:2}
+Figures @fig:plot1, @fig:plot2, {@fig:plot3}a and {@fig:plot3}b:
 
-Equations {@eq:1} and @eq:2, eqs. {@eq:1}-{@eq:3} and eqs. {@eq:1}-{@eq:2}-{@eq:3}.
+![Plot 1.](img/plot1.png){#fig:plot1.png}
+![Plot 2.](img/plot2.png){#fig:plot2.png}
+![Plot 3.](img/plot3.png){#fig:plot3.png}
 
-Equations and references in lists:
+Figure @fig:plot1 and Fig. {@fig:plot3}a.  Figures {@fig:plot1}--{@fig:plot3}, and Figs {@fig:plot1}--{@fig:plot2}--{@fig:plot3}.
 
-  * Equation 3:
-    $$ y = h(x) $$ {#eq:3}
-  * Equations {@eq:1} and @eq:2, eqs. {@eq:1}-{@eq:3} and 
-    eqs. {@eq:1}-{@eq:2}-{@eq:3}.
+References in lists:
+
+ 1. Figure @fig:plot1 and Fig. {@fig:plot3}a.
+ 2. Figures {@fig:plot1}--{@fig:plot3}, and Figs 
+    {@fig:plot1}--{@fig:plot2}--{@fig:plot3}.
 
 A [Regular link](http://example.com/), an [*italicized link*](http://example.com/) and an email.address@mailinator.com.
-
