@@ -3,6 +3,6 @@ include README.md
 include LICENSE
 include demos/Makefile
 include demos/demo.md
-include demos/img/today.png
-include demos/img/yesterday.png
-include demos/img/earlier.png
+include demos/img/plot1.png
+include demos/img/plot2.png
+include demos/img/plot3.png
