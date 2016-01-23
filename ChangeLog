@@ -1,6 +1,10 @@
 
+pandoc-fignos 0.7.6 (2016-01-23)
 
-pandoc-fignos 0.7.5.1 (2016-01-22)
+    * Fixed autolink_bare_uris processing that got accidentally broke.
+
+
+pandoc-fignos 0.7.5.1 (2016-01-23)
 
     * Fixed MANIFEST.in which listed wrong files.
 
