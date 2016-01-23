@@ -1,4 +1,10 @@
 
+
+pandoc-fignos 0.X (unreleased)
+
+    * Added regression tests.
+
+
 pandoc-fignos 0.7.6 (2016-01-23)
 
     * Fixed autolink_bare_uris processing that got accidentally broke.
