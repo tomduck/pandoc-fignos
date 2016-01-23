@@ -9,7 +9,7 @@ LONG_DESCRIPTION = """\
 pandoc-fignos is a pandoc filter for numbering figures and figure references.
 """
 
-VERSION = '0.7.4'
+VERSION = '0.7.5'
 
 setup(
     name='pandoc-fignos',

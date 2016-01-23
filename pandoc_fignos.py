@@ -159,7 +159,10 @@ def repair_broken_refs(value):
         if is_broken_ref(value[i]['t'], value[i]['c'],
                          value[i+1]['t'], value[i+1]['c']):
             flag = True  # Found broken reference
-            s1 = value[i]['c'][1][0]['c']  # Get the first half of the ref
+            try:  # Pandoc >= 1.16
+                s1 = value[i]['c'][1][0]['c']  # Get the first half of the ref
+            except TypeError:  # Pandoc < 1.16
+                s1 = value[i]['c'][0][0]['c']  # Get the first half of the ref
             s2 = value[i+1]['c']           # Get the second half of the ref
             ref = '@fig' + s2[:s2.index('}')]  # Form the reference
             prefix = s1[:s1.index('{@fig')]    # Get the prefix
