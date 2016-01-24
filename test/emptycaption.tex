@@ -1,0 +1,6 @@
+
+%% When using pipe chains I need to include the following code in the LaTeX header,
+%% or else pdflatex injects its own 'Figure 1.' text.  I am not sure why there should be
+%% a difference from the standard pandoc call.
+
+\usepackage[labelformat=empty]{caption}

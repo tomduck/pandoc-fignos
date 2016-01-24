@@ -1,10 +1,22 @@
 
+
+This file provides developer notes.
+
+
+Install Alternatives
+--------------------
+
 To install the most recent sources from github using pip:
 
     # pip install git+https://github.com/tomduck/pandoc-fignos.git
 
 (to upgrade use the --upgrade flag).
-    
+
+
+Testing
+-------
+
+Regression tests can be run by executing `Make` in test/.  Note that the `Makefile` expects that specific numbered pandoc targets (e.g., pandoc-1.16.0.2) are available.
 
 To test pandoc-fignos using a specific version of python:
 
@@ -16,7 +28,10 @@ To test pandoc-fignos using a specific version of python:
              pandoc -f json -o test.pdf
 
 
-Tagging a release:
+Preparing a Release
+-------------------
+    
+Tagging:
 
     $ git tag -a <tag> -m <message>
     $ git push origin <tag>
