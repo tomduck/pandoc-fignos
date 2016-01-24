@@ -68,6 +68,26 @@ else:    # No decoding; utf-8-encoded strings in means the same out
 # pylint: disable=invalid-name
 references = {}  # Global references tracker
 
+
+# The following code is expected to be needed in the near future, but is not
+# necessary to include now
+
+## # Get the pandoc version
+## import os, subprocess
+## try:
+##     import psutil  # Don't make this a dependency unless absolutely necessary
+##     command = psutil.Process(os.getpid()).parent().exe()
+## except ImportError:
+##     # Big assumption: That this is the name of the pandoc executable that
+##     # was called, and that we can call it from the shell.  This is probably
+##     # OK for most use cases.
+##     command = 'pandoc'
+## finally:
+##     output = subprocess.check_output([command, '-v'])
+##     line = output.decode('utf-8').split('\n')[0][7:].split('\n')
+##     PANDOCVERSION = line[0][7:] if line.startswith('pandoc') else None
+
+
 def is_attrimage(key, value):
     """True if this is an attributed image; False otherwise."""
 
