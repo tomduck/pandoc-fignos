@@ -16,4 +16,4 @@ References in lists:
  2. Figures {@fig:plot1}-{@fig:plot3}, and Figs. 
     {@fig:plot1}-{@fig:plot2}-{@fig:plot3}.
 
-A [Regular link](http://example.com/), an [*italicized link*](http://example.com/) and an email.address@mailinator.com.
+A [regular link](http://example.com/), an [*italicized link*](http://example.com/) and an email.address@mailinator.com.
