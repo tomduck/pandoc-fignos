@@ -129,12 +129,13 @@ owing to the ancient version of setuptools that Debian provides.  The command sh
 
 ### Installing from source ###
 
-You may also choose to install sources [downloaded from github].  Execute the following command as root in the top directory of your download:
+You may also choose to install sources [downloaded from github].  After installing the prerequisites ([pandocfilters] and [pandoc-attributes]) you may install pandoc-fignos by executing the following command as root in the top directory of your download:
 
     python setup.py install
 
 [downloaded from github]: https://github.com/tomduck/pandoc-fignos/archive/master.zip
-
+[pandocfilters]: https://github.com/jgm/pandocfilters
+[pandoc-attributes]: https://github.com/aaren/pandoc-attributes
 
 Getting Help
 ------------
