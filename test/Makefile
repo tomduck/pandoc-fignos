@@ -35,10 +35,6 @@ out/demo-1.15.pdf: demo.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.15) $< --filter pandoc-fignos $(FLAGS) -o $@
 
-out/demo-1.15-autolink.pdf: demo.md
-	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
-	$(PANDOC-1.15) $< --from markdown+autolink_bare_uris --filter pandoc-fignos $(FLAGS) -o $@
-
 out/demo-1.15-py2.7.pdf: demo.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.15) $< -t json | $(PYTHON-2.7) ../pandoc_fignos.py | $(PANDOC-1.15) -f json $(FLAGS) -H emptycaption.tex -o $@
@@ -46,6 +42,10 @@ out/demo-1.15-py2.7.pdf: demo.md
 out/demo-1.15-py3.4.pdf: demo.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.15) $< -t json | $(PYTHON-3.4) ../pandoc_fignos.py | $(PANDOC-1.15) -f json $(FLAGS) -H emptycaption.tex -o $@
+
+out/demo-1.15-autolink.pdf: demo.md
+	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
+	$(PANDOC-1.15) $< --from markdown+autolink_bare_uris --filter pandoc-fignos $(FLAGS) -o $@
 
 .PHONY: clean
 
