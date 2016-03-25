@@ -16,16 +16,22 @@ To install the most recent sources from github using pip:
 Testing
 -------
 
-Regression tests can be run by executing `Make` in test/.  Note that the `Makefile` expects that specific numbered pandoc targets (e.g., pandoc-1.16.0.2) are available.
-
 To test pandoc-fignos using a specific version of python:
 
-    a) Copy pandoc_fignos.py into the test directory;
+ a) Copy pandoc_fignos.py into the test directory;
 
-    b) Use a pipe chain on test.md as follows:
+ b) Apply a pipe chain to test.md as follows:
 
-       $ pandoc test.md -t json | python2.7 pandoc_fignos.py | \
+    ~~~~
+    $ pandoc test.md -t json | \
+             python2.7 pandoc_fignos.py --pandocversion=1.17.0.2 | \
              pandoc -f json -o test.pdf
+    ~~~
+
+    Be sure to supply the correct pandoc version to the pandoc-fignos filter.
+
+A suite of regression tests are provided in test/.  Read the README.md in that
+directory for instructions.
 
 
 Preparing a Release
