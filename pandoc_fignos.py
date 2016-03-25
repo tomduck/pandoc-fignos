@@ -37,6 +37,10 @@ import functools
 import itertools
 import io
 import sys
+import os, os.path
+import subprocess
+import psutil
+import getopt
 
 # pylint: disable=import-error
 import pandocfilters
@@ -44,15 +48,29 @@ from pandocfilters import stringify, walk
 from pandocfilters import RawInline, Str, Space, Para, Plain, Cite, elt
 from pandocattributes import PandocAttributes
 
+# Get the pandoc version.  Inspect the parent process first, then check the
+# python command line args.
+PANDOCVERSION = None
+# pylint: disable=invalid-name
+command = psutil.Process(os.getpid()).parent().exe()
+if os.path.basename(command).startswith('pandoc'):
+    output = subprocess.check_output([command, '-v'])
+    line = output.decode('utf-8').split('\n')[0]
+    PANDOCVERSION = line.split(' ')[-1]
+else:
+    optlist, args = getopt.getopt(sys.argv[1:], '', ['pandocversion='])
+    if optlist:
+        PANDOCVERSION = optlist[0][1]
+if PANDOCVERSION is None:
+    raise RuntimeError('Cannot determine pandoc version.  '\
+                       'Please file an issue at '\
+                       'https://github.com/tomduck/pandoc-fignos/issues')
+
 # Create our own pandoc image primitives to accommodate different pandoc
 # versions.
 # pylint: disable=invalid-name
 Image = elt('Image', 2)      # Pandoc < 1.16
 AttrImage = elt('Image', 3)  # Pandoc >= 1.16
-
-# Patterns for matching labels and references
-LABEL_PATTERN = re.compile(r'(fig:[\w/-]*)(.*)')
-REF_PATTERN = re.compile(r'@(fig:[\w/-]+)')
 
 # Detect python 3
 PY3 = sys.version_info > (3,)
@@ -65,28 +83,12 @@ else:    # No decoding; utf-8-encoded strings in means the same out
     STDIN = sys.stdin
     STDOUT = sys.stdout
 
+# Patterns for matching labels and references
+LABEL_PATTERN = re.compile(r'(fig:[\w/-]*)(.*)')
+REF_PATTERN = re.compile(r'@(fig:[\w/-]+)')
+
 # pylint: disable=invalid-name
 references = {}  # Global references tracker
-
-
-# The following code is expected to be needed in the near future, but is not
-# necessary to include now
-
-## # Get the pandoc version
-## import os, subprocess
-## try:
-##     import psutil  # Don't make this a dependency unless absolutely necessary
-##     command = psutil.Process(os.getpid()).parent().exe()
-## except ImportError:
-##     # Big assumption: That this is the name of the pandoc executable that
-##     # was called, and that we can call it from the shell.  This is probably
-##     # OK for most use cases.
-##     command = 'pandoc'
-## finally:
-##     output = subprocess.check_output([command, '-v'])
-##     line = output.decode('utf-8').split('\n')[0][7:].split('\n')
-##     PANDOCVERSION = line[0][7:] if line.startswith('pandoc') else None
-
 
 def is_attrimage(key, value):
     """True if this is an attributed image; False otherwise."""
@@ -269,6 +271,11 @@ def replace_attrimages(key, value, fmt, meta):
             img = Image(caption, target)
         else:  # New pandoc >= 1.16
             assert len(value[0]['c']) == 3
+            if PANDOCVERSION >= '1.17' and fmt == 'latex':
+                # Remove id from the image attributes.  It is incorrectly
+                # handled by pandoc's TeX writer for these versions
+                if attrs[0].startswith('fig:'):
+                    attrs[0] = ''
             img = AttrImage(attrs, caption, target)
 
         if fmt in ('html', 'html5'):

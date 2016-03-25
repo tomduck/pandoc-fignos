@@ -1,16 +1,16 @@
 
 
-**NOTICE:** Pandoc 1.16 introduces image attributes.  The new syntax does not allow a space between an image and its attributes.  If you are using pandoc 1.16, then please update your markdown accordingly.
+**NOTICE:** Pandoc has introduced changes that require this filter to detect your pandoc version.  If the detection fails, please [file an issue] so that we may fix it.
 
 
-pandoc-fignos 0.7.6
-===================
+pandoc-fignos 0.8
+=================
 
 *pandoc-fignos* is a [pandoc] filter for numbering figures and figure references in markdown documents.
 
 Demonstration: Processing [demo.md] with `pandoc --filter pandoc-fignos` gives numbered figures and references in [pdf], [tex], [html], [epub], [md] and other formats.
 
-This version of pandoc-fignos was tested using pandoc 1.16.0.2 and 1.15.2, and should be compatible with earlier pandoc versions.  It is known to work under linux, Mac OS X and Windows.
+This version of pandoc-fignos was tested using pandoc 1.17.0.2, 1.16.0.2 and 1.15.2, and should be compatible with earlier pandoc versions.  It is known to work under linux, Mac OS X and Windows.
 
 Installation of the filter is straight-forward, with minimal dependencies.  It is simple to use and has been tested extensively.
 
@@ -70,6 +70,8 @@ or
 Curly braces around a reference are stripped from the output.
 
 See [demo.md] for an example.
+
+NOTE: pandoc-fignos originally allowed a space between an image and its attributes.  This is no longer allowed owing to the introduction of image attributes in pandoc 1.16.
 
 
 Usage

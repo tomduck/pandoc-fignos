@@ -1,7 +1,8 @@
 
 
-pandoc-fignos 0.X (unreleased)
+pandoc-fignos 0.8 (2016-03-25)
 
+    * Updated to work with pandoc 1.17.
     * Added regression tests.
 
 
