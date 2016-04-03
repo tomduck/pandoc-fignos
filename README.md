@@ -3,8 +3,8 @@
 **NOTICE:** Pandoc has introduced changes that require this filter to detect your pandoc version.  If the detection fails, please [file an issue] so that we may fix it.
 
 
-pandoc-fignos 0.8
-=================
+pandoc-fignos 0.8.1
+===================
 
 *pandoc-fignos* is a [pandoc] filter for numbering figures and figure references in markdown documents.
 
