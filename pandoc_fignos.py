@@ -52,7 +52,13 @@ from pandocattributes import PandocAttributes
 # python command line args.
 PANDOCVERSION = None
 # pylint: disable=invalid-name
-command = psutil.Process(os.getpid()).parent().exe()
+if os.name == 'nt':
+    command = psutil.Process(os.getpid()).parent().parent().exe()
+else:
+    command = psutil.Process(os.getpid()).parent().exe()
+if 'fignos' in command:
+    raise RuntimeError('Could not find parent to pandoc-fignos. ' \
+                       'Please contact developers.')
 if os.path.basename(command).startswith('pandoc'):
     output = subprocess.check_output([command, '-v'])
     line = output.decode('utf-8').split('\n')[0]
