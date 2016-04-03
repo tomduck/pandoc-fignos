@@ -53,12 +53,13 @@ from pandocattributes import PandocAttributes
 PANDOCVERSION = None
 # pylint: disable=invalid-name
 if os.name == 'nt':
+    # psutil appears to work differently for windows.  Two parent calls?  Weird.
     command = psutil.Process(os.getpid()).parent().parent().exe()
 else:
     command = psutil.Process(os.getpid()).parent().exe()
-if 'fignos' in command:
+if 'fignos' in command:  # Infinite process creation if we call pandoc-fignos!
     raise RuntimeError('Could not find parent to pandoc-fignos. ' \
-                       'Please contact developers.')
+                       'Please contact developer.')
 if os.path.basename(command).startswith('pandoc'):
     output = subprocess.check_output([command, '-v'])
     line = output.decode('utf-8').split('\n')[0]
