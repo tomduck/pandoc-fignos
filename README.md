@@ -1,10 +1,6 @@
 
-
-**NOTICE:** Pandoc has introduced changes that require this filter to detect your pandoc version.  If the detection fails, please [file an issue] so that we may fix it.
-
-
-pandoc-fignos 0.8.1
-===================
+pandoc-fignos 0.9
+=================
 
 *pandoc-fignos* is a [pandoc] filter for numbering figures and figure references in markdown documents.
 
@@ -97,6 +93,9 @@ Installation
 
 Pandoc-fignos requires [python], a programming language that comes pre-installed on linux and Mac OS X, and which is easily installed [on Windows].  Either python 2.7 or 3.x will do.
 
+[python]: https://www.python.org/
+[on Windows]: https://www.python.org/downloads/windows/
+
 
 ### Standard installation ###
 
@@ -109,6 +108,8 @@ To upgrade to the most recent release, use
     pip install --upgrade pandoc-fignos 
 
 Pip is a script that downloads and installs modules from the Python Package Index, [PyPI].  It should come installed with your python distribution.
+
+[PyPI]: https://pypi.python.org/pypi
 
 
 ### Installing on linux ###
@@ -123,10 +124,6 @@ During the install you may be asked to run
     easy_install -U setuptools
 
 owing to the ancient version of setuptools that Debian provides.  The command should be executed as root.  The pip install process should now work.
-
-[python]: https://www.python.org/
-[on Windows]: https://www.python.org/downloads/windows/
-[PyPI]: https://pypi.python.org/pypi
 
 
 ### Installing from source ###
