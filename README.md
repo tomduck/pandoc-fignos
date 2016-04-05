@@ -128,7 +128,7 @@ owing to the ancient version of setuptools that Debian provides.  The command sh
 [standard installation]: #standard-installation
 
 
-### Windows ###
+### Installing on Windows ###
 
 It is easy to install python on Windows.  First, [download] the latest release.  Run the installer and complete the following steps:
 
