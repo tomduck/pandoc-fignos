@@ -132,12 +132,12 @@ owing to the ancient version of setuptools that Debian provides.  The command sh
 
 It is easy to install python on Windows.  First, [download] the latest release.  Run the installer and complete the following steps:
 
- 1. **Install Python pane:** Check "Add Python 3.5 to path" then
+ 1. Install Python pane: Check "Add Python 3.5 to path" then
     click "Customize installation".
 
- 2. **Optional Features pane:** Click "Next".
+ 2. Optional Features pane: Click "Next".
 
- 3. **Advanced Options pane:** Optionally check "Install for all
+ 3. Advanced Options pane: Optionally check "Install for all
     users" and customize the install location, then click "Install".
 
 Once python is installed, start the "Command Prompt" program.  Depending on where you installed python, you may need elevate your privileges by right-clicking the "Command Prompt" program and selecting "Run as administrator".  You may now follow the [standard installation] procedure given above.  Be sure to close the Command Prompt program when you have finished.
