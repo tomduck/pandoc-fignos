@@ -84,10 +84,10 @@ Note that any use of `--filter pandoc-citeproc` or `--bibliography=FILE` should 
 Customization
 -------------
 
-Pandoc-fignos may be customized by setting metadata variables in either the [metadata block] or on the command line (using `-M KEY=VAL`).  The following variables are currently supported:
+Pandoc-fignos may be customized by setting metadata variables in either the [metadata block] or on the command line (using `-M KEY=VAL`).  The following variables are supported:
 
   * `figure-title` - Sets the figure title at the beginning of each
-    figure caption.  Default: `Figure`
+    figure caption.
 
 [metadata block]: http://pandoc.org/README.html#extension-yaml_metadata_block
 
