@@ -1,6 +1,6 @@
 
-pandoc-fignos 0.9
-=================
+pandoc-fignos 0.10
+==================
 
 *pandoc-fignos* is a [pandoc] filter for numbering figures and figure references in markdown documents.
 
@@ -29,9 +29,10 @@ Contents
  1. [Rationale](#rationale)
  2. [Markdown Syntax](#markdown-syntax)
  3. [Usage](#usage)
- 4. [Details](#details)
- 5. [Installation](#installation)
- 6. [Getting Help](#getting-help)
+ 4. [Customization](#customization)
+ 5. [Details](#details)
+ 6. [Installation](#installation)
+ 7. [Getting Help](#getting-help)
 
 
 Rationale
@@ -78,6 +79,17 @@ To apply the filter, use the following option with pandoc:
     --filter pandoc-fignos
 
 Note that any use of `--filter pandoc-citeproc` or `--bibliography=FILE` should come *after* the pandoc-fignos filter call.
+
+
+Customization
+-------------
+
+Pandoc-fignos may be customized by setting metadata variables in either the [metadata block] or on the command line (using `-M KEY=VAL`).  The following variables are currently supported:
+
+  * `figure-title` - Sets the figure title at the beginning of each
+    figure caption.  Default: `Figure`
+
+[metadata block]: http://pandoc.org/README.html#extension-yaml_metadata_block
 
 
 Details

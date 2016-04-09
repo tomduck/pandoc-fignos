@@ -1,4 +1,6 @@
-
+---
+figure-title: Fig.
+...
 
 Figures @fig:plot1, @fig:plot2, {@fig:plot3}a and {@fig:plot3}b:
 

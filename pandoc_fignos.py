@@ -45,7 +45,8 @@ import getopt
 # pylint: disable=import-error
 import pandocfilters
 from pandocfilters import stringify, walk
-from pandocfilters import RawInline, Str, Space, Para, Plain, Cite, elt
+from pandocfilters import RawBlock, RawInline
+from pandocfilters import Str, Space, Para, Plain, Cite, elt
 from pandocattributes import PandocAttributes
 
 # Get the pandoc version.  Inspect the parent process first, then check the
@@ -96,6 +97,9 @@ REF_PATTERN = re.compile(r'@(fig:[\w/-]+)')
 
 # pylint: disable=invalid-name
 references = {}  # Global references tracker
+
+# Meta variables
+FIGURETITLE = None
 
 def is_attrimage(key, value):
     """True if this is an attributed image; False otherwise."""
@@ -268,7 +272,9 @@ def replace_attrimages(key, value, fmt, meta):
         if fmt == 'latex':
             caption = list(caption) + [RawInline('tex', r'\label{%s}'%label)]
         else:
-            caption = ast('Figure %d. '%references[label]) + list(caption)
+            figuretitle = 'Figure' if FIGURETITLE is None else FIGURETITLE
+            caption = ast('%s %d. '%(figuretitle, references[label])) + \
+              list(caption)
 
         # Required for pandoc to process the image
         target[1] = "fig:"
@@ -318,11 +324,22 @@ def replace_refs(key, value, fmt, meta):
 def main():
     """Filters the document AST."""
 
+    global FIGURETITLE
+
     # Get the output format, document and metadata
     fmt = sys.argv[1] if len(sys.argv) > 1 else ''
     doc = pandocfilters.json.loads(STDIN.read())
     meta = doc[0]['unMeta']
 
+    # Extract meta variables
+    FIGURETITLE = meta['figure-title']['c'][0]['c'] if 'figure-title' in meta \
+      else None
+
+    # For latex/pdf, inject command to change figuretitle
+    if fmt == 'latex' and FIGURETITLE:
+        tex = r'\renewcommand{\figurename}{%s}'%FIGURETITLE
+        doc[1] = [RawBlock('tex', tex)] + doc[1]
+      
     # Replace attributed images and references in the AST
     altered = functools.reduce(lambda x, action: walk(x, action, fmt, meta),
                                [preprocess, replace_attrimages, replace_refs],
