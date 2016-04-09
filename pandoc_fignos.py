@@ -99,7 +99,7 @@ REF_PATTERN = re.compile(r'@(fig:[\w/-]+)')
 references = {}  # Global references tracker
 
 # Meta variables
-FIGURETITLE = None
+FIGURENAME = None
 
 def is_attrimage(key, value):
     """True if this is an attributed image; False otherwise."""
@@ -272,8 +272,8 @@ def replace_attrimages(key, value, fmt, meta):
         if fmt == 'latex':
             caption = list(caption) + [RawInline('tex', r'\label{%s}'%label)]
         else:
-            figuretitle = 'Figure' if FIGURETITLE is None else FIGURETITLE
-            caption = ast('%s %d. '%(figuretitle, references[label])) + \
+            figurename = 'Figure' if FIGURENAME is None else FIGURENAME
+            caption = ast('%s %d. '%(figurename, references[label])) + \
               list(caption)
 
         # Required for pandoc to process the image
@@ -324,7 +324,7 @@ def replace_refs(key, value, fmt, meta):
 def main():
     """Filters the document AST."""
 
-    global FIGURETITLE
+    global FIGURENAME
 
     # Get the output format, document and metadata
     fmt = sys.argv[1] if len(sys.argv) > 1 else ''
@@ -332,16 +332,16 @@ def main():
     meta = doc[0]['unMeta']
 
     # Extract meta variables
-    if 'figure-title' in meta:
-        FIGURETITLE = meta['figure-title']['c']  # Works for cmdline vars
-        if type(FIGURETITLE) is list:  # For YAML vars
+    if 'figure-name' in meta:
+        FIGURENAME = meta['figure-name']['c']  # Works for cmdline vars
+        if type(FIGURENAME) is list:  # For YAML vars
             # Note: At this point I am expecting a single-word replacement.
             # This will need to be revisited if multiple words are needed.
-            FIGURETITLE = FIGURETITLE[0]['c']
+            FIGURENAME = FIGURENAME[0]['c']
 
-    # For latex/pdf, inject command to change figuretitle
-    if fmt == 'latex' and FIGURETITLE:
-        tex = r'\renewcommand{\figurename}{%s}'%FIGURETITLE
+    # For latex/pdf, inject command to change figurename
+    if fmt == 'latex' and FIGURENAME:
+        tex = r'\renewcommand{\figurename}{%s}'%FIGURENAME
         doc[1] = [RawBlock('tex', tex)] + doc[1]
       
     # Replace attributed images and references in the AST
