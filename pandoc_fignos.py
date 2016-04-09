@@ -332,8 +332,12 @@ def main():
     meta = doc[0]['unMeta']
 
     # Extract meta variables
-    FIGURETITLE = meta['figure-title']['c'][0]['c'] if 'figure-title' in meta \
-      else None
+    if 'figure-title' in meta:
+        FIGURETITLE = meta['figure-title']['c']  # Works for cmdline vars
+        if type(FIGURETITLE) is list:  # For YAML vars
+            # Note: At this point I am expecting a single-word replacement.
+            # This will need to be revisited if multiple words are needed.
+            FIGURETITLE = FIGURETITLE[0]['c']
 
     # For latex/pdf, inject command to change figuretitle
     if fmt == 'latex' and FIGURETITLE:
