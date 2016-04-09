@@ -86,8 +86,8 @@ Customization
 
 Pandoc-fignos may be customized by setting metadata variables in either the [metadata block] or on the command line (using `-M KEY=VAL`).  The following variables are supported:
 
-  * `figure-title` - Sets the figure title at the beginning of each
-    figure caption.
+  * `figure-name` - Sets the figure name given at the beginning of
+    each figure caption.
 
 [metadata block]: http://pandoc.org/README.html#extension-yaml_metadata_block
 
