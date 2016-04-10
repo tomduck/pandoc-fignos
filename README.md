@@ -157,6 +157,6 @@ Once python is installed, start the "Command Prompt" program.  Depending on wher
 Getting Help
 ------------
 
-If you have any difficulties with pandoc-fignos, please [file an issue] on github.
+If you have any difficulties with pandoc-fignos, or would like to see a new feature, please [file an issue] on github.
 
 [file an issue]: https://github.com/tomduck/pandoc-fignos/issues
