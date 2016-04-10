@@ -80,10 +80,6 @@ To apply the filter, use the following option with pandoc:
 
 Note that any use of `--filter pandoc-citeproc` or `--bibliography=FILE` should come *after* the pandoc-fignos filter call.
 
-
-Customization
--------------
-
 Pandoc-fignos may be customized by setting metadata variables in either the [metadata block] or on the command line (using `-M KEY=VAL`).  The following variables are supported:
 
   * `figure-name` - Sets the figure name given at the beginning of
@@ -97,7 +93,9 @@ Details
 
 For tex/pdf output, LaTeX's `\label` and `\ref` macros are used; for all others the numbers are hard-coded.
 
-Links are constructed for html and pdf output.
+Likewise, pandoc-fignos redefines LaTeX's `\figurename` command, and hard codes the figure name for the rest.
+
+Links are constructed for both html and pdf output.
 
 
 Installation
