@@ -149,7 +149,7 @@ It is easy to install python on Windows.  First, [download] the latest release. 
  3. Advanced Options pane: Optionally check "Install for all
     users" and customize the install location, then click "Install".
 
-Once python is installed, start the "Command Prompt" program.  Depending on where you installed python, you may need elevate your privileges by right-clicking the "Command Prompt" program and selecting "Run as administrator".  You may now follow the [standard installation] procedure given above.  Be sure to close the Command Prompt program when you have finished.
+Once python is installed, start the "Command Prompt" program.  Depending on where you installed python, you may need to elevate your privileges by right-clicking the "Command Prompt" program and selecting "Run as administrator".  You may now follow the [standard installation] procedure given above.  Be sure to close the Command Prompt program when you have finished.
 
 [download]: https://www.python.org/downloads/windows/
 
