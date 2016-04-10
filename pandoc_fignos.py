@@ -324,7 +324,7 @@ def replace_refs(key, value, fmt, meta):
 def main():
     """Filters the document AST."""
 
-    global FIGURENAME
+    global FIGURENAME  # pylint: disable=global-statement
 
     # Get the output format, document and metadata
     fmt = sys.argv[1] if len(sys.argv) > 1 else ''
@@ -343,7 +343,7 @@ def main():
     if fmt == 'latex' and FIGURENAME:
         tex = r'\renewcommand{\figurename}{%s}'%FIGURENAME
         doc[1] = [RawBlock('tex', tex)] + doc[1]
-      
+
     # Replace attributed images and references in the AST
     altered = functools.reduce(lambda x, action: walk(x, action, fmt, meta),
                                [preprocess, replace_attrimages, replace_refs],
