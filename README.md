@@ -29,10 +29,9 @@ Contents
  1. [Rationale](#rationale)
  2. [Markdown Syntax](#markdown-syntax)
  3. [Usage](#usage)
- 4. [Customization](#customization)
- 5. [Details](#details)
- 6. [Installation](#installation)
- 7. [Getting Help](#getting-help)
+ 4. [Details](#details)
+ 5. [Installation](#installation)
+ 6. [Getting Help](#getting-help)
 
 
 Rationale
