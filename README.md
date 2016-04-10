@@ -79,10 +79,10 @@ To apply the filter, use the following option with pandoc:
 
 Note that any use of `--filter pandoc-citeproc` or `--bibliography=FILE` should come *after* the pandoc-fignos filter call.
 
-Pandoc-fignos may be customized by setting metadata variables in either the [metadata block] or on the command line (using `-M KEY=VAL`).  The following variables are supported:
+Pandoc-fignos may be customized by setting variables in the [metadata block] or on the command line (using `-M KEY=VAL`).  The following variables are supported:
 
-  * `figure-name` - Set this to change "Figure" at the beginning of
-    a caption to something new (e.g., "Fig." or "图").
+  * `figure-name` - Changes "Figure" at the beginning of a caption
+     to a new word (e.g., "Fig." or "图").
 
 [metadata block]: http://pandoc.org/README.html#extension-yaml_metadata_block
 
