@@ -6,9 +6,9 @@ pandoc-fignos 0.10
 
 Demonstration: Processing [demo.md] with `pandoc --filter pandoc-fignos` gives numbered figures and references in [pdf], [tex], [html], [epub], [md] and other formats.
 
-This version of pandoc-fignos was tested using pandoc 1.17.0.2, 1.16.0.2 and 1.15.2.  It works under linux, Mac OS X and Windows.
+This version of pandoc-fignos was tested using pandoc 1.17.0.2, 1.16.0.2 and 1.15.2.  It works under linux, Mac OS X and Windows.  Older versions and other platforms can be supported on request.
 
-Installation of the filter is straight-forward.  It is simple to use and has been tested extensively.
+Installation of the filter is straight-forward.  It is simple to use and has been tested extensively.  I am pleased to receive bug reports and feature requests on the project's [Issues tracker].
 
 See also: [pandoc-eqnos], [pandoc-tablenos]
 
@@ -21,6 +21,7 @@ See also: [pandoc-eqnos], [pandoc-tablenos]
 [md]: https://github.com/tomduck/pandoc-fignos/blob/master/demos/out/demo.md
 [pandoc-eqnos]: https://github.com/tomduck/pandoc-eqnos 
 [pandoc-tablenos]: https://github.com/tomduck/pandoc-tablenos 
+[Issues tracker]: https://github.com/tomduck/pandoc-fignos/issues
 
 
 Contents
