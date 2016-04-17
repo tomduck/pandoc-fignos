@@ -1,4 +1,9 @@
 
+pandoc-fignos 0.11 (unreleased)
+
+    * Cleanup of attributes handling.
+
+
 pandoc-fignos 0.10 (2016-04-09)
 
     * Added figure-name customization (Issue #12).

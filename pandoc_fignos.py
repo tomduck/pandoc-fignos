@@ -23,7 +23,7 @@
 # The basic idea is to scan the AST two times in order to:
 #
 #   1. Insert text for the figure number in each figure caption.
-#      For LaTeX, insert \label{...} instead.  The figure labels
+#      For LaTeX, insert \label{...} instead.  The figure ids
 #      and associated figure numbers are stored in the global
 #      references tracker.
 #
@@ -91,8 +91,8 @@ else:    # No decoding; utf-8-encoded strings in means the same out
     STDIN = sys.stdin
     STDOUT = sys.stdout
 
-# Patterns for matching labels and references
-LABEL_PATTERN = re.compile(r'(fig:[\w/-]*)(.*)')
+# Patterns for matching ids and references
+LABEL_PATTERN = re.compile(r'(fig:[\w/-]*)')
 REF_PATTERN = re.compile(r'@(fig:[\w/-]+)')
 
 # pylint: disable=invalid-name
@@ -128,23 +128,19 @@ def parse_attrimage(value):
     """Parses an attributed image."""
 
     if len(value[0]['c']) == 2:  # Old pandoc < 1.16
-        attrs, (caption, target) = None, value[0]['c']
-        s = stringify(value[1:]).strip() # The attribute string
-        # Extract label from attributes (label, classes, kvs)
-        label = PandocAttributes(s, 'markdown').to_pandoc()[0]
-        if label == 'fig:': # Make up a unique description
-            label = label + '__'+str(hash(target[0]))+'__'
-        return attrs, caption, target, label
+        caption, target = value[0]['c']
+        attrs = PandocAttributes(stringify(value[1:]).strip(), 'markdown')
+        if attrs.id == 'fig:': # Make up a unique description
+            attrs.id = 'fig:' + '__'+str(hash(target[0]))+'__'
+        return attrs, caption, target
 
     else:  # New pandoc >= 1.16
         assert len(value[0]['c']) == 3
-        attrs, caption, target = value[0]['c']
-        s = stringify(value[1:]).strip() # The attribute string
-        # Extract label from attributes
-        label = attrs[0]
-        if label == 'fig:': # Make up a unique description
-            label = label + '__'+str(hash(target[0]))+'__'
-        return attrs, caption, target, label
+        s, caption, target = value[0]['c']
+        attrs = PandocAttributes(s, 'pandoc')
+        if attrs.id == 'fig:': # Make up a unique description
+            attrs.id = 'fig:' + '__'+str(hash(target[0]))+'__'
+        return attrs, caption, target
 
 def is_ref(key, value):
     """True if this is a figure reference; False otherwise."""
@@ -154,7 +150,7 @@ def is_ref(key, value):
 def parse_ref(value):
     """Parses a figure reference."""
     prefix = value[0][0]['citationPrefix']
-    label = REF_PATTERN.match(value[1][0]['c']).groups()[0]
+    label = REF_PATTERN.match(value[1][0]['c']).group(1)
     suffix = value[0][0]['citationSuffix']
     return prefix, label, suffix
 
@@ -181,7 +177,7 @@ def is_broken_ref(key1, value1, key2, value2):
 def repair_broken_refs(value):
     """Repairs references broken by pandoc's --autolink_bare_uris."""
 
-    # autolink_bare_uris splits {@fig:label} at the ':' and treats
+    # autolink_bare_uris splits {@fig:id} at the ':' and treats
     # the first half as if it is a mailto url and the second half as a string.
     # Let's replace this mess with Cite and Str elements that we normally
     # get.
@@ -259,21 +255,21 @@ def replace_attrimages(key, value, fmt, meta):
     if is_attrimage(key, value):
 
         # Parse the image
-        attrs, caption, target, label = parse_attrimage(value)
+        attrs, caption, target = parse_attrimage(value)
 
         # Bail out if the label does not conform
-        if not label or not LABEL_PATTERN.match(label):
+        if not attrs.id or not LABEL_PATTERN.match(attrs.id):
             return None
 
         # Save the reference
-        references[label] = len(references) + 1
+        references[attrs.id] = len(references) + 1
 
         # Adjust caption depending on the output format
         if fmt == 'latex':
-            caption = list(caption) + [RawInline('tex', r'\label{%s}'%label)]
+            caption = list(caption) + [RawInline('tex', r'\label{%s}'%attrs.id)]
         else:
             figurename = 'Figure' if FIGURENAME is None else FIGURENAME
-            caption = ast('%s %d. '%(figurename, references[label])) + \
+            caption = ast('%s %d. '%(figurename, references[attrs.id])) + \
               list(caption)
 
         # Required for pandoc to process the image
@@ -287,12 +283,12 @@ def replace_attrimages(key, value, fmt, meta):
             if PANDOCVERSION >= '1.17' and fmt == 'latex':
                 # Remove id from the image attributes.  It is incorrectly
                 # handled by pandoc's TeX writer for these versions
-                if attrs[0].startswith('fig:'):
-                    attrs[0] = ''
-            img = AttrImage(attrs, caption, target)
+                if attrs.id.startswith('fig:'):
+                    attrs.id = ''
+            img = AttrImage(attrs.to_pandoc(), caption, target)
 
         if fmt in ('html', 'html5'):
-            anchor = RawInline('html', '<a name="%s"></a>'%label)
+            anchor = RawInline('html', '<a name="%s"></a>'%attrs.id)
             return [Plain([anchor]), Para([img])]
         else:
             return Para([img])
