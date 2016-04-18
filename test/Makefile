@@ -10,23 +10,30 @@ PANDOC-1.15 = pandoc-$(v1.15)
 PYTHON-2.7 = python2.7
 PYTHON-3.4 = python3.4
 
-FLAGS = --variable geometry:margin=1in
+FLAGS = --variable geometry:margin=1in --standalone
 
-all: out/demo-1.17.pdf \
-     out/demo-1.17-py2.7.pdf \
-     out/demo-1.17-py3.4.pdf \
-     out/demo-1.17-autolink.pdf \
-     out/demo-1.16.pdf \
-     out/demo-1.16-py2.7.pdf \
-     out/demo-1.16-py3.4.pdf \
-     out/demo-1.16-autolink.pdf \
-     out/demo-1.15.pdf \
-     out/demo-1.15-py2.7.pdf \
-     out/demo-1.15-py3.4.pdf \
-     out/demo-1.15-autolink.pdf
+PDF = out/demo-1.17.pdf \
+      out/demo-1.17-py2.7.pdf \
+      out/demo-1.17-py3.4.pdf \
+      out/demo-1.17-autolink.pdf \
+      out/demo-1.16.pdf \
+      out/demo-1.16-py2.7.pdf \
+      out/demo-1.16-py3.4.pdf \
+      out/demo-1.16-autolink.pdf \
+      out/demo-1.15.pdf \
+      out/demo-1.15-py2.7.pdf \
+      out/demo-1.15-py3.4.pdf \
+      out/demo-1.15-autolink.pdf
 
+HTML = out/demo-1.17.html \
+       out/demo-1.16.html \
+       out/demo-1.15.html
 
-out/demo-1.17.pdf: demo.md
+IMG = out/img/plot1.png out/img/plot2.png out/img/plot3.png 
+
+all: $(PDF) $(HTML) $(IMG)
+
+out/demo-1.17.%: demo.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.17) $< --filter pandoc-fignos $(FLAGS) -o $@
 
@@ -44,7 +51,7 @@ out/demo-1.17-autolink.pdf: demo.md
 
 
 
-out/demo-1.16.pdf: demo.md
+out/demo-1.16.%: demo.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.16) $< --filter pandoc-fignos $(FLAGS) -o $@
 
@@ -62,7 +69,7 @@ out/demo-1.16-autolink.pdf: demo.md
 
 
 
-out/demo-1.15.pdf: demo.md
+out/demo-1.15.%: demo.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.15) $< --filter pandoc-fignos $(FLAGS) -o $@
 
@@ -77,6 +84,11 @@ out/demo-1.15-py3.4.pdf: demo.md
 out/demo-1.15-autolink.pdf: demo.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.15) $< --from markdown+autolink_bare_uris --filter pandoc-fignos $(FLAGS) -o $@
+
+
+out/img/plot%.png: img/plot%.png
+	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
+	cp $< $@
 
 
 

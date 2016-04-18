@@ -19,3 +19,50 @@ References in lists:
     {@fig:plot1}-{@fig:plot2}-{@fig:plot3}.
 
 A [regular link](http://example.com/), an [*italicized link*](http://example.com/) and an email.address@mailinator.com.
+
+
+\newpage
+
+
+---------------------------------------------------------------------
+
+Corner cases
+------------
+
+Figure:
+
+![Unnumbered and unattributed.](img/plot3.png)
+
+****
+
+Figure:
+
+![Unnumbered and attributed (small).](img/plot3.png){#baz width="50px"}
+
+****
+
+Figure {@fig:c1}:
+
+![Numbered and attributed (small).](img/plot3.png){#fig:c1 width="50px"} 
+
+
+\newpage
+
+
+****
+
+Figure {@fig:c2}:
+
+![Numbered and attributed (small) with breaking space after markdown.](img/plot3.png){#fig:c2 width="50px"} 
+
+****
+
+Image (non-breaking space after markdown), unattributed:
+
+![Caption should not show.](img/plot3.png)\ 
+
+****
+
+Image (non-breaking space after markdown), attributed (small):
+
+![Caption should not show.](img/plot3.png){#fig: width="50px"}\ 
