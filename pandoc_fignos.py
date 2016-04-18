@@ -40,7 +40,7 @@ import sys
 import os, os.path
 import subprocess
 import psutil
-import getopt
+import argparse
 
 # pylint: disable=import-error
 import pandocfilters
@@ -48,6 +48,13 @@ from pandocfilters import stringify, walk
 from pandocfilters import RawBlock, RawInline
 from pandocfilters import Str, Space, Para, Plain, Cite, elt
 from pandocattributes import PandocAttributes
+
+
+# Read the command-line arguments
+parser = argparse.ArgumentParser(description='Pandoc figure numbers filter.')
+parser.add_argument('fmt')
+parser.add_argument('--pandocversion', help='The pandoc version.')
+args = parser.parse_args()
 
 # Get the pandoc version.  Inspect the parent process first, then check the
 # python command line args.
@@ -66,16 +73,14 @@ if os.path.basename(command).startswith('pandoc'):
     line = output.decode('utf-8').split('\n')[0]
     PANDOCVERSION = line.split(' ')[-1]
 else:
-    optlist, args = getopt.getopt(sys.argv[1:], '', ['pandocversion='])
-    if optlist:
-        PANDOCVERSION = optlist[0][1]
+    if args.pandocversion:
+        PANDOCVERSION = args.pandocversion
 if PANDOCVERSION is None:
     raise RuntimeError('Cannot determine pandoc version.  '\
                        'Please file an issue at '\
                        'https://github.com/tomduck/pandoc-fignos/issues')
 
-# Create our own pandoc image primitives to accommodate different pandoc
-# versions.  But always use AttrImage internally.
+# Create our own pandoc image primitives
 # pylint: disable=invalid-name
 Image = elt('Image', 2)      # Pandoc < 1.16
 AttrImage = elt('Image', 3)  # Pandoc >= 1.16
@@ -213,7 +218,6 @@ def remove_braces_from_figrefs(value):
         if is_braced_figref(i, value):
             flag = True  # Found reference
             value[i-1]['c'] = value[i-1]['c'][:-1]  # Remove the braces
-
             value[i+1]['c'] = value[i+1]['c'][1:]
     return flag
 
@@ -346,7 +350,7 @@ def main():
     global figurename  # pylint: disable=global-statement
 
     # Get the output format, document and metadata
-    fmt = sys.argv[1] if len(sys.argv) > 1 else ''
+    fmt = args.fmt
     doc = pandocfilters.json.loads(STDIN.read())
     meta = doc[0]['unMeta']
 
