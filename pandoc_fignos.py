@@ -32,6 +32,8 @@
 #
 # There is also an initial scan to do some preprocessing.
 
+# pylint: disable=invalid-name
+
 import re
 import functools
 import itertools
@@ -49,7 +51,6 @@ from pandocfilters import RawBlock, RawInline
 from pandocfilters import Str, Space, Para, Plain, Cite, elt
 from pandocattributes import PandocAttributes
 
-
 # Read the command-line arguments
 parser = argparse.ArgumentParser(description='Pandoc figure numbers filter.')
 parser.add_argument('fmt')
@@ -59,7 +60,6 @@ args = parser.parse_args()
 # Get the pandoc version.  Inspect the parent process first, then check the
 # python command line args.
 PANDOCVERSION = None
-# pylint: disable=invalid-name
 if os.name == 'nt':
     # psutil appears to work differently for windows.  Two parent calls?  Weird.
     command = psutil.Process(os.getpid()).parent().parent().exe()
@@ -81,7 +81,6 @@ if PANDOCVERSION is None:
                        'https://github.com/tomduck/pandoc-fignos/issues')
 
 # Create our own pandoc image primitives
-# pylint: disable=invalid-name
 Image = elt('Image', 2)      # Pandoc < 1.16
 AttrImage = elt('Image', 3)  # Pandoc >= 1.16
 
@@ -100,7 +99,6 @@ else:    # No decoding; utf-8-encoded strings in means the same out
 LABEL_PATTERN = re.compile(r'(fig:[\w/-]*)')
 REF_PATTERN = re.compile(r'@(fig:[\w/-]+)')
 
-# pylint: disable=invalid-name
 references = {}  # Global references tracker
 
 # Meta variables
