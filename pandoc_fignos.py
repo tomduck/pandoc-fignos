@@ -57,8 +57,8 @@ parser.add_argument('fmt')
 parser.add_argument('--pandocversion', help='The pandoc version.')
 args = parser.parse_args()
 
-# Get the pandoc version.  Inspect the parent process first, then check the
-# python command line args.
+# Get the pandoc version.  Check the command-line args first, then inspect the
+# parent process.  As a last resort, make a bare call to pandoc.
 PANDOCVERSION = None
 if args.pandocversion:
     PANDOCVERSION = args.pandocversion
@@ -74,8 +74,7 @@ else:
         # Call whatever pandoc is available and hope for the best
         command = 'pandoc'
     if 'fignos' in command:  # Infinite process creation!
-        raise RuntimeError('Could not find parent to pandoc-fignos. ' \
-                           'Please contact developer.')
+        command = 'pandoc'  # Hope for the best here too
     if os.path.basename(command).startswith('pandoc'):
         output = subprocess.check_output([command, '-v'])
         line = output.decode('utf-8').split('\n')[0]
