@@ -60,26 +60,26 @@ args = parser.parse_args()
 # Get the pandoc version.  Inspect the parent process first, then check the
 # python command line args.
 PANDOCVERSION = None
-try:
-    if os.name == 'nt':
-        # psutil appears to work differently for windows.  Two parent calls?
-        # Weird.
-        command = psutil.Process(os.getpid()).parent().parent().exe()
-    else:
-        command = psutil.Process(os.getpid()).parent().exe()
-except:  # pylint: disable=bare-except
-    # Call whatever pandoc is available and hope for the best
-    command = 'pandoc'
-if 'fignos' in command:  # Infinite process creation if we call pandoc-fignos!
-    raise RuntimeError('Could not find parent to pandoc-fignos. ' \
-                       'Please contact developer.')
-if os.path.basename(command).startswith('pandoc'):
-    output = subprocess.check_output([command, '-v'])
-    line = output.decode('utf-8').split('\n')[0]
-    PANDOCVERSION = line.split(' ')[-1]
+if args.pandocversion:
+    PANDOCVERSION = args.pandocversion
 else:
-    if args.pandocversion:
-        PANDOCVERSION = args.pandocversion
+    try:  # Get the information from the parent process, if we can
+        if os.name == 'nt':
+            # psutil appears to work differently for windows.  Two parent calls?
+            # Weird.
+            command = psutil.Process(os.getpid()).parent().parent().exe()
+        else:
+            command = psutil.Process(os.getpid()).parent().exe()
+    except:  # pylint: disable=bare-except
+        # Call whatever pandoc is available and hope for the best
+        command = 'pandoc'
+    if 'fignos' in command:  # Infinite process creation!
+        raise RuntimeError('Could not find parent to pandoc-fignos. ' \
+                           'Please contact developer.')
+    if os.path.basename(command).startswith('pandoc'):
+        output = subprocess.check_output([command, '-v'])
+        line = output.decode('utf-8').split('\n')[0]
+        PANDOCVERSION = line.split(' ')[-1]
 if PANDOCVERSION is None:
     raise RuntimeError('Cannot determine pandoc version.  '\
                        'Please file an issue at '\
