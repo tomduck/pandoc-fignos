@@ -12,26 +12,26 @@ PYTHON-3.4 = python3.4
 
 FLAGS = --variable geometry:margin=1in --standalone
 
-PDF = out/demo-1.17.pdf \
-      out/demo-1.17-py2.7.pdf \
-      out/demo-1.17-py3.4.pdf \
-      out/demo-1.17-autolink.pdf \
-      out/demo-1.16.pdf \
-      out/demo-1.16-py2.7.pdf \
-      out/demo-1.16-py3.4.pdf \
-      out/demo-1.16-autolink.pdf \
-      out/demo-1.15.pdf \
-      out/demo-1.15-py2.7.pdf \
-      out/demo-1.15-py3.4.pdf \
-      out/demo-1.15-autolink.pdf
+all: pdf html img
 
-HTML = out/demo-1.17.html \
-       out/demo-1.16.html \
-       out/demo-1.15.html
+pdf: out/demo-1.17.pdf \
+     out/demo-1.17-py2.7.pdf \
+     out/demo-1.17-py3.4.pdf \
+     out/demo-1.17-autolink.pdf \
+     out/demo-1.16.pdf \
+     out/demo-1.16-py2.7.pdf \
+     out/demo-1.16-py3.4.pdf \
+     out/demo-1.16-autolink.pdf \
+     out/demo-1.15.pdf \
+     out/demo-1.15-py2.7.pdf \
+     out/demo-1.15-py3.4.pdf \
+     out/demo-1.15-autolink.pdf
 
-IMG = out/img/plot1.png out/img/plot2.png out/img/plot3.png 
+html: out/demo-1.17.html \
+      out/demo-1.16.html \
+      out/demo-1.15.html
 
-all: $(PDF) $(HTML) $(IMG)
+img: out/img/plot1.png out/img/plot2.png out/img/plot3.png 
 
 out/demo-1.17.%: demo.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
