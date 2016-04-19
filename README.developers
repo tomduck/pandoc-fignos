@@ -24,7 +24,7 @@ To test pandoc-fignos using a specific version of python:
 
     ~~~~
     $ pandoc test.md -t json | \
-             python2.7 pandoc_fignos.py --pandocversion=1.17.0.2 | \
+             python2.7 pandoc_fignos.py latex --pandocversion=1.17.0.2 | \
              pandoc -f json -o test.pdf
     ~~~
 
