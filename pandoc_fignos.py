@@ -198,7 +198,7 @@ def repair_broken_refs(value):
                   "citationHash":0}],
                 [Str(ref)])
     if flag:
-        return [v for v in value if v is not None]
+        return [v for v in value if not v is None]
 
 def is_braced_figref(i, value):
     """Returns true if a reference is braced; otherwise False.
@@ -234,6 +234,24 @@ def preprocess(key, value, fmt, meta):
         else:
             return Plain(value)
 
+def deQuoted(value):
+    """Replaces Quoted elements that stringify() can't handle."""
+    # pandocfilters.stringify() needs to be updated...
+
+    # The weird thing about this is that chained filters do not see this
+    # element.  Pandoc gives different json depending on whether or it is
+    # calling the filter directly.  This should not be happening.
+    newvalue = []
+    for v in value:
+        if v['t'] != 'Quoted':
+            newvalue.append(v)
+        else:
+            quote = '"' if v['c'][0]['t'] == 'DoubleQuote' else "'"
+            newvalue.append(Str(quote))
+            newvalue += v['c'][1]
+            newvalue.append(Str(quote))
+    return newvalue
+
 def get_attrs(value, n):
     """Extracts attributes from a list of values.
     Extracted elements are set to None in the list.
@@ -249,7 +267,7 @@ def get_attrs(value, n):
     if value[n:] and value[n]['t'] == 'Str' and value[n]['c'].startswith('{'):
         for i, v in enumerate(value[n:]):
             if v['t'] == 'Str' and v['c'].strip().endswith('}'):
-                s = stringify(value[n:n+i+1])    # Extract the attrs
+                s = stringify(deQuoted(value[n:n+i+1]))  # Extract the attrs
                 value[n:n+i] = [None]*i          # Remove extracted elements
                 endspaces = s[len(s.rstrip()):]  # Check for spaces after attrs
                 value[n+i] = Str(endspaces) if len(endspaces) else None
@@ -271,7 +289,7 @@ def replace_attrimages(key, value, fmt, meta):
                     attrs = get_attrs(value, i)
                     if attrs:
                         value[i] = AttrImage(attrs.to_pandoc(), *v['c'])
-                        value = [v for v in value if v is not None]
+                        value = [v for v in value if not v is  None]
                         flag = True
 
             # If the only element of this paragraph is an image, then mark the
