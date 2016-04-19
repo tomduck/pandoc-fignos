@@ -60,11 +60,16 @@ args = parser.parse_args()
 # Get the pandoc version.  Inspect the parent process first, then check the
 # python command line args.
 PANDOCVERSION = None
-if os.name == 'nt':
-    # psutil appears to work differently for windows.  Two parent calls?  Weird.
-    command = psutil.Process(os.getpid()).parent().parent().exe()
-else:
-    command = psutil.Process(os.getpid()).parent().exe()
+try:
+    if os.name == 'nt':
+        # psutil appears to work differently for windows.  Two parent calls?
+        # Weird.
+        command = psutil.Process(os.getpid()).parent().parent().exe()
+    else:
+        command = psutil.Process(os.getpid()).parent().exe()
+except:  # pylint: disable=bare-except
+    # Call whatever pandoc is available and hope for the best
+    command = 'pandoc'
 if 'fignos' in command:  # Infinite process creation if we call pandoc-fignos!
     raise RuntimeError('Could not find parent to pandoc-fignos. ' \
                        'Please contact developer.')
