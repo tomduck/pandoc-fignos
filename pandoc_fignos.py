@@ -241,6 +241,9 @@ def get_attrs(value, n):
     """
     # Note: Pandoc does not allow for there to be a space between the image
     # and its attributes.
+
+    # Fix me: This currently does not allow curly braces inside quoted
+    # attributes.  The close bracket is interpreted as the end of the attrs.
     assert value[n]['t'] == 'Image'
     n += 1  # n is now the index where attributes should start
     if value[n:] and value[n]['t'] == 'Str' and value[n]['c'].startswith('{'):
