@@ -293,11 +293,11 @@ def replace_attrimages(key, value, fmt, meta):
                     attrs = get_attrs(value, i)
                     if attrs:
                         value[i] = AttrImage(attrs.to_pandoc(), *v['c'])
-                        value = [v for v in value if not v is  None]
                         flag = True
 
             # If the only element of this paragraph is an image, then mark the
             # image as a figure.
+            value = [v for v in value if not v is  None]
             if flag and len(value) == 1:
                 attrs, caption, target = parse_attrimage(value[0]['c'])
                 target[1] = 'fig:'  # Pandoc uses this as a figure marker

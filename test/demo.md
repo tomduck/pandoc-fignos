@@ -24,8 +24,6 @@ A [regular link](http://example.com/), an [*italicized link*](http://example.com
 \newpage
 
 
----------------------------------------------------------------------
-
 Corner cases
 ------------
 
@@ -41,9 +39,7 @@ Figure:
 
 ****
 
-
 \newpage
-
 
 Figure {@fig:c1}:
 
@@ -69,3 +65,12 @@ Image (non-breaking space after markdown), unattributed:
 Image (non-breaking space after markdown), attributed (small):
 
 ![Caption should not show.](img/plot3.png){#fig: width="50px"}\ 
+
+****
+
+\newpage
+
+Inline image with attributes
+![Caption should not show.](img/plot3.png){#fig: width="50px"}
+and another without
+![Caption should not show.](img/plot3.png)
