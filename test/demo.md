@@ -41,12 +41,13 @@ Figure:
 
 ****
 
+
+\newpage
+
+
 Figure {@fig:c1}:
 
 ![Numbered and attributed (small).](img/plot3.png){#fig:c1 width="50px"} 
-
-
-\newpage
 
 
 ****
@@ -56,6 +57,8 @@ Figure {@fig:c2}:
 ![Numbered and attributed (small) with breaking space after markdown.](img/plot3.png){#fig:c2 width="50px"} 
 
 ****
+
+\newpage
 
 Image (non-breaking space after markdown), unattributed:
 
