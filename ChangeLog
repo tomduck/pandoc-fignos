@@ -1,5 +1,5 @@
 
-pandoc-fignos 0.11 (unreleased)
+pandoc-fignos 0.11 (2016-04-19)
 
     * Bug fix to allow for attributed (non-figure) images.
     * Better pandoc version detection.
