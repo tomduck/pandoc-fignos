@@ -106,7 +106,7 @@ Pandoc-fignos requires [python], a programming language that comes pre-installed
 [python]: https://www.python.org/
 
 
-### Standard installation ###
+#### Standard installation ####
 
 Install pandoc-fignos as root using the shell command
 
@@ -121,7 +121,7 @@ Pip is a script that downloads and installs modules from the Python Package Inde
 [PyPI]: https://pypi.python.org/pypi
 
 
-### Installing on linux ###
+#### Installing on linux ####
 
 If you are running linux, pip may be packaged separately from python.  On Debian-based systems (including Ubuntu), you can install pip as root using
 
@@ -137,7 +137,7 @@ owing to the ancient version of setuptools that Debian provides.  The command sh
 [standard installation]: #standard-installation
 
 
-### Installing on Windows ###
+#### Installing on Windows ####
 
 It is easy to install python on Windows.  First, [download] the latest release.  Run the installer and complete the following steps:
 
