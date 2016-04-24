@@ -91,11 +91,17 @@ AttrImage = elt('Image', 3)  # Pandoc >= 1.16
 # Detect python 3
 PY3 = sys.version_info > (3,)
 
-# Pandoc uses UTF-8 for both input and output; so must we
-if PY3:  # Force utf-8 decoding (decoding of input streams is automatic in py3)
+# Pandoc uses UTF-8 for both input and output; so must we.
+if PY3:
+    # Py3 strings are unicode: https://docs.python.org/3.5/howto/unicode.html.
+    # Character encoding/decoding is performed automatically at stream
+    # interfaces: https://stackoverflow.com/questions/16549332/.
+    # Set it to UTF-8 for all streams.
     STDIN = io.TextIOWrapper(sys.stdin.buffer, 'utf-8', 'strict')
     STDOUT = io.TextIOWrapper(sys.stdout.buffer, 'utf-8', 'strict')
-else:    # No decoding; utf-8-encoded strings in means the same out
+else:
+    # Py2 strings are ASCII bytes.  Encoding/decoding is handled separately.
+    # See: https://docs.python.org/2/howto/unicode.html.
     STDIN = sys.stdin
     STDOUT = sys.stdout
 
