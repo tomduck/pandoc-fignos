@@ -56,7 +56,7 @@ To number a figure, add the label `fig:id` to its attributes:
 
 The prefix `#fig:` is required. `id` should be replaced with a unique identifier composed of letters, numbers, dashes, slashes and underscores.
 
-Alternatively, you can use attributed reference links as follows:
+Alternatively, you can use attributed links:
 
     ![Caption.][reflink]
 
