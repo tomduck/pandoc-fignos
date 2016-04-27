@@ -25,19 +25,28 @@ A [regular link](http://example.com/), an [*italicized link*](http://example.com
 
 \newpage
 
+****
 
 Corner cases
 ------------
 
+Note: Attributed images are supported by pandoc >= 1.16.  Using the attribute `width="50px"` with earlier versions has no effect.
+
+****
+
 Figure:
 
 ![Unnumbered and unattributed.](img/plot3.png)
+
+*[Issue #15](https://github.com/tomduck/pandoc-fignos/issues/15): pdf output has numbers.*
 
 ****
 
 Figure:
 
 ![Unnumbered and attributed (small).](img/plot3.png){#baz width="50px"}
+
+*[Issue #15](https://github.com/tomduck/pandoc-fignos/issues/15): pdf output has numbers.*
 
 ***
 
@@ -79,7 +88,7 @@ Image (non-breaking space after markdown), attributed (small):
 
 \newpage
 
-Inline image with attributes
+Inline image with attributes (small)
 ![Caption should not show.](img/plot3.png){#fig: width="50px"}
 and another without
 ![Caption should not show.](img/plot3.png)
