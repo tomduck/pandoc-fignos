@@ -39,20 +39,27 @@ Figure:
 
 ![Unnumbered and attributed (small).](img/plot3.png){#baz width="50px"}
 
-****
+***
 
 \newpage
 
 Figure {@fig:c1}:
 
-![Numbered and attributed (small).](img/plot3.png){#fig:c1 width="50px"} 
-
+![Numbered and attributed (small).](img/plot3.png){#fig:c1 width="50px"}
 
 ****
 
 Figure {@fig:c2}:
 
-![Numbered and attributed (small) with breaking space after markdown.](img/plot3.png){#fig:c2 width="50px"} 
+![Numbered and link-attributed (small).][link-c2]
+
+[link-c2]: img/plot3.png {#fig:c2 width="50px"}
+
+****
+
+Figure {@fig:c3}:
+
+![Numbered and attributed (small) with breaking space after markdown.](img/plot3.png){#fig:c3 width="50px"} 
 
 ****
 
