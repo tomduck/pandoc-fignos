@@ -1,5 +1,5 @@
 
-pandoc-fignos 0.11
+pandoc-fignos 0.12
 ==================
 
 *pandoc-fignos* is a [pandoc] filter for numbering figures and figure references in markdown documents.
@@ -55,6 +55,12 @@ To number a figure, add the label `fig:id` to its attributes:
     ![Caption.](image.png){#fig:id}
 
 The prefix `#fig:` is required. `id` should be replaced with a unique identifier composed of letters, numbers, dashes, slashes and underscores.
+
+Alternatively, you can use attributed reference links as follows:
+
+    ![Caption.][reflink]
+
+    [reflink]: image.png {#fig:id}
 
 To reference the figure, use
 

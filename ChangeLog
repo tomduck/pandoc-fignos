@@ -1,4 +1,9 @@
 
+pandoc-fignos 0.12 (2016-04-27)
+
+    * Support reference links for pandoc < 1.16 (Issue #14).
+
+
 pandoc-fignos 0.11 (2016-04-19)
 
     * Bug fix to allow for attributed (non-figure) images.

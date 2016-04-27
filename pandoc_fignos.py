@@ -105,6 +105,13 @@ else:
     STDIN = sys.stdin
     STDOUT = sys.stdout
 
+# Url-encoded strings are handled in different packages in python 2 and 3
+# pylint: disable=no-name-in-module
+if PY3:
+    from urllib.request import unquote
+else:
+    from urllib import unquote
+
 # Patterns for matching labels and references
 LABEL_PATTERN = re.compile(r'(fig:[\w/-]*)')
 REF_PATTERN = re.compile(r'@(fig:[\w/-]+)')
@@ -273,7 +280,9 @@ def get_attrs(value, n):
     # Fix me: This currently does not allow curly braces inside quoted
     # attributes.  The close bracket is interpreted as the end of the attrs.
     assert value[n]['t'] == 'Image'
+    image = value[n]
     n += 1  # n is now the index where attributes should start
+    flag = False  # Flag when attributes are found
     if value[n:] and value[n]['t'] == 'Str' and value[n]['c'].startswith('{'):
         for i, v in enumerate(value[n:]):
             if v['t'] == 'Str' and v['c'].strip().endswith('}'):
@@ -281,7 +290,20 @@ def get_attrs(value, n):
                 value[n:n+i] = [None]*i          # Remove extracted elements
                 endspaces = s[len(s.rstrip()):]  # Check for spaces after attrs
                 value[n+i] = Str(endspaces) if len(endspaces) else None
+                flag = True
                 return PandocAttributes(s.strip(), 'markdown')
+    if not flag and PANDOCVERSION < '1.16':
+        # Look for attributes attached to image path, as occurs with
+        # reference links.  Remove the encoding.
+        try:
+            seq = unquote(image['c'][1][0]).split()
+            path, s = seq[0], ' '.join(seq[1:])
+        except ValueError:
+            pass
+        else:
+            image['c'][1][0] = path  # Remove the attribute string from the path
+            return PandocAttributes(s.strip(), 'markdown')
+
 
 # pylint: disable=unused-argument, too-many-branches
 def replace_attrimages(key, value, fmt, meta):
