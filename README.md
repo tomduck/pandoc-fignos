@@ -58,9 +58,9 @@ The prefix `#fig:` is required. `id` should be replaced with a unique identifier
 
 Alternatively, you can use attributed links:
 
-    ![Caption.][reflink]
+    ![Caption.][link]
 
-    [reflink]: image.png {#fig:id}
+    [link]: image.png {#fig:id}
 
 To reference the figure, use
 
