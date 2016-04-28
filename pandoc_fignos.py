@@ -225,7 +225,7 @@ def repair_broken_refs(value):
     if flag:
         return [v for v in value if not v is None]
 
-def is_braced_figref(i, value):
+def is_braced_figref(value, i):
     """Returns true if a reference is braced; otherwise False.
     i is the index in the value list.
     """
@@ -238,7 +238,7 @@ def remove_braces_from_figrefs(value):
     """Search for figure references and remove curly braces around them."""
     flag = False
     for i in range(len(value)-1)[1:]:
-        if is_braced_figref(i, value):
+        if is_braced_figref(value, i):
             flag = True  # Found reference
             value[i-1]['c'] = value[i-1]['c'][:-1]  # Remove the braces
             value[i+1]['c'] = value[i+1]['c'][1:]
@@ -283,12 +283,15 @@ def get_attrs(value, n):
     n is the index where the attributes start.
     """
     if value[n:] and value[n]['t'] == 'Str' and value[n]['c'].startswith('{'):
+
         depth = 0  # The bracket depth (0 means all brackets are closed)
         seq = []  # A sequence of saved values
         i = 0
+
         for i, v in enumerate(value[n:]):  # Scan throught the value list
-            if v['t'] == 'Str':
-                for j, c in enumerate(v['c']):  # Scan for { and }
+            if v and v['t'] == 'Str':
+                # Scan for { and }
+                for j, c in enumerate(v['c']):
                     if c == '{':
                         depth += 1
                     elif c == '}':
@@ -302,11 +305,14 @@ def get_attrs(value, n):
             seq.append(v)
             if depth == 0:
                 break
+
         if depth == 0:
+
             # Remove extracted and empty elements
             value[n:n+i] = [None]*i
             if not value[n+i]['c']:
                 value[n+i] = None
+
             # Return the attrs
             attrstr = stringify(deQuoted(seq)).strip()
             return PandocAttributes(attrstr, 'markdown')
@@ -405,9 +411,27 @@ def replace_attrimages(key, value, fmt, meta):
 def replace_refs(key, value, fmt, meta):
     """Replaces references to labelled images."""
 
-    # Remove braces around references
     if key in ('Para', 'Plain'):
+
+        flag = False  # Flag when something has changed
+
+        # Extract reference attributes
+        for i, v in enumerate(value):
+            if v and is_figref(v['t'], v['c']):
+                if i+1 < len(value):
+                    attrs = get_attrs(value, i+1)
+                    if attrs:
+                        v['c'].append(attrs)  # Temporarily append the attrs
+                        flag = True
+        if flag:
+            value = [v for v in value if not v is None]
+
+        # Remove braces around references
         if remove_braces_from_figrefs(value):
+            flag = True
+
+        # If something has changed, return the updated content
+        if flag:
             if key == 'Para':
                 return Para(value)
             else:
@@ -415,11 +439,37 @@ def replace_refs(key, value, fmt, meta):
 
     # Replace references
     if is_figref(key, value):
+
+        # Parse the figure reference
         prefix, label, suffix = parse_figref(value)
+
+        # Get attributes for this reference
+        if len(value) == 3:
+            attrs = value.pop(-1)
+        else:
+            attrs = PandocAttributes('', 'markdown')
+
+        # Interpret the attributes
+        cref_ = cref
+        onvals = ['On', 'True', 'Yes']
+        if 'cref' in attrs.kvs:
+            if attrs['cref'].capitalize() in onvals:
+                cref_ = True
+            else:
+                cref_ = False
+        capitalize = False
+        if 'Cref' in attrs.kvs:
+            if attrs['Cref'].capitalize() in onvals:
+                cref_ = True
+                capitalize = True
+        
+
         # The replacement depends on the output format
         if fmt == 'latex':
-            if cref:
-                return prefix + [RawInline('tex', r'\cref{%s}'%label)] + suffix
+            if cref_:
+                macro = r'\Cref' if capitalize else '\cref'
+                rawinline = [RawInline('tex', r'%s{%s}'%(macro, label))]
+                return prefix + rawinline + suffix
             else:
                 return prefix + [RawInline('tex', r'\ref{%s}'%label)] + suffix
         elif fmt in ('html', 'html5'):
