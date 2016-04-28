@@ -70,15 +70,21 @@ else:
             command = psutil.Process(os.getpid()).parent().parent().exe()
         else:
             command = psutil.Process(os.getpid()).parent().exe()
+        if not os.path.basename(command).startswith('pandoc'):
+            raise RuntimeError('pandoc not found')
     except:  # pylint: disable=bare-except
         # Call whatever pandoc is available and hope for the best
         command = 'pandoc'
-    if 'fignos' in command:  # Infinite process creation!
-        command = 'pandoc'  # Hope for the best here too
-    if os.path.basename(command).startswith('pandoc'):
+    try:
+        # Get the version number and confirm it conforms to expectations
         output = subprocess.check_output([command, '-v'])
         line = output.decode('utf-8').split('\n')[0]
-        PANDOCVERSION = line.split(' ')[-1]
+        pandocversion = line.split(' ')[-1].strip()
+        pattern = re.compile(r'^1\.[0-9]+(?:\.[0-9]+)?(?:\.[0-9]+)?$')
+        if pattern.match(pandocversion):
+            PANDOCVERSION = pandocversion
+    except: # pylint: disable=bare-except
+        pass
 if PANDOCVERSION is None:
     raise RuntimeError('Cannot determine pandoc version.  '\
                        'Please file an issue at '\
