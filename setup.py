@@ -28,7 +28,7 @@ LONG_DESCRIPTION = """\
 A pandoc filter for numbering figures and figure references.
 """
 
-VERSION = '0.12'
+VERSION = '0.13'
 
 
 #-----------------------------------------------------------------------------

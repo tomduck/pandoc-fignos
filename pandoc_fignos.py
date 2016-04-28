@@ -43,6 +43,7 @@ import os, os.path
 import subprocess
 import psutil
 import argparse
+import copy
 
 # pylint: disable=import-error
 import pandocfilters
@@ -124,8 +125,9 @@ REF_PATTERN = re.compile(r'@(fig:[\w/-]+)')
 
 references = {}  # Global references tracker
 
-# Meta variables
-figurename = 'Figure'  # May be reset by main()
+# Meta variables; may be reset by main()
+figurename = 'Figure'
+cref = False
 
 def is_attrimage(key, value):
     """True if this is an attributed image; False otherwise."""
@@ -276,31 +278,54 @@ def deQuoted(value):
     return newvalue
 
 def get_attrs(value, n):
+    """Extracts attributes from a value list.
+    Extracted elements are set to None in the list.
+    n is the index where the attributes start.
+    """
+    if value[n:] and value[n]['t'] == 'Str' and value[n]['c'].startswith('{'):
+        depth = 0  # The bracket depth (0 means all brackets are closed)
+        seq = []  # A sequence of saved values
+        i = 0
+        for i, v in enumerate(value[n:]):  # Scan throught the value list
+            if v['t'] == 'Str':
+                for j, c in enumerate(v['c']):  # Scan for { and }
+                    if c == '{':
+                        depth += 1
+                    elif c == '}':
+                        depth -= 1
+                    if depth == 0:  # Attributes end
+                        head, tail = v['c'][:j+1], v['c'][j+1:]
+                        value[n+i] = copy.deepcopy(v)
+                        value[n+i]['c'] = tail
+                        v['c'] = head
+                        break
+            seq.append(v)
+            if depth == 0:
+                break
+        if depth == 0:
+            # Remove extracted and empty elements
+            value[n:n+i] = [None]*i
+            if not value[n+i]['c']:
+                value[n+i] = None
+            # Return the attrs
+            attrstr = stringify(deQuoted(seq)).strip()
+            return PandocAttributes(attrstr, 'markdown')
+
+def get_figattrs(value, n):
     """Extracts attributes from a list of values.
     Extracted elements are set to None in the list.
     n is the index of the image.
     """
     # Note: Pandoc does not allow for there to be a space between the image
     # and its attributes.
-
-    # Fix me: This currently does not allow curly braces inside quoted
-    # attributes.  The close bracket is interpreted as the end of the attrs.
     assert value[n]['t'] == 'Image'
-    image = value[n]
-    n += 1  # n is now the index where attributes should start
-    flag = False  # Flag when attributes are found
-    if value[n:] and value[n]['t'] == 'Str' and value[n]['c'].startswith('{'):
-        for i, v in enumerate(value[n:]):
-            if v['t'] == 'Str' and v['c'].strip().endswith('}'):
-                s = stringify(deQuoted(value[n:n+i+1]))  # Extract the attrs
-                value[n:n+i] = [None]*i          # Remove extracted elements
-                endspaces = s[len(s.rstrip()):]  # Check for spaces after attrs
-                value[n+i] = Str(endspaces) if len(endspaces) else None
-                flag = True
-                return PandocAttributes(s.strip(), 'markdown')
-    if not flag and PANDOCVERSION < '1.16':
+    attrs = get_attrs(value, n+1)
+    if attrs:
+        return attrs
+    elif PANDOCVERSION < '1.16':
         # Look for attributes attached to image path, as occurs with
         # reference links.  Remove the encoding.
+        image = value[n]
         try:
             seq = unquote(image['c'][1][0]).split()
             path, s = seq[0], ' '.join(seq[1:])
@@ -309,7 +334,6 @@ def get_attrs(value, n):
         else:
             image['c'][1][0] = path  # Remove the attribute string from the path
             return PandocAttributes(s.strip(), 'markdown')
-
 
 # pylint: disable=unused-argument, too-many-branches
 def replace_attrimages(key, value, fmt, meta):
@@ -324,7 +348,7 @@ def replace_attrimages(key, value, fmt, meta):
         if PANDOCVERSION < '1.16':  # Attributed images were introduced in 1.16
             for i, v in enumerate(value):
                 if v and v['t'] == 'Image':
-                    attrs = get_attrs(value, i)
+                    attrs = get_figattrs(value, i)
                     if attrs:
                         value[i] = AttrImage(attrs.to_pandoc(), *v['c'])
                         flag = True
@@ -394,7 +418,10 @@ def replace_refs(key, value, fmt, meta):
         prefix, label, suffix = parse_figref(value)
         # The replacement depends on the output format
         if fmt == 'latex':
-            return prefix + [RawInline('tex', r'\ref{%s}'%label)] + suffix
+            if cref:
+                return prefix + [RawInline('tex', r'\cref{%s}'%label)] + suffix
+            else:
+                return prefix + [RawInline('tex', r'\ref{%s}'%label)] + suffix
         elif fmt in ('html', 'html5'):
             link = '<a href="#%s">%s</a>' % (label, references[label])
             return prefix + [RawInline('html', link)] + suffix
@@ -404,7 +431,8 @@ def replace_refs(key, value, fmt, meta):
 def main():
     """Filters the document AST."""
 
-    global figurename  # pylint: disable=global-statement
+    # pylint: disable=global-statement
+    global figurename, cref
 
     # Get the output format, document and metadata
     fmt = args.fmt
@@ -418,11 +446,21 @@ def main():
             # Note: At this point I am expecting a single-word replacement.
             # This will need to be revisited if multiple words are needed.
             figurename = figurename[0]['c']
+    if 'cref' in meta and meta['cref']['c']:
+        cref = True
+    if 'fignos-cref' in meta and meta['fignos-cref']:
+        cref = True
 
     # For latex/pdf, inject command to change figurename
     if fmt == 'latex' and figurename != 'Figure':
         tex = r'\renewcommand{\figurename}{%s}'%figurename
         doc[1] = [RawBlock('tex', tex)] + doc[1]
+
+    # For latex/pdf, inject a command to ensure \cref
+    if fmt == 'latex' and cref:
+        tex1 = r'\providecommand{\cref}{\ref}'
+        tex2 = r'\providecommand{\Cref}{\ref}'
+        doc[1] = [RawBlock('tex', tex1), RawBlock('tex', tex2)] + doc[1]
 
     # Replace attributed images and references in the AST
     altered = functools.reduce(lambda x, action: walk(x, action, fmt, meta),
