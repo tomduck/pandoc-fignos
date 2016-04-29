@@ -91,7 +91,7 @@ if PANDOCVERSION is None:
                        'Please file an issue at '\
                        'https://github.com/tomduck/pandoc-fignos/issues')
 
-# Create our own pandoc image primitives
+# Create our own pandoc primitives
 Image = elt('Image', 2)      # Pandoc < 1.16
 AttrImage = elt('Image', 3)  # Pandoc >= 1.16
 
@@ -155,7 +155,7 @@ def is_figure(key, value):
 def is_figref(key, value):
     """True if this is a figure reference; False otherwise."""
     return key == 'Cite' and REF_PATTERN.match(value[1][0]['c']) and \
-      parse_figref(value)[1] in references
+       parse_figref(value)[1] in references
 
 def parse_figref(value):
     """Parses a figure reference."""
@@ -341,30 +341,42 @@ def get_figattrs(value, n):
             image['c'][1][0] = path  # Remove the attribute string from the path
             return PandocAttributes(s.strip(), 'markdown')
 
-# pylint: disable=unused-argument, too-many-branches
+def use_attrimages(value):
+    """Internally use AttrImage for all attributed images.
+    Unattributed images are left untouched.
+    Returns True if the value list was modified.
+    """
+
+    flag = False  # Flag that the value is modified
+
+    # Seach for attributed images and replace them
+    for i, v in enumerate(value):
+        if v and v['t'] == 'Image':
+            attrs = get_figattrs(value, i)
+            if attrs:
+                value[i] = AttrImage(attrs.to_pandoc(), *v['c'])
+                flag = True
+
+    # If the only element of this paragraph is an image, then mark the
+    # image as a figure.
+    value = [v for v in value if not v is  None]
+    if flag and len(value) == 1:
+        # pylint: disable=unused-variable
+        attrs, caption, target = parse_attrimage(value[0]['c'])
+        target[1] = 'fig:'  # Pandoc uses this as a figure marker
+
+    return flag
+
+# pylint: disable=unused-argument,too-many-branches
 def replace_attrimages(key, value, fmt, meta):
     """Replaces attributed images while storing reference labels."""
 
     if key == 'Para':
 
-        flag = False  # Flag that the value is modified
-
-        # Internally use AttrImage for all attributed images, regardless of
-        # the pandoc version.  Unattributed images will be left as such.
+        # Always use AttrImage internally
+        flag = False  # Set flag if value list is changed
         if PANDOCVERSION < '1.16':  # Attributed images were introduced in 1.16
-            for i, v in enumerate(value):
-                if v and v['t'] == 'Image':
-                    attrs = get_figattrs(value, i)
-                    if attrs:
-                        value[i] = AttrImage(attrs.to_pandoc(), *v['c'])
-                        flag = True
-
-            # If the only element of this paragraph is an image, then mark the
-            # image as a figure.
-            value = [v for v in value if not v is  None]
-            if flag and len(value) == 1:
-                attrs, caption, target = parse_attrimage(value[0]['c'])
-                target[1] = 'fig:'  # Pandoc uses this as a figure marker
+            flag = use_attrimages(value)
 
         # Return the content.  Add html anchors for figures.
         if fmt in ('html', 'html5') and is_figure(key, value):
@@ -406,25 +418,33 @@ def replace_attrimages(key, value, fmt, meta):
                 if attrs.id.startswith('fig:'):
                     attrs.id = ''
             return AttrImage(attrs.to_pandoc(), caption, target)
+#pylint: enable=too-many-branches
 
+
+def use_attrrefs(value):
+    """Reads and stores attributes for references."""
+    flag = False  # Flag when something has changed
+
+    # Extract reference attributes
+    for i, v in enumerate(value):
+        if v and is_figref(v['t'], v['c']):
+            if i+1 < len(value):
+                attrs = get_attrs(value, i+1)
+                if attrs:
+                    # Temporarily append the attrs to the reference
+                    v['c'].append(attrs)
+                    flag = True
+    if flag:
+        value = [v for v in value if not v is None]
+        return value
+
+    
 # pylint: disable=unused-argument
 def replace_refs(key, value, fmt, meta):
     """Replaces references to labelled images."""
 
     if key in ('Para', 'Plain'):
 
-        flag = False  # Flag when something has changed
-
-        # Extract reference attributes
-        for i, v in enumerate(value):
-            if v and is_figref(v['t'], v['c']):
-                if i+1 < len(value):
-                    attrs = get_attrs(value, i+1)
-                    if attrs:
-                        v['c'].append(attrs)  # Temporarily append the attrs
-                        flag = True
-        if flag:
-            value = [v for v in value if not v is None]
 
         # Remove braces around references
         if remove_braces_from_figrefs(value):
@@ -462,12 +482,12 @@ def replace_refs(key, value, fmt, meta):
             if attrs['Cref'].capitalize() in onvals:
                 cref_ = True
                 capitalize = True
-        
+
 
         # The replacement depends on the output format
         if fmt == 'latex':
             if cref_:
-                macro = r'\Cref' if capitalize else '\cref'
+                macro = r'\Cref' if capitalize else r'\cref'
                 rawinline = [RawInline('tex', r'%s{%s}'%(macro, label))]
                 return prefix + rawinline + suffix
             else:
