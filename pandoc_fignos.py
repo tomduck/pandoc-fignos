@@ -91,7 +91,7 @@ if PANDOCVERSION is None:
                        'Please file an issue at '\
                        'https://github.com/tomduck/pandoc-fignos/issues')
 
-# Create our own pandoc primitives
+# Create our own pandoc image primitives
 Image = elt('Image', 2)      # Pandoc < 1.16
 AttrImage = elt('Image', 3)  # Pandoc >= 1.16
 
@@ -423,6 +423,7 @@ def replace_attrimages(key, value, fmt, meta):
 
 def use_attrrefs(value):
     """Reads and stores attributes for references."""
+
     flag = False  # Flag when something has changed
 
     # Extract reference attributes
@@ -434,9 +435,8 @@ def use_attrrefs(value):
                     # Temporarily append the attrs to the reference
                     v['c'].append(attrs)
                     flag = True
-    if flag:
-        value = [v for v in value if not v is None]
-        return value
+
+    return flag
 
     
 # pylint: disable=unused-argument
@@ -445,6 +445,12 @@ def replace_refs(key, value, fmt, meta):
 
     if key in ('Para', 'Plain'):
 
+        flag = False  # Flag when something has changed
+
+        # Use attributed references
+        if use_attrrefs(value):
+            flag = True
+            value = [v for v in value if not v is None]
 
         # Remove braces around references
         if remove_braces_from_figrefs(value):
