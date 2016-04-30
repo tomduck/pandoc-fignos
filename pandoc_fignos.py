@@ -129,28 +129,37 @@ references = {}  # Global references tracker
 figurename = 'Figure'
 cref = False
 
-def is_attrimage(key, value):
-    """True if this is an attributed image; False otherwise."""
-    return key == 'Image' and len(value) == 3
 
-def parse_attrimage(value):
-    """Parses an attributed image."""
-    o, caption, target = value
-    attrs = PandocAttributes(o, 'pandoc')
-    if attrs.id == 'fig:': # Make up a unique description
-        attrs.id = 'fig:' + '__'+str(hash(target[0]))+'__'
-    return attrs, caption, target
+# Decorators -----------------------------------------------------------------
 
-def is_figure(key, value):
-    """True if this is a figure; False otherwise."""
-    if key == 'Para' and len(value) == 1:
-        return is_figure(value[0]['t'], value[0]['c'])
-    elif key == 'Image' and is_attrimage(key, value):
-        # pylint: disable=unused-variable
-        attrs, caption, target = parse_attrimage(value)
-        return target[1] == 'fig:'  # Pandoc uses this as a figure marker
-    else:
-        return False
+def filter_nones_from_value(func):
+    """Filters Nones from the value list modified by call to func(value, ...).
+    The filtering is done *in place*.  Returns the results from the func call.
+    """
+    @functools.wraps(f)
+    def wrapper(value, *args, **kwargs):
+        """Performs the filtering."""
+        ret = func(value, *args, **kwargs)
+        while None in value:
+            value.remove(None)
+        return ret
+    wrapper.__name__ = f.__name__
+    wrapper.__qualname__ = f.__qualname__
+    return wrapper
+
+def repeat_until_true(func):
+    """Repeats the call to func(value, ...) until True is returned."""
+    @functools.wraps(f)
+    def wrapper(*args, **kwargs):
+        """Repeats the call until True is returned."""
+        while func(value, *args, **kwargs):
+            pass
+    wrapper.__name__ = f.__name__
+    wrapper.__qualname__ = f.__qualname__
+    return wrapper
+
+
+# Helper functions ----------------------------------------------------------
 
 def is_figref(key, value):
     """True if this is a figure reference; False otherwise."""
@@ -164,14 +173,66 @@ def parse_figref(value):
     suffix = value[0][0]['citationSuffix']
     return prefix, label, suffix
 
-def ast(string):
-    """Returns an AST representation of the string."""
+@filter_nones_from_value
+def extract_attrs(value, n):
+    """Extracts attributes from a value list.
+    n is the index where the attributes start.
+    """
+    if value[n:] and value[n]['t'] == 'Str' and value[n]['c'].startswith('{'):
+
+        # It starts with {, so this may be an attributes list.  Do not
+        # consider } in quoted elements.
+        # 
+        seq = []          # The sequence of saved values
+        quotechar = None  # Keeps track of quotes in strings
+        flag = False      # Flags that an attributes list is found
+        i=0               # Initialization
+        
+        for i, v in enumerate(value[n:]):  # Scan through the value list
+            if v and v['t'] == 'Str':
+                # Scan for } outside of a quote
+                for j, c in enumerate(v['c']):
+                    if c == quotechar:  # This is an end quote
+                        quotechar = None
+                        continue
+                    if quotechar:  # We are still inside the quote
+                        continue
+                    if c in ['"', "'"]:  # This is an open quote
+                        quotechar = c
+                        continue
+                    if c == '}':  # The attributes end here
+                        head, tail = v['c'][:j+1], v['c'][j+1:]
+                        value[n+i] = copy.deepcopy(v)
+                        value[n+i]['c'] = tail
+                        v['c'] = head
+                        flag = True
+                        break
+            seq.append(v)
+            if flag:
+                break
+            
+        if flag:
+
+            # Nullify extracted and empty elements
+            value[n:n+i] = [None]*i
+            if not value[n+i]['c']:
+                value[n+i] = None
+
+            # Return the attrs
+            attrstr = stringify(deQuoted(seq)).strip()
+            return PandocAttributes(attrstr, 'markdown')
+
+
+# preprocess() and frieds ----------------------------------------------------
+
+def to_pandoc(s):
+    """Returns pandoc's representation of the string s."""
     toks = [Str(tok) for tok in string.split()]
     spaces = [Space()]*len(toks)
     ret = list(itertools.chain(*zip(toks, spaces)))
-    if string[0] == ' ':
+    if s[0] == ' ':
         ret = [Space()] + ret
-    return ret if string[-1] == ' ' else ret[:-1]
+    return ret if s[-1] == ' ' else ret[:-1]
 
 def is_broken_ref(key1, value1, key2, value2):
     """True if this is a broken link; False otherwise."""
@@ -184,6 +245,8 @@ def is_broken_ref(key1, value1, key2, value2):
           value1[1][0]['c'].endswith('{@fig') \
           and key2 == 'Str' and '}' in value2
 
+@repeat_until_true
+@filter_nones_from_value
 def repair_broken_refs(value):
     """Repairs references broken by pandoc's --autolink_bare_uris."""
 
@@ -207,7 +270,7 @@ def repair_broken_refs(value):
             suffix = s2[s2.index('}')+1:]      # Get the suffix
             # We need to be careful with the prefix string because it might be
             # part of another broken reference.  Simply put it back into the
-            # stream and repeat the preprocess() call.
+            # stream and repeat the repair_broken_refs() call.
             if i > 0 and value[i-1]['t'] == 'Str':
                 value[i-1]['c'] = value[i-1]['c'] + prefix
                 value[i] = None
@@ -222,50 +285,47 @@ def repair_broken_refs(value):
                   "citationMode":{"t":"AuthorInText", "c":[]},
                   "citationHash":0}],
                 [Str(ref)])
-    if flag:
-        return [v for v in value if not v is None]
-
-def is_braced_figref(value, i):
-    """Returns true if a reference is braced; otherwise False.
-    i is the index in the value list.
-    """
-    # The braces will be found in the surrounding values
-    return is_figref(value[i]['t'], value[i]['c']) \
-      and value[i-1]['t'] == 'Str' and value[i+1]['t'] == 'Str' \
-      and value[i-1]['c'].endswith('{') and value[i+1]['c'].startswith('}')
-
-def remove_braces_from_figrefs(value):
-    """Search for figure references and remove curly braces around them."""
-    flag = False
-    for i in range(len(value)-1)[1:]:
-        if is_braced_figref(value, i):
-            flag = True  # Found reference
-            value[i-1]['c'] = value[i-1]['c'][:-1]  # Remove the braces
-            value[i+1]['c'] = value[i+1]['c'][1:]
     return flag
 
 # pylint: disable=unused-argument
 def preprocess(key, value, fmt, meta):
     """Preprocesses to correct for problems."""
     if key in ('Para', 'Plain'):
-        while True:  # Repeat processing until it succeeds
-            newvalue = repair_broken_refs(value)
-            if newvalue:
-                value = newvalue
-            else:
-                break
-        if key == 'Para':
-            return Para(value)
-        else:
-            return Plain(value)
+        repair_broken_refs(value):
+
+
+# replace_attrimages() and friends -------------------------------------------
+
+def is_attrimage(key, value):
+    """True if this is an attributed image; False otherwise."""
+    return key == 'Image' and len(value) == 3
+
+def is_figure(key, value):
+    """True if this is a figure; False otherwise."""
+    if key == 'Para' and len(value) == 1:
+        return is_figure(value[0]['t'], value[0]['c'])
+    elif key == 'Image' and is_attrimage(key, value):
+        # pylint: disable=unused-variable
+        attrs, caption, target = parse_attrimage(value)
+        return target[1] == 'fig:'  # Pandoc uses this as a figure marker
+    else:
+        return False
+
+def parse_attrimage(value):
+    """Parses an attributed image."""
+    o, caption, target = value
+    attrs = PandocAttributes(o, 'pandoc')
+    if attrs.id == 'fig:': # Make up a unique description
+        attrs.id = 'fig:' + '__'+str(hash(target[0]))+'__'
+    return attrs, caption, target
 
 def deQuoted(value):
-    """Replaces Quoted elements that stringify() can't handle."""
+    """Returns a new value list that stringify() can handle."""
     # pandocfilters.stringify() needs to be updated...
-
-    # The weird thing about this is that chained filters do not see this
-    # element.  Pandoc gives different json depending on whether or it is
-    # calling the filter directly.  This should not be happening.
+    # The weird thing about this is that chained pandoc filters do not see
+    # the 'Quoted' json element.  Pandoc gives different json depending on
+    # whether or not it is calling the filter directly.  This should not be
+    # happening.
     newvalue = []
     for v in value:
         if v['t'] != 'Quoted':
@@ -277,55 +337,12 @@ def deQuoted(value):
             newvalue.append(Str(quote))
     return newvalue
 
-def get_attrs(value, n):
-    """Extracts attributes from a value list.
-    Extracted elements are set to None in the list.
-    n is the index where the attributes start.
-    """
-    if value[n:] and value[n]['t'] == 'Str' and value[n]['c'].startswith('{'):
-
-        depth = 0  # The bracket depth (0 means all brackets are closed)
-        seq = []  # A sequence of saved values
-        i = 0
-
-        for i, v in enumerate(value[n:]):  # Scan throught the value list
-            if v and v['t'] == 'Str':
-                # Scan for { and }
-                for j, c in enumerate(v['c']):
-                    if c == '{':
-                        depth += 1
-                    elif c == '}':
-                        depth -= 1
-                    if depth == 0:  # Attributes end
-                        head, tail = v['c'][:j+1], v['c'][j+1:]
-                        value[n+i] = copy.deepcopy(v)
-                        value[n+i]['c'] = tail
-                        v['c'] = head
-                        break
-            seq.append(v)
-            if depth == 0:
-                break
-
-        if depth == 0:
-
-            # Remove extracted and empty elements
-            value[n:n+i] = [None]*i
-            if not value[n+i]['c']:
-                value[n+i] = None
-
-            # Return the attrs
-            attrstr = stringify(deQuoted(seq)).strip()
-            return PandocAttributes(attrstr, 'markdown')
-
-def get_figattrs(value, n):
+def extract_figattrs(value, n):
     """Extracts attributes from a list of values.
-    Extracted elements are set to None in the list.
     n is the index of the image.
     """
-    # Note: Pandoc does not allow for there to be a space between the image
-    # and its attributes.
     assert value[n]['t'] == 'Image'
-    attrs = get_attrs(value, n+1)
+    attrs = extract_attrs(value, n+1)
     if attrs:
         return attrs
     elif PANDOCVERSION < '1.16':
@@ -341,31 +358,28 @@ def get_figattrs(value, n):
             image['c'][1][0] = path  # Remove the attribute string from the path
             return PandocAttributes(s.strip(), 'markdown')
 
+@filter_nones_from_value
 def use_attrimages(value):
     """Internally use AttrImage for all attributed images.
     Unattributed images are left untouched.
-    Returns True if the value list was modified.
     """
 
-    flag = False  # Flag that the value is modified
+    flag = False  # Flags that an AttrImage was found
 
-    # Seach for attributed images and replace them
+    # Seach for attributed images and replace them with an AttrImage
     for i, v in enumerate(value):
         if v and v['t'] == 'Image':
-            attrs = get_figattrs(value, i)
+            attrs = extract_figattrs(value, i)
             if attrs:
                 value[i] = AttrImage(attrs.to_pandoc(), *v['c'])
                 flag = True
 
-    # If the only element of this paragraph is an image, then mark the
-    # image as a figure.
-    value = [v for v in value if not v is  None]
-    if flag and len(value) == 1:
-        # pylint: disable=unused-variable
-        attrs, caption, target = parse_attrimage(value[0]['c'])
-        target[1] = 'fig:'  # Pandoc uses this as a figure marker
-
-    return flag
+def add_figure_marker(key, value):
+    """Adds figure marker to the image."""
+    assert is_attrimage(key, value)
+    # pylint: disable=unused-variable
+    attrs, caption, target = parse_attrimage(value)
+    target[1] = 'fig:'  # Pandoc uses this as a figure marker
 
 # pylint: disable=unused-argument,too-many-branches
 def replace_attrimages(key, value, fmt, meta):
@@ -376,15 +390,15 @@ def replace_attrimages(key, value, fmt, meta):
         # Always use AttrImage internally
         flag = False  # Set flag if value list is changed
         if PANDOCVERSION < '1.16':  # Attributed images were introduced in 1.16
-            flag = use_attrimages(value)
+            use_attrimages(value)
+            if len(value) == 1:  # Add the figure marker
+                add_figure_marker(value[0]['t'], value[0]['c'])
 
-        # Return the content.  Add html anchors for figures.
+        # Prepend html anchors for figures.
         if fmt in ('html', 'html5') and is_figure(key, value):
             attrs, caption, target = parse_attrimage(value[0]['c'])
             anchor = RawInline('html', '<a name="%s"></a>'%attrs.id)
             return [Plain([anchor]), Para(value)]
-        elif flag:
-            return Para(value)
 
     elif is_attrimage(key, value):
 
@@ -393,10 +407,10 @@ def replace_attrimages(key, value, fmt, meta):
 
         # Bail out if the label does not conform
         if not attrs.id or not LABEL_PATTERN.match(attrs.id):
-            if PANDOCVERSION < '1.16':
+            if PANDOCVERSION < '1.16':  # Attributed images are not supported
                 return Image(caption, target)
             else:
-                return None
+                return
 
         # Save the reference
         references[attrs.id] = len(references) + 1
@@ -405,11 +419,11 @@ def replace_attrimages(key, value, fmt, meta):
         if fmt == 'latex':
             caption = list(caption) + [RawInline('tex', r'\label{%s}'%attrs.id)]
         else:
-            caption = ast('%s %d. '%(figurename, references[attrs.id])) + \
-              list(caption)
+            caption = to_pandoc('%s %d. '%(figurename, references[attrs.id])) \
+              + list(caption)
 
         # Return the replacement
-        if PANDOCVERSION < '1.16':
+        if PANDOCVERSION < '1.16':  # Attributed images are not supported
             return Image(caption, target)
         else:
             if PANDOCVERSION >= '1.17' and fmt == 'latex':
@@ -417,54 +431,50 @@ def replace_attrimages(key, value, fmt, meta):
                 # handled by pandoc's TeX writer for these versions
                 if attrs.id.startswith('fig:'):
                     attrs.id = ''
-            return AttrImage(attrs.to_pandoc(), caption, target)
 #pylint: enable=too-many-branches
 
 
+# replace_refs() and friends -------------------------------------------------
+
+def is_braced_figref(value, i):
+    """Returns true if a reference is braced; otherwise False.
+    i is the index in the value list.
+    """
+    # The braces will be found in the surrounding values
+    return is_figref(value[i]['t'], value[i]['c']) \
+      and value[i-1]['t'] == 'Str' and value[i+1]['t'] == 'Str' \
+      and value[i-1]['c'].endswith('{') and value[i+1]['c'].startswith('}')
+
+@filter_nones_from_value
+def remove_braces_from_figrefs(value):
+    """Search for figure references and remove curly braces around them."""
+    for i in range(len(value)-1)[1:]:
+        if is_braced_figref(value, i):
+            v = value[i-1]['c']
+            value[i-1]['c'] = v[:-1] if len(v)>1 else None
+            v = value[i+1]['c']
+            value[i+1]['c'] = v[1:] if len(v)>1 else None
+
+@filter_nones_from_value
 def use_attrrefs(value):
-    """Reads and stores attributes for references."""
-
-    flag = False  # Flag when something has changed
-
-    # Extract reference attributes
+    """Extracts attributes appends them to the reference."""
     for i, v in enumerate(value):
         if v and is_figref(v['t'], v['c']):
             if i+1 < len(value):
-                attrs = get_attrs(value, i+1)
+                attrs = extract_attrs(value, i+1)
                 if attrs:
-                    # Temporarily append the attrs to the reference
                     v['c'].append(attrs)
                     flag = True
-
-    return flag
-
     
 # pylint: disable=unused-argument
 def replace_refs(key, value, fmt, meta):
     """Replaces references to labelled images."""
 
     if key in ('Para', 'Plain'):
+        use_attrrefs(value):
+        remove_braces_from_figrefs(value)
 
-        flag = False  # Flag when something has changed
-
-        # Use attributed references
-        if use_attrrefs(value):
-            flag = True
-            value = [v for v in value if not v is None]
-
-        # Remove braces around references
-        if remove_braces_from_figrefs(value):
-            flag = True
-
-        # If something has changed, return the updated content
-        if flag:
-            if key == 'Para':
-                return Para(value)
-            else:
-                return Plain(value)
-
-    # Replace references
-    if is_figref(key, value):
+    elif is_figref(key, value):
 
         # Parse the figure reference
         prefix, label, suffix = parse_figref(value)
@@ -503,6 +513,9 @@ def replace_refs(key, value, fmt, meta):
             return prefix + [RawInline('html', link)] + suffix
         else:
             return prefix + [Str('%d'%references[label])] + suffix
+
+
+# Main program ---------------------------------------------------------------
 
 def main():
     """Filters the document AST."""
