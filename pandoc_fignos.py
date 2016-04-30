@@ -43,6 +43,7 @@ import os, os.path
 import subprocess
 import psutil
 import argparse
+import uuid
 
 # pylint: disable=import-error
 import pandocfilters
@@ -135,8 +136,9 @@ def parse_attrimage(value):
     """Parses an attributed image."""
     o, caption, target = value
     attrs = PandocAttributes(o, 'pandoc')
-    if attrs.id == 'fig:': # Make up a unique description
-        attrs.id = 'fig:' + '__'+str(hash(target[0]))+'__'
+    if attrs.id == 'fig:' and target[1] == 'fig:':
+        # Make up a unique description
+        attrs.id = 'fig:' + '__'+str(uuid.uuid4())+'__'
     return attrs, caption, target
 
 def is_figure(key, value):
@@ -333,8 +335,8 @@ def replace_attrimages(key, value, fmt, meta):
             # image as a figure.
             value = [v for v in value if not v is  None]
             if flag and len(value) == 1:
-                attrs, caption, target = parse_attrimage(value[0]['c'])
-                target[1] = 'fig:'  # Pandoc uses this as a figure marker
+                # Pandoc uses this as a figure marker
+                value[0]['c'][2][1] = 'fig:'
 
         # Return the content.  Add html anchors for figures.
         if fmt in ('html', 'html5') and is_figure(key, value):
@@ -349,8 +351,9 @@ def replace_attrimages(key, value, fmt, meta):
         # Parse the image
         attrs, caption, target = parse_attrimage(value)
 
-        # Bail out if the label does not conform
-        if not attrs.id or not LABEL_PATTERN.match(attrs.id):
+        # Bail out if this is not a figure, or it the label does not conform
+        if not is_figure(key,value) or not attrs.id or \
+          not LABEL_PATTERN.match(attrs.id):
             if PANDOCVERSION < '1.16':
                 return Image(caption, target)
             else:

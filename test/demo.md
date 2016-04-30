@@ -44,11 +44,19 @@ Figure:
 
 Figure:
 
+![Unnumbered and with empty attributes.](img/plot3.png){}
+
+*[Issue #15](https://github.com/tomduck/pandoc-fignos/issues/15): pdf output has numbers.*
+
+****
+
+Figure:
+
 ![Unnumbered and attributed (small).](img/plot3.png){#baz width="50px"}
 
 *[Issue #15](https://github.com/tomduck/pandoc-fignos/issues/15): pdf output has numbers.*
 
-***
+****
 
 \newpage
 
@@ -88,7 +96,19 @@ Image (non-breaking space after markdown), attributed (small):
 
 \newpage
 
-Inline image with attributes (small)
+Inline image with attributes (small; the "fig:" id should be ignored -- check for missing number in figure sequence)
 ![Caption should not show.](img/plot3.png){#fig: width="50px"}
 and another without
 ![Caption should not show.](img/plot3.png)
+
+****
+
+\newpage
+
+Here is a series of unreferenceable figures::
+
+![Unreferenceable 1.](img/plot1.png){#fig: width="50px"}
+
+![Unreferenceable 2.](img/plot2.png){#fig: width="50px"}
+
+![Unreferenceable 3.](img/plot3.png){#fig: width="50px"}
