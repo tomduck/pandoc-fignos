@@ -1,8 +1,8 @@
 ---
-figure-name: Fig.
+figure-name: FIG
 ...
 
-Figures @fig:plot1, @fig:plot2, {@fig:plot3}a and {@fig:plot3}b:
+Figures @fig:plot1, {@fig:plot2}a and {@fig:plot2}b, and  {@fig:plot3}:
 
 ![Plot 1.](img/plot1.png){#fig:plot1}
 
@@ -12,11 +12,13 @@ Figures @fig:plot1, @fig:plot2, {@fig:plot3}a and {@fig:plot3}b:
 
 [ref-link]: img/plot3.png {#fig:plot3}
 
-Figure @fig:plot1 and Fig. {@fig:plot3}a.  Figures {@fig:plot1}-{@fig:plot3}, and Figs {@fig:plot1}-{@fig:plot2}-{@fig:plot3}.
+*@fig:plot1 and {+@fig:plot2}a.
+
+Figures {@fig:plot1}-{@fig:plot3}, and Figs {@fig:plot1}-{@fig:plot2}-{@fig:plot3}.
 
 References in lists:
 
- 1. Figure @fig:plot1 and Fig. {@fig:plot3}a.
+ 1. Figure @fig:plot1 and Fig. {@fig:plot2}a.
  2. Figures {@fig:plot1}-{@fig:plot3}, and Figs. 
     {@fig:plot1}-{@fig:plot2}-{@fig:plot3}.
 
