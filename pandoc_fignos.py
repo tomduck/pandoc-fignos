@@ -157,7 +157,7 @@ def replace_refs(key, value, fmt, meta):  # pylint: disable=unused-argument
     if key == 'Ref':
 
         # Parse the figure reference
-        attrs, prefix, label, suffix = value
+        attrs, label = value
         attrs = PandocAttributes(attrs, 'pandoc')
 
         # Check for cref usage
@@ -175,10 +175,9 @@ def replace_refs(key, value, fmt, meta):  # pylint: disable=unused-argument
         if fmt == 'latex':
             if cref:
                 macro = r'\cref' if use_abbrev else r'\Cref'
-                rawinline = [RawInline('tex', r'%s{%s}'%(macro, label))]
-                return prefix + rawinline + suffix
+                return RawInline('tex', r'%s{%s}'%(macro, label))
             else:
-                return prefix + [RawInline('tex', r'\ref{%s}'%label)] + suffix
+                return RawInline('tex', r'\ref{%s}'%label)
         elif fmt in ('html', 'html5'):
             if cref:
                 name = figureabbrev if use_abbrev else figurelong
@@ -186,14 +185,13 @@ def replace_refs(key, value, fmt, meta):  # pylint: disable=unused-argument
                   (name, label, references[label])
             else:
                 link = '<a href="#%s">%s</a>' % (label, references[label])
-            return prefix + [RawInline('html', link)] + suffix
+            return RawInline('html', link)
         else:
             name = figureabbrev if use_abbrev else figurelong
             if cref:
-                return prefix + [Str('%s %d'%(name, references[label]))] + \
-                  suffix
+                return Str('%s %d'%(name, references[label]))
             else:
-                return prefix + [Str('%d'%references[label])] + suffix
+                return Str('%d'%references[label])
 
 
 # Main program ---------------------------------------------------------------
@@ -210,26 +208,21 @@ def main():
     meta = doc[0]['unMeta']
 
     # Extract meta variables
+    def _get_meta(name):
+        ret = meta[name]['c']  # Works for cmdline vars
+        if type(ret) is list:  # For YAML vars
+            ret = ret[0]['c']
+        return ret
     if 'figure-name' in meta:
-        figurename = meta['figure-name']['c']  # Works for cmdline vars
-        if type(figurename) is list:  # For YAML vars
-            figurename = figurename[0]['c']
+        figurename = _get_meta('figure-name')
     if 'figure-long' in meta:
-        figurelong = meta['figure-long']['c']  # Works for cmdline vars
-        if type(figurelong) is list:  # For YAML vars
-            figurelong = figurelong[0]['c']
+        figurelong = _get_meta('figure-long')
     if 'figure-abbrev' in meta:
-        figureabbrev = meta['figure-abbrev']['c']  # Works for cmdline vars
-        if type(figureabbrev) is list:  # For YAML vars
-            figureabbrev = figureabbrev[0]['c']
+        figureabbrev = _get_meta('figure-abbrev')
     if 'cref' in meta:
-        include_cref = default_cref = meta['cref']['c']
-        if type(default_cref) is list:
-            include_cref = default_cref = default_cref[0]['c']
+        include_cref = default_cref = _get_meta('cref')
     if 'fignos-cref' in meta:
-        include_cref = default_cref = meta['fignos-cref']['c']
-        if type(default_cref) is list:
-            include_cref = default_cref = default_cref[0]['c']
+        include_cref = default_cref = _get_meta('fignos-cref')
 
     # First pass
     altered = functools.reduce(lambda x, action: walk(x, action, fmt, meta),
@@ -246,10 +239,10 @@ def main():
         tex = r'\renewcommand{\figurename}{%s}'%figurename
         altered[1] = [RawBlock('tex', tex)] + altered[1]
 
-    # For latex/pdf, inject a command to ensure \cref
+    # For latex/pdf, inject a command to fake \cref when it is missing
     if include_cref and fmt == 'latex':
-        tex1 = r'\providecommand{\cref}{\ref}'
-        tex2 = r'\providecommand{\Cref}{\ref}'
+        tex1 = r'\providecommand{\cref}{%s~\ref}' % figureabbrev
+        tex2 = r'\providecommand{\Cref}{%s~\ref}' % figurelong
         altered[1] = [RawBlock('tex', tex1), RawBlock('tex', tex2)] + altered[1]
 
     # Dump the results
