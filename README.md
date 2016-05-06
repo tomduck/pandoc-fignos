@@ -1,9 +1,9 @@
 
 
-NEW: Pandoc-fignos now supports clever referencing!
+NEW: Pandoc-fignos supports clever referencing.  Details below
 
 
-pandoc-fignos 0.12
+pandoc-fignos 0.13
 ==================
 
 *pandoc-fignos* is a [pandoc] filter for numbering figures and figure references in markdown documents.
@@ -42,7 +42,7 @@ Contents
 Rationale
 ---------
 
-Figure numbers and references are frequently used in academic writing, but are not currently supported by pandoc.  Pandoc-fignos is an add-on filter that provides the missing functionality.
+Figure numbers and references are frequently used in academic writing, but are not supported by pandoc.  Pandoc-fignos is an add-on filter that provides the missing functionality.
 
 The markdown syntax recognized by pandoc-fignos was developed in [pandoc Issue #813] -- see [this post] by [@scaramouche1].  It seems likely that this will be close to what pandoc ultimately adopts.  Pandoc-fignos is a transitional package for those who need figure numbers and references now.
 
@@ -108,7 +108,7 @@ to have the reference name (i.e., "fig.") automatically generated.  The above fo
 
      *@fig:id
 
-instead.  If you turn on clever referencing by default (see [Customization](#customization), below), you can disable it for a reference using
+instead.  If clever referencing is enabled by default (see [Customization](#customization), below), you can disable it for a given reference using
 
     !@fig:id
 
@@ -227,6 +227,6 @@ Once python is installed, start the "Command Prompt" program.  Depending on wher
 Getting Help
 ------------
 
-If you have any difficulties with pandoc-fignos, or would like to see a new feature, please [file an issue] on github.
+If you have any difficulties with pandoc-fignos, or would like to see a new feature, please [file an Issue] on GitHub.
 
-[file an issue]: https://github.com/tomduck/pandoc-fignos/issues
+[file an Issue]: https://github.com/tomduck/pandoc-fignos/issues

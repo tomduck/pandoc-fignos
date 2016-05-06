@@ -1,7 +1,8 @@
 
 pandoc-fignos 0.13 (unreleased)
 
-    * Improved pandoc version detection.
+    * Added clever referencing (Issue #13).
+    * Moved library code to pandocfiltering project.
 
 
 pandoc-fignos 0.12 (2016-04-27)
