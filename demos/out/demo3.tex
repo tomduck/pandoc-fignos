@@ -1,4 +1,8 @@
-Some data are shown in fig. \ref{fig:data}.
+\renewcommand{\figurename}{FIG}
+\providecommand{\cref}{fig.~\ref}
+\providecommand{\Cref}{Figure~\ref}
+
+Some data are shown in \cref{fig:data}.
 
 \begin{figure}[htbp]
 \centering
@@ -12,10 +16,10 @@ Some data are shown in fig. \ref{fig:data}.
 \caption{More data.\label{fig:more}}
 \end{figure}
 
-Figure \ref{fig:more}a and fig. \ref{fig:more}b give more data.
+\Cref{fig:more}a and \cref{fig:more}b give more data.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics{img/plot3.png}
-\caption{Even more data.\label{fig:__-6416055258953668043__}}
+\caption{Even more data.\label{fig:__-6244528604011238964__}}
 \end{figure}
