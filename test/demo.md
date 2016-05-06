@@ -1,10 +1,10 @@
 ---
 figure-name: FIG
-fignos-cref-name: FIG.
-fignos-Cref-name: FIGURE
+fignos-plus-name: FIG.
+fignos-star-name: FIGURE
 ...
 
-Figures @fig:1, {@fig:2}a and {@fig:2}b, and  {@fig:3}:
+Figures @fig:1, {@fig:2}a and {@fig:2}b, and  {@fig:3}: 
 
 ![Plot 1.](img/plot1.png){#fig:1}
 
@@ -16,12 +16,12 @@ Figures @fig:1, {@fig:2}a and {@fig:2}b, and  {@fig:3}:
 
 *@fig:1, {+@fig:2}a and fig. !@fig:3.
 
-Figures {@fig:1}-{@fig:3}, and Figs {@fig:1}-{@fig:2}-{@fig:3}.
+Figures {@fig:1}-{@fig:3}, and figs. {@fig:1}-{@fig:2}-{@fig:3}.
 
 References in lists:
 
- 1. Figure @fig:1 and Fig. {@fig:2}a.
- 2. Figures {@fig:1}-{@fig:3}, and Figs. 
+ 1. *@fig:1, {+@fig:2}a and fig. !@fig:3.
+ 2. Figures {@fig:1}-{@fig:3}, and figs. 
     {@fig:1}-{@fig:2}-{@fig:3}.
 
 A [regular link](http://example.com/), an [*italicized link*](http://example.com/) and an email.address@mailinator.com.
@@ -34,7 +34,7 @@ A [regular link](http://example.com/), an [*italicized link*](http://example.com
 Corner cases
 ------------
 
-Note: Attributed images are supported by pandoc >= 1.16.  Using the attribute `width="50px"` with earlier versions has no effect.
+*Issue: Attributed images are supported by pandoc >= 1.16.  Using the attribute `width="50px"` with earlier versions has no effect.*
 
 ****
 
@@ -56,7 +56,9 @@ Figure:
 
 \newpage
 
-Figure {@fig:c1}:
+Figure @fig:c1:
+
+*Issue: references ending in colons do not convert for pandoc 1.15*
 
 ![Numbered and attributed (small).](img/plot3.png){#fig:c1 width="50px"}
 
