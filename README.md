@@ -100,15 +100,15 @@ Writing markdown like
 
     See fig. @fig:id.
 
-seems a bit redundant.  Pandoc-fignos supports "clever referencing" so that you can write
+seems a bit redundant.  Pandoc-fignos supports "clever referencing" via single-character modifiers in front of a reference.  You can write
 
      See +@fig:id.
 
-and have the reference name (i.e., "fig.") automatically generated.  The form above is used mid-sentence.  At the beginning of a sentence, use
+to have the reference name (i.e., "fig.") automatically generated.  The above form is used mid-sentence.  At the beginning of a sentence, use
 
      *@fig:id
 
-instead.  If you turn on clever referencing by default (see "Customization", below), you can disable it on a case-by-case basis using
+instead.  If you turn on clever referencing by default (see [Customization](#customization), below), you can disable it for a reference using
 
     !@fig:id
 
@@ -131,12 +131,12 @@ Pandoc-fignos may be customized by setting variables in the [metadata block] or 
     caption (e.g., change it from "Figure to "Fig." or "图");
 
   * `fignos-cleveref` or just `cleveref` - Set to `On` to assume "+"
-    references by default;
+    clever references by default;
 
   * `fignos-plus-name` - Sets the name of a "+" reference 
     (e.g., change it from "fig." to "figure"); and
 
-  * `fignos-star-name` - Used to set the name of a "*" reference 
+  * `fignos-star-name` - Sets the name of a "*" reference 
     (e.g., change it from "Figure" to "Fig.").
 
 [metadata block]: http://pandoc.org/README.html#extension-yaml_metadata_block
@@ -163,7 +163,7 @@ For TeX/pdf output:
     included in your pandoc template via `\usepackage{cleveref}`),
     otherwise they are faked.  Non-breaking spaces are always used.
 
-For all other formats the figure numbers, caption name, and clever references are hard-coded into the output.
+For all other formats the numbers, caption name, and clever references are hard-coded into the output.
 
 Links are constructed for both html and pdf output.
 
