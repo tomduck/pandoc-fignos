@@ -71,13 +71,13 @@ LABEL_PATTERN = re.compile(r'(fig:[\w/-]*)')
 references = {}  # Global references tracker
 
 # Meta variables; may be reset elsewhere
-figurename = 'Figure'
-crefname = ['fig.', 'figs.']
-Crefname = ['Figure', 'Figures']
-cref = False
+captionname = 'Figure'            # Used with \figurename
+plusname = ['fig.', 'figs.']      # Used with \cref
+starname = ['Figure', 'Figures']  # Used with \Cref
+cleveref_default = False          # Default setting for clever referencing
 
-# Flags that cleveref must be included in TeX documents
-include_cref = False
+# Flags that cleveref tex is needed
+clevereftex = False
 
 
 # Helper functions ----------------------------------------------------------
@@ -137,7 +137,7 @@ def replace_figures(key, value, fmt, meta): # pylint: disable=unused-argument
         if fmt == 'latex':
             caption = list(caption) + [RawInline('tex', r'\label{%s}'%attrs[0])]
         else:
-            caption = pandocify('%s %d. '%(figurename, references[attrs[0]])) \
+            caption = pandocify('%s %d. '%(captionname, references[attrs[0]])) \
               + list(caption)
 
         # Return the replacement
@@ -152,7 +152,7 @@ def replace_figures(key, value, fmt, meta): # pylint: disable=unused-argument
 def replace_refs(key, value, fmt, meta):  # pylint: disable=unused-argument
     """Replaces references to labelled images."""
 
-    global include_cref  # pylint: disable=global-statement
+    global clevereftex  # pylint: disable=global-statement
 
     if key == 'Ref':
 
@@ -160,35 +160,35 @@ def replace_refs(key, value, fmt, meta):  # pylint: disable=unused-argument
         attrs, label = value
         attrs = PandocAttributes(attrs, 'pandoc')
 
-        # Check for cref usage
-        if not include_cref:
+        # Check if we need cleveref tex
+        if not clevereftex:
             if 'modifier' in attrs.kvs and attrs['modifier'] in ['*', '+']:
-                include_cref = True
+                clevereftex = True
 
         # Choose between \Cref, \cref and \ref
-        cref_ = attrs['modifier'] in ['*', '+'] if 'modifier' in attrs.kvs \
-          else cref
-        abbrev = attrs['modifier'] == '+' if 'modifier' in attrs.kvs \
-          else cref
+        cleveref = attrs['modifier'] in ['*', '+'] \
+          if 'modifier' in attrs.kvs else cleveref_default
+        plus = attrs['modifier'] == '+' if 'modifier' in attrs.kvs \
+          else cleveref_default
 
         # The replacement depends on the output format
         if fmt == 'latex':
-            if cref_:
-                macro = r'\cref' if abbrev else r'\Cref'
+            if cleveref:
+                macro = r'\cref' if plus else r'\Cref'
                 return RawInline('tex', r'%s{%s}'%(macro, label))
             else:
                 return RawInline('tex', r'\ref{%s}'%label)
         elif fmt in ('html', 'html5'):
-            if cref_:
-                name = crefname[0] if abbrev else Crefname[0]
+            if cleveref:
+                name = plusname[0] if plus else starname[0]
                 link = '%s <a href="#%s">%s</a>' % \
                   (name, label, references[label])
             else:
                 link = '<a href="#%s">%s</a>' % (label, references[label])
             return RawInline('html', link)
         else:
-            name = crefname[0] if abbrev else Crefname[0]
-            if cref_:
+            name = plusname[0] if plus else starname[0]
+            if cleveref:
                 return Str('%s %d'%(name, references[label]))
             else:
                 return Str('%d'%references[label])
@@ -201,57 +201,60 @@ def process(meta):
     computed fields."""
 
     # pylint: disable=global-statement
-    global figurename, cref, include_cref, crefname, Crefname
+    global captionname, cleveref_default, clevereftex, plusname, starname
 
     # Initialize computed fields
-    crefnametex = None
-    Crefnametex = None
+    plusnametex = None
+    starnametex = None
 
     # Read in the metadata fields and do some checking
 
-    if 'figure-name' in meta:
-        figurename = get_meta(meta, 'figure-name')
-        assert type(figurename) in STRTYPES
+    if 'fignos-caption-name' in meta:
+        captionname = get_meta(meta, 'fignos-caption-name')
+        assert type(captionname) in STRTYPES
+    elif 'figure-name' in meta:  # Deprecated
+        captionname = get_meta(meta, 'figure-name')
+        assert type(captionname) in STRTYPES
 
-    if 'cref' in meta:
-        include_cref = cref = get_meta(meta, 'cref')
-        assert cref in [True, False]
+    if 'cleveref' in meta:
+        clevereftex = cleveref_default = get_meta(meta, 'cleveref')
+        assert cleveref_default in [True, False]
 
-    if 'fignos-cref' in meta:
-        include_cref = cref = get_meta(meta, 'fignos-cref')
-        assert type(cref) in [True, False]
+    if 'fignos-cleveref' in meta:
+        clevereftex = cleveref_default = get_meta(meta, 'fignos-cleveref')
+        assert cleveref_default in [True, False]
 
-    if 'fignos-cref-name' in meta:
-        tmp = get_meta(meta, 'fignos-cref-name')
+    if 'fignos-plus-name' in meta:
+        tmp = get_meta(meta, 'fignos-plus-name')
         if type(tmp) is list:
-            crefname = tmp
+            plusname = tmp
         else:
-            crefname[0] = tmp
-        assert len(crefname) == 2
-        for name in crefname:
+            plusname[0] = tmp
+        assert len(plusname) == 2
+        for name in plusname:
             assert type(name) in STRTYPES
 
         # LaTeX to inject
-        crefnametex = \
+        plusnametex = \
             r'\providecommand{\crefname}[3]{}\crefname{figure}{%s}{%s}'%\
-            (crefname[0], crefname[1])
+            (plusname[0], plusname[1])
 
-    if 'fignos-Cref-name' in meta:
-        tmp = get_meta(meta, 'fignos-Cref-name')
+    if 'fignos-star-name' in meta:
+        tmp = get_meta(meta, 'fignos-star-name')
         if type(tmp) is list:
-            Crefname = tmp
+            starname = tmp
         else:
-            Crefname[0] = tmp
-        assert len(Crefname) == 2
-        for name in Crefname:
+            starname[0] = tmp
+        assert len(starname) == 2
+        for name in starname:
             assert type(name) in STRTYPES
 
         # LaTeX to inject
-        Crefnametex = \
+        starnametex = \
             r'\providecommand{\Crefname}[3]{}\Crefname{figure}{%s}{%s}'%\
-            (Crefname[0], Crefname[1])
+            (starname[0], starname[1])
 
-    return crefnametex, Crefnametex
+    return plusnametex, starnametex
 
 
 def main():
@@ -263,7 +266,7 @@ def main():
     meta = doc[0]['unMeta']
 
     # Process the metadata variables
-    crefnametex, Crefnametex = process(meta)
+    plusnametex, starnametex = process(meta)
 
     # First pass
     altered = functools.reduce(lambda x, action: walk(x, action, fmt, meta),
@@ -275,22 +278,22 @@ def main():
     altered = functools.reduce(lambda x, action: walk(x, action, fmt, meta),
                                [use_refs, replace_refs], altered)
 
-    # For latex/pdf, inject command to change figurename
-    if fmt == 'latex' and figurename != 'Figure':
-        tex = r'\renewcommand{\figurename}{%s}'%figurename
+    # For latex/pdf, inject command to change caption name
+    if fmt == 'latex' and captionname != 'Figure':
+        tex = r'\renewcommand{\figurename}{%s}'%captionname
         altered[1] = [RawBlock('tex', tex)] + altered[1]
 
     # For latex/pdf, inject a command to fake \cref when it is missing
-    if include_cref and fmt == 'latex':
-        tex1 = r'\providecommand{\cref}{%s~\ref}' % crefname[0]
-        tex2 = r'\providecommand{\Cref}{%s~\ref}' % Crefname[0]
+    if clevereftex and fmt == 'latex':
+        tex1 = r'\providecommand{\cref}{%s~\ref}' % plusname[0]
+        tex2 = r'\providecommand{\Cref}{%s~\ref}' % starname[0]
         altered[1] = [RawBlock('tex', tex1), RawBlock('tex', tex2)] + altered[1]
 
-    # For latex/pdf, inject commands if crefname and/or Crefname are changed
-    if crefnametex:
-        altered[1] = [RawBlock('tex', crefnametex)] + altered[1]
-    if Crefnametex:
-        altered[1] = [RawBlock('tex', Crefnametex)] + altered[1]
+    # For latex/pdf, inject commands if plusname and/or starname are changed
+    if plusnametex:
+        altered[1] = [RawBlock('tex', plusnametex)] + altered[1]
+    if starnametex:
+        altered[1] = [RawBlock('tex', starnametex)] + altered[1]
 
     # Dump the results
     json.dump(altered, STDOUT)
