@@ -112,14 +112,14 @@ instead.  If you turn on clever referencing by default (see "Customization", bel
 
     !@fig:id
 
-Demonstration: Processing [demo2.md] with `pandoc --filter pandoc-fignos` gives numbered figures and references in [pdf2], [tex2], [html2], [epub2], [md2] and other formats.
+Demonstration: Processing [demo2.md] with `pandoc --filter pandoc-fignos` gives numbered figures and references in [pdf][pdf2], [tex][tex2], [html][html2], [epub][epub2], [md][md2] and other formats.
 
-[demo2.md]:
-[pdf2]:
-[tex2]:
-[html2]:
-[epub2]:
-[md2]:
+[demo2.md]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/demo2.md
+[pdf2]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/out/demo2.pdf
+[tex2]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/out/demo2.tex
+[html2]: https://rawgit.com/tomduck/pandoc-fignos/master/demos/out/demo2.html
+[epub2]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/out/demo2.epub
+[md2]: https://github.com/tomduck/pandoc-fignos/blob/master/demos/out/demo2.md
 
 
 Customization
@@ -141,14 +141,14 @@ Pandoc-fignos may be customized by setting variables in the [metadata block] or 
 
 [metadata block]: http://pandoc.org/README.html#extension-yaml_metadata_block
 
-Demonstration: Processing [demo3.md] with `pandoc --filter pandoc-fignos` gives numbered figures and references in [pdf3], [tex3], [html3], [epub3], [md3] and other formats.
+Demonstration: Processing [demo3.md] with `pandoc --filter pandoc-fignos` gives numbered figures and references in [pdf][pdf3], [tex][tex3], [html][html3], [epub][epub3], [md][md3] and other formats.
 
-[demo3.md]:
-[pdf3]:
-[tex3]:
-[html3]:
-[epub3]:
-[md3]:
+[demo3.md]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/demo3.md
+[pdf3]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/out/demo3.pdf
+[tex3]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/out/demo3.tex
+[html3]: https://rawgit.com/tomduck/pandoc-fignos/master/demos/out/demo3.html
+[epub3]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/out/demo3.epub
+[md3]: https://github.com/tomduck/pandoc-fignos/blob/master/demos/out/demo3.md
 
 
 Technical Details
@@ -161,7 +161,7 @@ For TeX/pdf output:
   * `\figurename` is set for the caption name; and
   * `\cref` and `\Cref` are used if they are available (i.e.,
     included in your pandoc template via `\usepackage{cleveref}`),
-    otherwise they are faked.
+    otherwise they are faked.  Non-breaking spaces are always used.
 
 For all other formats the figure numbers, caption name, and clever references are hard-coded into the output.
 
