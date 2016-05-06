@@ -1,4 +1,8 @@
 
+
+NEW: Pandoc-fignos now supports clever referencing!
+
+
 pandoc-fignos 0.12
 ==================
 
@@ -19,18 +23,18 @@ See also: [pandoc-eqnos], [pandoc-tablenos]
 [html]: https://rawgit.com/tomduck/pandoc-fignos/master/demos/out/demo.html
 [epub]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/out/demo.epub
 [md]: https://github.com/tomduck/pandoc-fignos/blob/master/demos/out/demo.md
+[Issues tracker]: https://github.com/tomduck/pandoc-fignos/issues 
 [pandoc-eqnos]: https://github.com/tomduck/pandoc-eqnos 
 [pandoc-tablenos]: https://github.com/tomduck/pandoc-tablenos 
-[Issues tracker]: https://github.com/tomduck/pandoc-fignos/issues
 
 
 Contents
 --------
 
  1. [Rationale](#rationale)
- 2. [Markdown Syntax](#markdown-syntax)
- 3. [Usage](#usage)
- 4. [Details](#details)
+ 2. [Usage](#usage)
+ 3. [Markdown Syntax](#markdown-syntax)
+ 4. [Technical Details](#technical-details)
  5. [Installation](#installation)
  6. [Getting Help](#getting-help)
 
@@ -38,7 +42,7 @@ Contents
 Rationale
 ---------
 
-Figure numbers and references are required for academic writing, but are not currently supported by pandoc.  Pandoc-fignos is an add-on filter that provides the missing functionality.
+Figure numbers and references are frequently used in academic writing, but are not currently supported by pandoc.  Pandoc-fignos is an add-on filter that provides the missing functionality.
 
 The markdown syntax recognized by pandoc-fignos was developed in [pandoc Issue #813] -- see [this post] by [@scaramouche1].  It seems likely that this will be close to what pandoc ultimately adopts.  Pandoc-fignos is a transitional package for those who need figure numbers and references now.
 
@@ -47,8 +51,23 @@ The markdown syntax recognized by pandoc-fignos was developed in [pandoc Issue #
 [@scaramouche1]: https://github.com/scaramouche1
 
 
+Usage
+-----
+
+To apply the filter to a document, use the following option with pandoc:
+
+    --filter pandoc-fignos
+
+Note that any use of `--filter pandoc-citeproc` or `--bibliography=FILE` should come *after* the pandoc-fignos filter call.
+
+
 Markdown Syntax
 ---------------
+
+The basic syntax is taken from [this post] in [pandoc Issue #813].  The extended syntax goes further.
+
+
+### Basic Syntax ###
 
 To number a figure, add the label `fig:id` to its attributes:
 
@@ -56,7 +75,7 @@ To number a figure, add the label `fig:id` to its attributes:
 
 The prefix `#fig:` is required. `id` should be replaced with a unique identifier composed of letters, numbers, dashes, slashes and underscores.
 
-Alternatively, you can use attributed links:
+Alternatively, use attributed links:
 
     ![Caption.][link]
 
@@ -72,34 +91,79 @@ or
 
 Curly braces around a reference are stripped from the output.
 
-See [demo.md] for an example.
-
-NOTE: pandoc-fignos originally allowed a space between an image and its attributes.  This is no longer allowed owing to the introduction of image attributes in pandoc 1.16.
+Demonstration: Processing [demo.md] with `pandoc --filter pandoc-fignos` gives numbered figures and references in [pdf], [tex], [html], [epub], [md] and other formats.
 
 
-Usage
------
+### Extended Syntax ###
 
-To apply the filter, use the following option with pandoc:
+Writing markdown like
 
-    --filter pandoc-fignos
+    See fig. @fig:id.
 
-Note that any use of `--filter pandoc-citeproc` or `--bibliography=FILE` should come *after* the pandoc-fignos filter call.
+seems a bit redundant.  Pandoc-fignos supports "clever referencing" so that you can write
+
+     See +@fig:id.
+
+and have the reference name (i.e., "fig.") automatically generated.  The form above is used mid-sentence.  At the beginning of a sentence, use
+
+     *@fig:id
+
+instead.  If you turn on clever referencing by default (see "Customization", below), you can disable it on a case-by-case basis using
+
+    !@fig:id
+
+Demonstration: Processing [demo2.md] with `pandoc --filter pandoc-fignos` gives numbered figures and references in [pdf2], [tex2], [html2], [epub2], [md2] and other formats.
+
+[demo2.md]:
+[pdf2]:
+[tex2]:
+[html2]:
+[epub2]:
+[md2]:
+
+
+Customization
+-------------
 
 Pandoc-fignos may be customized by setting variables in the [metadata block] or on the command line (using `-M KEY=VAL`).  The following variables are supported:
 
-  * `figure-name` - Changes "Figure" at the beginning of a caption
-     to a new word (e.g., "Fig." or "图").
+  * `fignos-caption-name` - Sets the name at the beginning of a
+    caption (e.g., change it from "Figure to "Fig." or "图");
+
+  * `fignos-cleveref` or just `cleveref` - Set to `On` to assume "+"
+    references by default;
+
+  * `fignos-plus-name` - Sets the name of a "+" reference 
+    (e.g., change it from "fig." to "figure"); and
+
+  * `fignos-star-name` - Used to set the name of a "*" reference 
+    (e.g., change it from "Figure" to "Fig.").
 
 [metadata block]: http://pandoc.org/README.html#extension-yaml_metadata_block
 
+Demonstration: Processing [demo3.md] with `pandoc --filter pandoc-fignos` gives numbered figures and references in [pdf3], [tex3], [html3], [epub3], [md3] and other formats.
 
-Details
--------
+[demo3.md]:
+[pdf3]:
+[tex3]:
+[html3]:
+[epub3]:
+[md3]:
 
-For tex/pdf output, LaTeX's `\label` and `\ref` macros are used; for all others the numbers are hard-coded.
 
-Likewise, pandoc-fignos redefines LaTeX's `\figurename` command, and hard codes the figure name for the rest.
+Technical Details
+-----------------
+
+For TeX/pdf output:
+
+  * The `\label` and `\ref` macros are used for figure labels and
+    references;
+  * `\figurename` is set for the caption name; and
+  * `\cref` and `\Cref` are used if they are available (i.e.,
+    included in your pandoc template via `\usepackage{cleveref}`),
+    otherwise they are faked.
+
+For all other formats the figure numbers, caption name, and clever references are hard-coded into the output.
 
 Links are constructed for both html and pdf output.
 

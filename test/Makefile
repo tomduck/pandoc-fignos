@@ -21,16 +21,20 @@ pdf: out/demo-1.17.pdf \
      out/demo-1.17-py3.4.pdf \
      out/demo-1.17-autolink.pdf \
      out/demo-1.17-cleveref.pdf \
+     out/demo-1.17-autolink-cleveref.pdf \
      out/demo-1.16.pdf \
      out/demo-1.16-py2.7.pdf \
      out/demo-1.16-py3.4.pdf \
      out/demo-1.16-autolink.pdf \
      out/demo-1.16-cleveref.pdf \
+     out/demo-1.16-autolink-cleveref.pdf \
      out/demo-1.15.pdf \
      out/demo-1.15-py2.7.pdf \
      out/demo-1.15-py3.4.pdf \
      out/demo-1.15-autolink.pdf \
-     out/demo-1.15-cleveref.pdf
+     out/demo-1.15-cleveref.pdf \
+     out/demo-1.16-autolink-cleveref.pdf
+
 
 html: out/demo-1.17.html \
       out/demo-1.16.html \
@@ -38,6 +42,7 @@ html: out/demo-1.17.html \
       img
 
 img: out/img/plot1.png out/img/plot2.png out/img/plot3.png 
+
 
 out/demo-1.17.html: demo.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
@@ -60,6 +65,10 @@ out/demo-1.17-autolink.pdf: demo.md
 	$(PANDOC-1.17) $< --from markdown+autolink_bare_uris --filter pandoc-fignos $(PDFFLAGS) -o $@
 
 out/demo-1.17-cleveref.pdf: demo.md
+	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
+	$(PANDOC-1.17) $< --filter pandoc-fignos $(PDFFLAGS) --include-in-header=cleveref.tex -o $@
+
+out/demo-1.17-autolink-cleveref.pdf: demo.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.17) $< --from markdown+autolink_bare_uris --filter pandoc-fignos $(PDFFLAGS) --include-in-header=cleveref.tex -o $@
 
@@ -86,6 +95,10 @@ out/demo-1.16-autolink.pdf: demo.md
 
 out/demo-1.16-cleveref.pdf: demo.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
+	$(PANDOC-1.16) $< --filter pandoc-fignos $(PDFFLAGS) --include-in-header=cleveref.tex -o $@
+
+out/demo-1.16-autolink-cleveref.pdf: demo.md
+	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.16) $< --from markdown+autolink_bare_uris --filter pandoc-fignos $(PDFFLAGS) --include-in-header=cleveref.tex -o $@
 
 
@@ -111,8 +124,11 @@ out/demo-1.15-autolink.pdf: demo.md
 
 out/demo-1.15-cleveref.pdf: demo.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
-	$(PANDOC-1.15) $< --from markdown+autolink_bare_uris --filter pandoc-fignos $(PDFFLAGS) --include-in-header=cleveref.tex -o $@
+	$(PANDOC-1.15) $< --filter pandoc-fignos $(PDFFLAGS) --include-in-header=cleveref.tex -o $@
 
+out/demo-1.15-autolink-cleveref.pdf: demo.md
+	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
+	$(PANDOC-1.15) $< --from markdown+autolink_bare_uris --filter pandoc-fignos $(PDFFLAGS) --include-in-header=cleveref.tex -o $@
 
 
 out/img/plot%.png: img/plot%.png

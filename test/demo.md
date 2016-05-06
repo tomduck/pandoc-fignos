@@ -1,26 +1,28 @@
 ---
 figure-name: FIG
+fignos-cref-name: FIG.
+fignos-Cref-name: FIGURE
 ...
 
-Figures @fig:plot1, {@fig:plot2}a and {@fig:plot2}b, and  {@fig:plot3}:
+Figures @fig:1, {@fig:2}a and {@fig:2}b, and  {@fig:3}:
 
-![Plot 1.](img/plot1.png){#fig:plot1}
+![Plot 1.](img/plot1.png){#fig:1}
 
-![Plot 2.](img/plot2.png){#fig:plot2}
+![Plot 2.](img/plot2.png){#fig:2}
 
 ![Plot 3.][ref-link]
 
-[ref-link]: img/plot3.png {#fig:plot3}
+[ref-link]: img/plot3.png {#fig:3}
 
-*@fig:plot1 and {+@fig:plot2}a.
+*@fig:1, {+@fig:2}a and fig. !@fig:3.
 
-Figures {@fig:plot1}-{@fig:plot3}, and Figs {@fig:plot1}-{@fig:plot2}-{@fig:plot3}.
+Figures {@fig:1}-{@fig:3}, and Figs {@fig:1}-{@fig:2}-{@fig:3}.
 
 References in lists:
 
- 1. Figure @fig:plot1 and Fig. {@fig:plot2}a.
- 2. Figures {@fig:plot1}-{@fig:plot3}, and Figs. 
-    {@fig:plot1}-{@fig:plot2}-{@fig:plot3}.
+ 1. Figure @fig:1 and Fig. {@fig:2}a.
+ 2. Figures {@fig:1}-{@fig:3}, and Figs. 
+    {@fig:1}-{@fig:2}-{@fig:3}.
 
 A [regular link](http://example.com/), an [*italicized link*](http://example.com/) and an email.address@mailinator.com.
 

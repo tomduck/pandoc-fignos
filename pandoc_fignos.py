@@ -42,9 +42,10 @@ from pandocfilters import RawBlock, RawInline
 from pandocfilters import Str, Para, Plain, elt
 
 import pandocfiltering
-from pandocfiltering import repair_refs, pandocify
+from pandocfiltering import get_meta, STRTYPES
+from pandocfiltering import repair_refs, use_refs_factory
+from pandocfiltering import pandocify
 from pandocfiltering import use_attrimages, filter_attrimages
-from pandocfiltering import use_refs_factory
 from pandocfiltering import STDIN, STDOUT
 
 from pandocattributes import PandocAttributes
@@ -64,17 +65,16 @@ PANDOCVERSION = pandocfiltering.PANDOCVERSION
 Image = elt('Image', 2)      # Pandoc < 1.16
 AttrImage = elt('Image', 3)  # Pandoc >= 1.16
 
-# Patterns for matching labels and references
+# Pattern for matching labels
 LABEL_PATTERN = re.compile(r'(fig:[\w/-]*)')
-REF_PATTERN = re.compile(r'@(fig:[\w/-]+)')
 
 references = {}  # Global references tracker
 
 # Meta variables; may be reset elsewhere
 figurename = 'Figure'
-figurelong = 'Figure'
-figureabbrev = 'fig.'
-default_cref = False
+crefname = ['fig.', 'figs.']
+Crefname = ['Figure', 'Figures']
+cref = False
 
 # Flags that cleveref must be included in TeX documents
 include_cref = False
@@ -166,29 +166,29 @@ def replace_refs(key, value, fmt, meta):  # pylint: disable=unused-argument
                 include_cref = True
 
         # Choose between \Cref, \cref and \ref
-        cref = attrs['modifier'] in ['*', '+'] if 'modifier' in attrs.kvs \
-          else default_cref
-        use_abbrev = attrs['modifier'] == '+' if 'modifier' in attrs.kvs \
-          else False
+        cref_ = attrs['modifier'] in ['*', '+'] if 'modifier' in attrs.kvs \
+          else cref
+        abbrev = attrs['modifier'] == '+' if 'modifier' in attrs.kvs \
+          else cref
 
         # The replacement depends on the output format
         if fmt == 'latex':
-            if cref:
-                macro = r'\cref' if use_abbrev else r'\Cref'
+            if cref_:
+                macro = r'\cref' if abbrev else r'\Cref'
                 return RawInline('tex', r'%s{%s}'%(macro, label))
             else:
                 return RawInline('tex', r'\ref{%s}'%label)
         elif fmt in ('html', 'html5'):
-            if cref:
-                name = figureabbrev if use_abbrev else figurelong
+            if cref_:
+                name = crefname[0] if abbrev else Crefname[0]
                 link = '%s <a href="#%s">%s</a>' % \
                   (name, label, references[label])
             else:
                 link = '<a href="#%s">%s</a>' % (label, references[label])
             return RawInline('html', link)
         else:
-            name = figureabbrev if use_abbrev else figurelong
-            if cref:
+            name = crefname[0] if abbrev else Crefname[0]
+            if cref_:
                 return Str('%s %d'%(name, references[label]))
             else:
                 return Str('%d'%references[label])
@@ -196,33 +196,74 @@ def replace_refs(key, value, fmt, meta):  # pylint: disable=unused-argument
 
 # Main program ---------------------------------------------------------------
 
-def main():
-    """Filters the document AST."""
+def process(meta):
+    """Saves metadata fields in global variables and returns a few
+    computed fields."""
 
     # pylint: disable=global-statement
-    global figurename, figurelong, figureabbrev, default_cref, include_cref
+    global figurename, cref, include_cref, crefname, Crefname
+
+    # Initialize computed fields
+    crefnametex = None
+    Crefnametex = None
+
+    # Read in the metadata fields and do some checking
+
+    if 'figure-name' in meta:
+        figurename = get_meta(meta, 'figure-name')
+        assert type(figurename) in STRTYPES
+
+    if 'cref' in meta:
+        include_cref = cref = get_meta(meta, 'cref')
+        assert cref in [True, False]
+
+    if 'fignos-cref' in meta:
+        include_cref = cref = get_meta(meta, 'fignos-cref')
+        assert type(cref) in [True, False]
+
+    if 'fignos-cref-name' in meta:
+        tmp = get_meta(meta, 'fignos-cref-name')
+        if type(tmp) is list:
+            crefname = tmp
+        else:
+            crefname[0] = tmp
+        assert len(crefname) == 2
+        for name in crefname:
+            assert type(name) in STRTYPES
+
+        # LaTeX to inject
+        crefnametex = \
+            r'\providecommand{\crefname}[3]{}\crefname{figure}{%s}{%s}'%\
+            (crefname[0], crefname[1])
+
+    if 'fignos-Cref-name' in meta:
+        tmp = get_meta(meta, 'fignos-Cref-name')
+        if type(tmp) is list:
+            Crefname = tmp
+        else:
+            Crefname[0] = tmp
+        assert len(Crefname) == 2
+        for name in Crefname:
+            assert type(name) in STRTYPES
+
+        # LaTeX to inject
+        Crefnametex = \
+            r'\providecommand{\Crefname}[3]{}\Crefname{figure}{%s}{%s}'%\
+            (Crefname[0], Crefname[1])
+
+    return crefnametex, Crefnametex
+
+
+def main():
+    """Filters the document AST."""
 
     # Get the output format, document and metadata
     fmt = args.fmt
     doc = json.loads(STDIN.read())
     meta = doc[0]['unMeta']
 
-    # Extract meta variables
-    def _get_meta(name):
-        ret = meta[name]['c']  # Works for cmdline vars
-        if type(ret) is list:  # For YAML vars
-            ret = ret[0]['c']
-        return ret
-    if 'figure-name' in meta:
-        figurename = _get_meta('figure-name')
-    if 'figure-long' in meta:
-        figurelong = _get_meta('figure-long')
-    if 'figure-abbrev' in meta:
-        figureabbrev = _get_meta('figure-abbrev')
-    if 'cref' in meta:
-        include_cref = default_cref = _get_meta('cref')
-    if 'fignos-cref' in meta:
-        include_cref = default_cref = _get_meta('fignos-cref')
+    # Process the metadata variables
+    crefnametex, Crefnametex = process(meta)
 
     # First pass
     altered = functools.reduce(lambda x, action: walk(x, action, fmt, meta),
@@ -241,9 +282,15 @@ def main():
 
     # For latex/pdf, inject a command to fake \cref when it is missing
     if include_cref and fmt == 'latex':
-        tex1 = r'\providecommand{\cref}{%s~\ref}' % figureabbrev
-        tex2 = r'\providecommand{\Cref}{%s~\ref}' % figurelong
+        tex1 = r'\providecommand{\cref}{%s~\ref}' % crefname[0]
+        tex2 = r'\providecommand{\Cref}{%s~\ref}' % Crefname[0]
         altered[1] = [RawBlock('tex', tex1), RawBlock('tex', tex2)] + altered[1]
+
+    # For latex/pdf, inject commands if crefname and/or Crefname are changed
+    if crefnametex:
+        altered[1] = [RawBlock('tex', crefnametex)] + altered[1]
+    if Crefnametex:
+        altered[1] = [RawBlock('tex', Crefnametex)] + altered[1]
 
     # Dump the results
     json.dump(altered, STDOUT)
