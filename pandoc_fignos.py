@@ -278,22 +278,28 @@ def main():
     altered = functools.reduce(lambda x, action: walk(x, action, fmt, meta),
                                [use_refs, replace_refs], altered)
 
-    # For latex/pdf, inject command to change caption name
-    if fmt == 'latex' and captionname != 'Figure':
-        tex = r'\renewcommand{\figurename}{%s}'%captionname
-        altered[1] = [RawBlock('tex', tex)] + altered[1]
 
-    # For latex/pdf, inject a command to fake \cref when it is missing
-    if clevereftex and fmt == 'latex':
-        tex1 = r'\providecommand{\cref}{%s~\ref}' % plusname[0]
-        tex2 = r'\providecommand{\Cref}{%s~\ref}' % starname[0]
-        altered[1] = [RawBlock('tex', tex1), RawBlock('tex', tex2)] + altered[1]
+    # Assemble supporting tex
+    if fmt == 'latex':
+        tex = []
 
-    # For latex/pdf, inject commands if plusname and/or starname are changed
-    if plusnametex:
-        altered[1] = [RawBlock('tex', plusnametex)] + altered[1]
-    if starnametex:
-        altered[1] = [RawBlock('tex', starnametex)] + altered[1]
+        # Change caption name
+        if captionname != 'Figure':
+            tex.append(r'\renewcommand{\figurename}{%s}'%captionname)
+
+        # Fake \cref and \Cref when they are missing
+        if clevereftex:
+            tex.append(r'\providecommand{\cref}{%s~\ref}' % plusname[0])
+            tex.append(r'\providecommand{\Cref}{%s~\ref}' % starname[0])
+
+        # Include plusnametex and starnametex
+        if plusnametex:
+            tex.append(plusnametex)
+        if starnametex:
+            tex.append(starnametex)
+
+        altered[1] = [RawBlock('tex', '\n'.join(tex))] + altered[1]
+
 
     # Dump the results
     json.dump(altered, STDOUT)
