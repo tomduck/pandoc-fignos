@@ -37,19 +37,25 @@ import functools
 import argparse
 import json
 
+import sys
+if sys.version_info > (3,):
+    from urllib.request import unquote  # pylint: disable=no-name-in-module
+else:
+    from urllib import unquote  # pylint: disable=no-name-in-module
+
 from pandocfilters import walk
 from pandocfilters import RawBlock, RawInline
 from pandocfilters import Str, Para, Plain, elt
 
 import pandocfiltering
-from pandocfiltering import get_meta, STRTYPES
+from pandocfiltering import STRTYPES
+from pandocfiltering import get_meta, extract_attrs
 from pandocfiltering import repair_refs, use_refs_factory
+from pandocfiltering import use_attr_factory, filter_attr_factory
 from pandocfiltering import pandocify
-from pandocfiltering import use_attrimages, filter_attrimages
 from pandocfiltering import STDIN, STDOUT
 
 from pandocattributes import PandocAttributes
-
 
 # Read the command-line arguments
 parser = argparse.ArgumentParser(description='Pandoc figure numbers filter.')
@@ -63,7 +69,6 @@ PANDOCVERSION = pandocfiltering.PANDOCVERSION
 
 # Create our own pandoc image primitives
 Image = elt('Image', 2)      # Pandoc < 1.16
-AttrImage = elt('Image', 3)  # Pandoc >= 1.16
 
 # Pattern for matching labels
 LABEL_PATTERN = re.compile(r'(fig:[\w/-]*)')
@@ -108,13 +113,54 @@ def parse_figure(key, value):
 
 # Actions --------------------------------------------------------------------
 
-def replace_figures(key, value, fmt, meta): # pylint: disable=unused-argument
-    """Replaces figures while storing reference labels."""
+def _extract_imageattrs(value, n):
+    """Extracts attributes from a list of values.  n is the index where the
+    attributes begin.  Extracted elements are deleted from the value list.
+    Attrs are returned in pandoc format.
+    """
+
+    try:
+        return extract_attrs(value, n)
+
+    except (ValueError, IndexError):
+        # Look for attributes attached to the image path, as occurs with
+        # reference links.  Remove the encoding.
+        assert value[n-1]['t'] == 'Image'
+        image = value[n-1]
+
+        try:
+            seq = unquote(image['c'][1][0]).split()
+            path, s = seq[0], ' '.join(seq[1:])
+        except ValueError:
+            pass
+        else:
+            image['c'][1][0] = path  # Remove attr string from the path
+            return PandocAttributes(s.strip(), 'markdown').to_pandoc()
+
+def use_attrimages(key, value, fmt, meta):
+    """Attaches attributes to Image elements (pandoc < 1.16)."""
+    if PANDOCVERSION < '1.16':
+        action = use_attr_factory('Image', extract_attrs=_extract_imageattrs)
+        return action(key, value, fmt, meta)
+    else:
+        return # Images are already attributed for pandoc >= 1.16
+
+def filter_attrimages(key, value, fmt, meta):
+    """Filters attributes from Image elements (pandoc < 1.16)."""
+    if PANDOCVERSION < '1.16':
+        action = filter_attr_factory('Image', 2)
+        return action(key, value, fmt, meta)
+    else:
+        return # Images are already attributed for pandoc >= 1.16
+
+def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
+    """Processes the figures."""
 
     if key == 'Para':
 
         # Prepend html anchors for figures.
         if fmt in ('html', 'html5') and is_figure(key, value):
+            # pylint: disable=unused-variable
             attrs, caption, target = parse_figure(key, value)
             if LABEL_PATTERN.match(attrs[0]):
                 anchor = RawInline('html', '<a name="%s"></a>'%attrs[0])
@@ -127,8 +173,7 @@ def replace_figures(key, value, fmt, meta): # pylint: disable=unused-argument
 
         # Bail out if the label does not conform
         if not attrs[0] or not LABEL_PATTERN.match(attrs[0]):
-            # Attributed images are not supported by pandoc < 1.16
-            return Image(caption, target) if PANDOCVERSION < '1.16' else None
+            return
 
         # Save the reference
         references[attrs[0]] = len(references) + 1
@@ -140,13 +185,11 @@ def replace_figures(key, value, fmt, meta): # pylint: disable=unused-argument
             caption = pandocify('%s %d. '%(captionname, references[attrs[0]])) \
               + list(caption)
 
-        # Return the replacement
         if PANDOCVERSION >= '1.17' and fmt == 'latex':
             # Remove id from the image attributes.  It is incorrectly
             # handled by pandoc's TeX writer for these versions
             if LABEL_PATTERN.match(attrs[0]):
                 attrs[0] = ''
-        return AttrImage(attrs, caption, target)
 
 
 def replace_refs(key, value, fmt, meta):  # pylint: disable=unused-argument
@@ -270,7 +313,7 @@ def main():
 
     # First pass
     altered = functools.reduce(lambda x, action: walk(x, action, fmt, meta),
-                               [repair_refs, use_attrimages, replace_figures,
+                               [repair_refs, use_attrimages, process_figures,
                                 filter_attrimages], doc)
 
     # Second pass
