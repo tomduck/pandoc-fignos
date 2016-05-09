@@ -50,8 +50,8 @@ from pandocfilters import Str, Para, Plain, elt
 import pandocfiltering
 from pandocfiltering import STRTYPES
 from pandocfiltering import get_meta, extract_attrs
-from pandocfiltering import repair_refs, use_refs_factory
-from pandocfiltering import use_attr_factory, filter_attr_factory
+from pandocfiltering import repair_refs, use_refs_factory, replace_refs_factory
+from pandocfiltering import use_attrs_factory, filter_attrs_factory
 from pandocfiltering import pandocify
 from pandocfiltering import STDIN, STDOUT
 
@@ -80,9 +80,6 @@ captionname = 'Figure'            # Used with \figurename
 plusname = ['fig.', 'figs.']      # Used with \cref
 starname = ['Figure', 'Figures']  # Used with \Cref
 cleveref_default = False          # Default setting for clever referencing
-
-# Flags that cleveref tex is needed
-clevereftex = False
 
 
 # Helper functions ----------------------------------------------------------
@@ -137,18 +134,18 @@ def _extract_imageattrs(value, n):
             image['c'][1][0] = path  # Remove attr string from the path
             return PandocAttributes(s.strip(), 'markdown').to_pandoc()
 
-def use_attrimages(key, value, fmt, meta):
+def use_attrs_images(key, value, fmt, meta):
     """Attaches attributes to Image elements (pandoc < 1.16)."""
     if PANDOCVERSION < '1.16':
-        action = use_attr_factory('Image', extract_attrs=_extract_imageattrs)
+        action = use_attrs_factory('Image', extract_attrs=_extract_imageattrs)
         return action(key, value, fmt, meta)
     else:
         return # Images are already attributed for pandoc >= 1.16
 
-def filter_attrimages(key, value, fmt, meta):
+def filter_attrs_images(key, value, fmt, meta):
     """Filters attributes from Image elements (pandoc < 1.16)."""
     if PANDOCVERSION < '1.16':
-        action = filter_attr_factory('Image', 2)
+        action = filter_attrs_factory('Image', 2)
         return action(key, value, fmt, meta)
     else:
         return # Images are already attributed for pandoc >= 1.16
@@ -179,62 +176,16 @@ def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
         references[attrs[0]] = len(references) + 1
 
         # Adjust caption depending on the output format
-        if fmt == 'latex':
-            caption = list(caption) + [RawInline('tex', r'\label{%s}'%attrs[0])]
-        else:
-            caption = pandocify('%s %d. '%(captionname, references[attrs[0]])) \
-              + list(caption)
-
+        value[1] = list(caption) + [RawInline('tex', r'\label{%s}'%attrs[0])] \
+          if fmt == 'latex' else \
+          pandocify('%s %d. '%(captionname, references[attrs[0]])) \
+          + list(caption)
+              
         if PANDOCVERSION >= '1.17' and fmt == 'latex':
             # Remove id from the image attributes.  It is incorrectly
             # handled by pandoc's TeX writer for these versions
             if LABEL_PATTERN.match(attrs[0]):
                 attrs[0] = ''
-
-
-def replace_refs(key, value, fmt, meta):  # pylint: disable=unused-argument
-    """Replaces references to labelled images."""
-
-    global clevereftex  # pylint: disable=global-statement
-
-    if key == 'Ref':
-
-        # Parse the figure reference
-        attrs, label = value
-        attrs = PandocAttributes(attrs, 'pandoc')
-
-        # Check if we need cleveref tex
-        if not clevereftex:
-            if 'modifier' in attrs.kvs and attrs['modifier'] in ['*', '+']:
-                clevereftex = True
-
-        # Choose between \Cref, \cref and \ref
-        cleveref = attrs['modifier'] in ['*', '+'] \
-          if 'modifier' in attrs.kvs else cleveref_default
-        plus = attrs['modifier'] == '+' if 'modifier' in attrs.kvs \
-          else cleveref_default
-
-        # The replacement depends on the output format
-        if fmt == 'latex':
-            if cleveref:
-                macro = r'\cref' if plus else r'\Cref'
-                return RawInline('tex', r'%s{%s}'%(macro, label))
-            else:
-                return RawInline('tex', r'\ref{%s}'%label)
-        elif fmt in ('html', 'html5'):
-            if cleveref:
-                name = plusname[0] if plus else starname[0]
-                link = '%s <a href="#%s">%s</a>' % \
-                  (name, label, references[label])
-            else:
-                link = '<a href="#%s">%s</a>' % (label, references[label])
-            return RawInline('html', link)
-        else:
-            name = plusname[0] if plus else starname[0]
-            if cleveref:
-                return Str('%s %d'%(name, references[label]))
-            else:
-                return Str('%d'%references[label])
 
 
 # Main program ---------------------------------------------------------------
@@ -244,7 +195,7 @@ def process(meta):
     computed fields."""
 
     # pylint: disable=global-statement
-    global captionname, cleveref_default, clevereftex, plusname, starname
+    global captionname, cleveref_default, plusname, starname
 
     # Initialize computed fields
     plusnametex = None
@@ -260,11 +211,11 @@ def process(meta):
         assert type(captionname) in STRTYPES
 
     if 'cleveref' in meta:
-        clevereftex = cleveref_default = get_meta(meta, 'cleveref')
+        cleveref_default = get_meta(meta, 'cleveref')
         assert cleveref_default in [True, False]
 
     if 'fignos-cleveref' in meta:
-        clevereftex = cleveref_default = get_meta(meta, 'fignos-cleveref')
+        cleveref_default = get_meta(meta, 'fignos-cleveref')
         assert cleveref_default in [True, False]
 
     if 'fignos-plus-name' in meta:
@@ -313,16 +264,18 @@ def main():
 
     # First pass
     altered = functools.reduce(lambda x, action: walk(x, action, fmt, meta),
-                               [repair_refs, use_attrimages, process_figures,
-                                filter_attrimages], doc)
+                               [repair_refs, use_attrs_images, process_figures,
+                                filter_attrs_images], doc)
 
     # Second pass
     use_refs = use_refs_factory(references.keys())
+    replace_refs = replace_refs_factory(references, cleveref_default,
+                                    plusname, starname)
     altered = functools.reduce(lambda x, action: walk(x, action, fmt, meta),
                                [use_refs, replace_refs], altered)
 
 
-    # Assemble supporting tex
+    # Assemble supporting TeX
     if fmt == 'latex':
         tex = []
 
@@ -331,9 +284,7 @@ def main():
             tex.append(r'\renewcommand{\figurename}{%s}'%captionname)
 
         # Fake \cref and \Cref when they are missing
-        if clevereftex:
-            tex.append(r'\providecommand{\cref}{%s~\ref}' % plusname[0])
-            tex.append(r'\providecommand{\Cref}{%s~\ref}' % starname[0])
+        tex += pandocfiltering.clevereftex
 
         # Include plusnametex and starnametex
         if plusnametex:

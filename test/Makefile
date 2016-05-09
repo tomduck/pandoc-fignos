@@ -52,6 +52,10 @@ out/demo-1.17.pdf: demo.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.17) $< --filter pandoc-fignos $(PDFFLAGS) -o $@
 
+out/demo-1.17.tex: demo.md
+	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
+	$(PANDOC-1.17) $< --filter pandoc-fignos -o $@
+
 out/demo-1.17-py2.7.pdf: demo.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.17) $< -t json | $(PYTHON-2.7) ../pandoc_fignos.py latex --pandocversion=$(v1.17) | $(PANDOC-1.17) -f json $(PDFFLAGS) -o $@
@@ -81,6 +85,10 @@ out/demo-1.16.pdf: demo.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.16) $< --filter pandoc-fignos $(PDFFLAGS) -o $@
 
+out/demo-1.16.tex: demo.md
+	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
+	$(PANDOC-1.16) $< --filter pandoc-fignos -o $@
+
 out/demo-1.16-py2.7.pdf: demo.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.16) $< -t json | $(PYTHON-2.7) ../pandoc_fignos.py latex --pandocversion=$(v1.16) | $(PANDOC-1.16) -f json $(PDFFLAGS) -o $@
@@ -109,6 +117,10 @@ out/demo-1.15.html: demo.md
 out/demo-1.15.pdf: demo.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.15) $< --filter pandoc-fignos $(PDFFLAGS) -o $@
+
+out/demo-1.15.tex: demo.md
+	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
+	$(PANDOC-1.15) $< --filter pandoc-fignos -o $@
 
 out/demo-1.15-py2.7.pdf: demo.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
