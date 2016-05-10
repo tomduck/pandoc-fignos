@@ -115,13 +115,15 @@ instead.  If clever referencing is enabled by default (see [Customization](#cust
 
 Demonstration: Processing [demo2.md] with `pandoc --filter pandoc-fignos` gives numbered figures and references in [pdf][pdf2], [tex][tex2], [html][html2], [epub][epub2], [md][md2] and other formats.
 
+Note: The disabling modifier "!" is used instead of "-" because [pandoc unnecessarily drops minus signs] in front of references.
+
 [demo2.md]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/demo2.md
 [pdf2]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/out/demo2.pdf
 [tex2]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/out/demo2.tex
 [html2]: https://rawgit.com/tomduck/pandoc-fignos/master/demos/out/demo2.html
 [epub2]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/out/demo2.epub
 [md2]: https://github.com/tomduck/pandoc-fignos/blob/master/demos/out/demo2.md
-
+[pandoc unnecessarily drops minus signs]: https://github.com/jgm/pandoc/issues/2901
 
 Customization
 -------------
