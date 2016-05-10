@@ -9,7 +9,7 @@ out/%.pdf: %.md
 
 out/%.tex: %.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
-	pandoc $< --filter pandoc-fignos --variable geometry:margin=1in -o $@
+	pandoc $< --filter pandoc-fignos -o $@
 
 out/%.html: %.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi

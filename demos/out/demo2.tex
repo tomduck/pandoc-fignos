@@ -1,7 +1,15 @@
-\providecommand{\cref}{fig.~\ref}
-\providecommand{\Cref}{Figure~\ref}
+% Cleveref fakery
+\providecommand{\crefname}[3]{}
+\providecommand{\Crefname}[3]{}
+\crefname{figure}{fig.}{figs.}
+\Crefname{figure}{Figure}{Figures}
+\providecommand{\cref}{\plusnamesingular~\ref}
+\providecommand{\Cref}{\starnamesingular~\ref}
+\providecommand{\plusnamesingular}{}
+\providecommand{\starnamesingular}{}
 
-Some data are shown in \cref{fig:data}.
+Some data are shown in
+\renewcommand{\plusnamesingular}{fig.}\cref{fig:data}.
 
 \begin{figure}[htbp]
 \centering
@@ -15,10 +23,12 @@ Some data are shown in \cref{fig:data}.
 \caption{More data.\label{fig:more}}
 \end{figure}
 
-\Cref{fig:more}a and \cref{fig:more}b give more data.
+\renewcommand{\starnamesingular}{Figure}\Cref{fig:more}a and
+\renewcommand{\plusnamesingular}{fig.}\cref{fig:more}b give more data.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics{img/plot3.png}
-\caption{Even more data.\label{fig:__369885470610630506__}}
+\caption{Even more
+data.\label{fig:eebe8965-bb64-4f12-9403-0f88e9dae2c6}}
 \end{figure}
