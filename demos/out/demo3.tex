@@ -1,15 +1,17 @@
 % Fignos directives
 \renewcommand{\figurename}{FIG}
 
+% Cleveref macros
+\providecommand{\crefformat}[2]{}{}
+\providecommand{\Crefformat}[2]{}{}
+\crefformat{figure}{fig.~#2#1#3}
+\Crefformat{figure}{Figure~#2#1#3}
+
 % Cleveref fakery
-\providecommand{\crefname}[3]{}
-\providecommand{\Crefname}[3]{}
-\crefname{figure}{fig.}{figs.}
-\Crefname{figure}{Figure}{Figures}
-\providecommand{\cref}{\plusnamesingular~\ref}
-\providecommand{\Cref}{\starnamesingular~\ref}
 \providecommand{\plusnamesingular}{}
 \providecommand{\starnamesingular}{}
+\providecommand{\cref}{\plusnamesingular~\ref}
+\providecommand{\Cref}{\starnamesingular~\ref}
 
 Some data are shown in
 \renewcommand{\plusnamesingular}{fig.}\cref{fig:data}.
@@ -33,5 +35,5 @@ Some data are shown in
 \centering
 \includegraphics{img/plot3.png}
 \caption{Even more
-data.\label{fig:80412cec-d0c4-4c4c-86f8-87de2582a41d}}
+data.\label{fig:c1a82fc1-d282-4099-98f7-e145eb6bda57}}
 \end{figure}
