@@ -46,15 +46,14 @@ else:
 
 from pandocfilters import walk
 from pandocfilters import RawBlock, RawInline
-from pandocfilters import Para, Plain, elt
+from pandocfilters import Para, Plain
 
 import pandocfiltering
-from pandocfiltering import STRTYPES
+from pandocfiltering import STRTYPES, STDIN, STDOUT
 from pandocfiltering import get_meta, extract_attrs
 from pandocfiltering import repair_refs, use_refs_factory, replace_refs_factory
 from pandocfiltering import use_attrs_factory, filter_attrs_factory
 from pandocfiltering import pandocify
-from pandocfiltering import STDIN, STDOUT
 
 from pandocattributes import PandocAttributes
 
@@ -67,9 +66,6 @@ args = parser.parse_args()
 # Set/get PANDOCVERSION
 pandocfiltering.init(args.pandocversion)
 PANDOCVERSION = pandocfiltering.PANDOCVERSION
-
-# Create our own pandoc image primitives
-Image = elt('Image', 2)      # Pandoc < 1.16
 
 # Pattern for matching labels
 LABEL_PATTERN = re.compile(r'(fig:[\w/-]*)')

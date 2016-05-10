@@ -11,10 +11,9 @@ PYTHON-2.7 = python2.7
 PYTHON-3.4 = python3.4
 
 PDFFLAGS = --variable geometry:margin=1in --standalone
-
 HTMLFLAGS = --standalone
 
-all: pdf html img
+all: pdf html img tex md
 
 pdf: out/demo-1.17.pdf \
      out/demo-1.17-py2.7.pdf \
@@ -43,6 +42,9 @@ html: out/demo-1.17.html \
 
 img: out/img/plot1.png out/img/plot2.png out/img/plot3.png 
 
+tex: out/demo-1.17.tex
+
+md: out/demo-1.17.md
 
 out/demo-1.17.html: demo.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
@@ -53,6 +55,10 @@ out/demo-1.17.pdf: demo.md
 	$(PANDOC-1.17) $< --filter pandoc-fignos $(PDFFLAGS) -o $@
 
 out/demo-1.17.tex: demo.md
+	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
+	$(PANDOC-1.17) $< --filter pandoc-fignos -o $@
+
+out/demo-1.17.md: demo.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.17) $< --filter pandoc-fignos -o $@
 
