@@ -1,6 +1,6 @@
 
 
-NEW: Pandoc-fignos supports clever referencing.  Details below
+NEW: Pandoc-fignos supports clever referencing.  Details below.
 
 
 pandoc-fignos 0.13
@@ -34,9 +34,10 @@ Contents
  1. [Rationale](#rationale)
  2. [Usage](#usage)
  3. [Markdown Syntax](#markdown-syntax)
- 4. [Technical Details](#technical-details)
- 5. [Installation](#installation)
- 6. [Getting Help](#getting-help)
+ 4. [Customization](#customization)
+ 5. [Technical Details](#technical-details)
+ 6. [Installation](#installation)
+ 7. [Getting Help](#getting-help)
 
 
 Rationale
@@ -159,9 +160,9 @@ For TeX/pdf output:
   * The `\label` and `\ref` macros are used for figure labels and
     references;
   * `\figurename` is set for the caption name; and
-  * `\cref` and `\Cref` are used if they are available (i.e.,
-    included in your pandoc template via `\usepackage{cleveref}`),
-    otherwise they are faked.  Non-breaking spaces are always used.
+  * The clever referencing macros `\cref` and `\Cref` are used
+    if they are available (i.e., included in your pandoc template
+    via `\usepackage{cleveref}`), otherwise they are faked.
 
 For all other formats the numbers, caption name, and clever references are hard-coded into the output.
 

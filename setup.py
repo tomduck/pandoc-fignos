@@ -107,7 +107,10 @@ setup(
     url='https://github.com/tomduck/pandoc-fignos',
     download_url='https://github.com/tomduck/pandoc-fignos/tarball/'+VERSION,
 
-    install_requires=['pandocfilters', 'pandoc-attributes', 'psutil'],
+    install_requires=['pandocfiltering',
+                      'pandocfilters',
+                      'pandoc-attributes',
+                      'psutil'],
 
     py_modules=['pandoc_fignos'],
     entry_points={'console_scripts':['pandoc-fignos = pandoc_fignos:main']},
