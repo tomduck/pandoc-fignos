@@ -20,7 +20,7 @@
 
 # OVERVIEW
 #
-# The basic idea is to scan the AST two times in order to:
+# The basic idea is to scan the document twice in order to:
 #
 #   1. Insert text for the figure number in each figure caption.
 #      For LaTeX, insert \label{...} instead.  The figure ids
