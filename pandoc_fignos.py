@@ -36,6 +36,7 @@ import re
 import functools
 import argparse
 import json
+import uuid
 
 import sys
 if sys.version_info > (3,):
@@ -45,7 +46,7 @@ else:
 
 from pandocfilters import walk
 from pandocfilters import RawBlock, RawInline
-from pandocfilters import Str, Para, Plain, elt
+from pandocfilters import Para, Plain, elt
 
 import pandocfiltering
 from pandocfiltering import STRTYPES
@@ -104,7 +105,7 @@ def parse_figure(key, value):
         assert key == 'Image'
         attrs, caption, target = value
         if attrs[0] == 'fig:': # Make up a unique description
-            attrs[0] = 'fig:' + '__'+str(hash(target[0]))+'__'
+            attrs[0] = 'fig:' + str(uuid.uuid4())
         return attrs, caption, target
 
 
@@ -134,7 +135,7 @@ def _extract_imageattrs(value, n):
             image['c'][1][0] = path  # Remove attr string from the path
             return PandocAttributes(s.strip(), 'markdown').to_pandoc()
 
-def use_attrs_images(key, value, fmt, meta):
+def use_attrs_image(key, value, fmt, meta):
     """Attaches attributes to Image elements (pandoc < 1.16)."""
     if PANDOCVERSION < '1.16':
         action = use_attrs_factory('Image', extract_attrs=_extract_imageattrs)
@@ -142,7 +143,7 @@ def use_attrs_images(key, value, fmt, meta):
     else:
         return # Images are already attributed for pandoc >= 1.16
 
-def filter_attrs_images(key, value, fmt, meta):
+def filter_attrs_image(key, value, fmt, meta):
     """Filters attributes from Image elements (pandoc < 1.16)."""
     if PANDOCVERSION < '1.16':
         action = filter_attrs_factory('Image', 2)
@@ -180,7 +181,7 @@ def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
           if fmt == 'latex' else \
           pandocify('%s %d. '%(captionname, references[attrs[0]])) \
           + list(caption)
-              
+
         if PANDOCVERSION >= '1.17' and fmt == 'latex':
             # Remove id from the image attributes.  It is incorrectly
             # handled by pandoc's TeX writer for these versions
@@ -248,8 +249,8 @@ def main():
 
     # First pass
     altered = functools.reduce(lambda x, action: walk(x, action, fmt, meta),
-                               [repair_refs, use_attrs_images, process_figures,
-                                filter_attrs_images], doc)
+                               [repair_refs, use_attrs_image, process_figures,
+                                filter_attrs_image], doc)
 
     # Second pass
     use_refs = use_refs_factory(references.keys())
