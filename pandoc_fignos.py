@@ -197,10 +197,6 @@ def process(meta):
     # pylint: disable=global-statement
     global captionname, cleveref_default, plusname, starname
 
-    # Initialize computed fields
-    plusnametex = None
-    starnametex = None
-
     # Read in the metadata fields and do some checking
 
     if 'fignos-caption-name' in meta:
@@ -228,11 +224,6 @@ def process(meta):
         for name in plusname:
             assert type(name) in STRTYPES
 
-        # LaTeX to inject
-        plusnametex = \
-            r'\providecommand{\crefname}[3]{}\crefname{figure}{%s}{%s}'%\
-            (plusname[0], plusname[1])
-
     if 'fignos-star-name' in meta:
         tmp = get_meta(meta, 'fignos-star-name')
         if type(tmp) is list:
@@ -242,13 +233,6 @@ def process(meta):
         assert len(starname) == 2
         for name in starname:
             assert type(name) in STRTYPES
-
-        # LaTeX to inject
-        starnametex = \
-            r'\providecommand{\Crefname}[3]{}\Crefname{figure}{%s}{%s}'%\
-            (starname[0], starname[1])
-
-    return plusnametex, starnametex
 
 
 def main():
@@ -260,7 +244,7 @@ def main():
     meta = doc[0]['unMeta']
 
     # Process the metadata variables
-    plusnametex, starnametex = process(meta)
+    process(meta)
 
     # First pass
     altered = functools.reduce(lambda x, action: walk(x, action, fmt, meta),
@@ -269,30 +253,22 @@ def main():
 
     # Second pass
     use_refs = use_refs_factory(references.keys())
-    replace_refs = replace_refs_factory(references, cleveref_default,
-                                    plusname, starname)
+    replace_refs = replace_refs_factory(references, cleveref_default, 'figure',
+                                        plusname, starname)
     altered = functools.reduce(lambda x, action: walk(x, action, fmt, meta),
                                [use_refs, replace_refs], altered)
 
 
     # Assemble supporting TeX
     if fmt == 'latex':
-        tex = []
+        tex = ['% Fignos directives']
 
         # Change caption name
         if captionname != 'Figure':
             tex.append(r'\renewcommand{\figurename}{%s}'%captionname)
 
-        # Fake \cref and \Cref when they are missing
-        tex += pandocfiltering.clevereftex
-
-        # Include plusnametex and starnametex
-        if plusnametex:
-            tex.append(plusnametex)
-        if starnametex:
-            tex.append(starnametex)
-
-        altered[1] = [RawBlock('tex', '\n'.join(tex))] + altered[1]
+        if len(tex) > 1:
+            altered[1] = [RawBlock('tex', '\n'.join(tex))] + altered[1]
 
 
     # Dump the results
