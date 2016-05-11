@@ -77,32 +77,6 @@ starname = ['Figure', 'Figures']  # Used with \Cref
 cleveref_default = False          # Default setting for clever referencing
 
 
-# Helper functions ----------------------------------------------------------
-
-def is_figure(key, value):
-    """True if this is a figure; False otherwise."""
-    if key == 'Para' and len(value) == 1:
-        return is_figure(value[0]['t'], value[0]['c'])  # Recursive call
-    elif key == 'Image' and len(value) == 3:
-        # pylint: disable=unused-variable
-        attrs, caption, target = value
-        return target[1] == 'fig:'  # Pandoc uses this as a figure marker
-    else:
-        return False
-
-def parse_figure(key, value):
-    """Parses the value from a figure."""
-    if key == 'Para':
-        assert is_figure(key, value)
-        return parse_figure(value[0]['t'], value[0]['c'])
-    else:
-        assert key == 'Image'
-        attrs, caption, target = value
-        if attrs[0] == 'fig:': # Make up a unique description
-            attrs[0] = 'fig:' + str(uuid.uuid4())
-        return attrs, caption, target
-
-
 # Actions --------------------------------------------------------------------
 
 def _extract_imageattrs(value, n):
@@ -147,24 +121,28 @@ def filter_attrs_image(key, value, fmt, meta):
 def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
     """Processes the figures."""
 
-    if key == 'Para':
+    if key == 'Para' and len(value) == 1:  # May enclose a Figure
+        if value[0]['t'] == 'Image' and len(value[0]['c']) == 3 and \
+                value[0]['c'][2][1] == 'fig:':
+            # A figure is contained.  Prepend html anchors.
+            if fmt in ('html', 'html5'):
+                # pylint: disable=unused-variable
+                attrs, caption, target = value[0]['c']
+                if LABEL_PATTERN.match(attrs[0]):
+                    anchor = RawInline('html', '<a name="%s"></a>'%attrs[0])
+                    return [Plain([anchor]), Para(value)]
 
-        # Prepend html anchors for figures.
-        if fmt in ('html', 'html5') and is_figure(key, value):
-            # pylint: disable=unused-variable
-            attrs, caption, target = parse_figure(key, value)
-            if LABEL_PATTERN.match(attrs[0]):
-                anchor = RawInline('html', '<a name="%s"></a>'%attrs[0])
-                return [Plain([anchor]), Para(value)]
-
-    elif is_figure(key, value):
+    elif key == 'Image' and len(value) == 3:  # This is a figure
 
         # Parse the image
-        attrs, caption, target = parse_figure(key, value)
+        attrs, caption, target = value
 
         # Bail out if the label does not conform
         if not attrs[0] or not LABEL_PATTERN.match(attrs[0]):
             return
+
+        if attrs[0] == 'fig:': # Make up a unique description
+            attrs[0] = attrs[0] + str(uuid.uuid4())
 
         # Save the reference
         references[attrs[0]] = len(references) + 1
