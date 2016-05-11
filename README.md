@@ -1,6 +1,6 @@
 
 
-NEW: Pandoc-fignos supports clever referencing.  Details below.
+NOTICE: Clever referencing is now supported -- details below.  A code overhaul was performed during the implementation.  All regressions tests are passing.  If you find anything broken, please file a report on the [Issues tracker].
 
 
 pandoc-fignos 0.13

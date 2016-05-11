@@ -6,11 +6,11 @@ fignos-star-name: FIGURE
 
 Figures @fig:1, {@fig:2}a and {@fig:2}b, and  {@fig:3}: 
 
-![Plot 1.](img/plot1.png){#fig:1}
+![Some data.](img/plot1.png){#fig:1}
 
-![Plot 2.](img/plot2.png){#fig:2}
+![More data.](img/plot2.png){#fig:2}
 
-![Plot 3.][ref-link]
+![Even more data. Reference to +@fig:1.][ref-link]
 
 [ref-link]: img/plot3.png {#fig:3}
 

@@ -45,15 +45,13 @@ else:
     from urllib import unquote  # pylint: disable=no-name-in-module
 
 from pandocfilters import walk
-from pandocfilters import RawBlock, RawInline
-from pandocfilters import Para, Plain
+from pandocfilters import Str, Space, Para, Plain, RawBlock, RawInline
 
 import pandocfiltering
 from pandocfiltering import STRTYPES, STDIN, STDOUT
 from pandocfiltering import get_meta, extract_attrs
 from pandocfiltering import repair_refs, use_refs_factory, replace_refs_factory
 from pandocfiltering import use_attrs_factory, filter_attrs_factory
-from pandocfiltering import pandocify
 
 from pandocattributes import PandocAttributes
 
@@ -112,7 +110,6 @@ def _extract_imageattrs(value, n):
     attributes begin.  Extracted elements are deleted from the value list.
     Attrs are returned in pandoc format.
     """
-
     try:
         return extract_attrs(value, n)
 
@@ -173,10 +170,13 @@ def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
         references[attrs[0]] = len(references) + 1
 
         # Adjust caption depending on the output format
-        value[1] = list(caption) + [RawInline('tex', r'\label{%s}'%attrs[0])] \
-          if fmt == 'latex' else \
-          pandocify('%s %d. '%(captionname, references[attrs[0]])) \
-          + list(caption)
+        if fmt == 'latex':
+            value[1] = list(caption) + \
+              [RawInline('tex', r'\label{%s}'%attrs[0])]
+        else:
+            value[1] = [Str('%s'%captionname), Space(),
+                        Str('%d.'%references[attrs[0]]), Space()] + \
+                        list(caption)
 
         if PANDOCVERSION >= '1.17' and fmt == 'latex':
             # Remove id from the image attributes.  It is incorrectly
