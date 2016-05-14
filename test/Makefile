@@ -15,136 +15,136 @@ HTMLFLAGS = --standalone
 
 all: pdf html img tex md
 
-pdf: out/demo-1.17.pdf \
-     out/demo-1.17-py2.7.pdf \
-     out/demo-1.17-py3.4.pdf \
-     out/demo-1.17-autolink.pdf \
-     out/demo-1.17-cleveref.pdf \
-     out/demo-1.17-autolink-cleveref.pdf \
-     out/demo-1.16.pdf \
-     out/demo-1.16-py2.7.pdf \
-     out/demo-1.16-py3.4.pdf \
-     out/demo-1.16-autolink.pdf \
-     out/demo-1.16-cleveref.pdf \
-     out/demo-1.16-autolink-cleveref.pdf \
-     out/demo-1.15.pdf \
-     out/demo-1.15-py2.7.pdf \
-     out/demo-1.15-py3.4.pdf \
-     out/demo-1.15-autolink.pdf \
-     out/demo-1.15-cleveref.pdf \
-     out/demo-1.16-autolink-cleveref.pdf
+pdf: out/test-1.17.pdf \
+     out/test-1.17-py2.7.pdf \
+     out/test-1.17-py3.4.pdf \
+     out/test-1.17-autolink.pdf \
+     out/test-1.17-cleveref.pdf \
+     out/test-1.17-autolink-cleveref.pdf \
+     out/test-1.16.pdf \
+     out/test-1.16-py2.7.pdf \
+     out/test-1.16-py3.4.pdf \
+     out/test-1.16-autolink.pdf \
+     out/test-1.16-cleveref.pdf \
+     out/test-1.16-autolink-cleveref.pdf \
+     out/test-1.15.pdf \
+     out/test-1.15-py2.7.pdf \
+     out/test-1.15-py3.4.pdf \
+     out/test-1.15-autolink.pdf \
+     out/test-1.15-cleveref.pdf \
+     out/test-1.16-autolink-cleveref.pdf
 
 
-html: out/demo-1.17.html \
-      out/demo-1.16.html \
-      out/demo-1.15.html \
+html: out/test-1.17.html \
+      out/test-1.16.html \
+      out/test-1.15.html \
       img
 
 img: out/img/plot1.png out/img/plot2.png out/img/plot3.png 
 
-tex: out/demo-1.17.tex
+tex: out/test-1.17.tex
 
-md: out/demo-1.17.md
+md: out/test-1.17.md
 
-out/demo-1.17.html: demo.md
+out/test-1.17.html: test.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.17) $< --filter pandoc-fignos $(HTMLFLAGS) -o $@
 
-out/demo-1.17.pdf: demo.md
+out/test-1.17.pdf: test.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.17) $< --filter pandoc-fignos $(PDFFLAGS) -o $@
 
-out/demo-1.17.tex: demo.md
+out/test-1.17.tex: test.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.17) $< --filter pandoc-fignos -o $@
 
-out/demo-1.17.md: demo.md
+out/test-1.17.md: test.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.17) $< --filter pandoc-fignos -o $@
 
-out/demo-1.17-py2.7.pdf: demo.md
+out/test-1.17-py2.7.pdf: test.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.17) $< -t json | $(PYTHON-2.7) ../pandoc_fignos.py latex --pandocversion=$(v1.17) | $(PANDOC-1.17) -f json $(PDFFLAGS) -o $@
 
-out/demo-1.17-py3.4.pdf: demo.md
+out/test-1.17-py3.4.pdf: test.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.17) $< -t json | $(PYTHON-3.4) ../pandoc_fignos.py latex --pandocversion=$(v1.17) | $(PANDOC-1.17) -f json $(PDFFLAGS) -o $@
 
-out/demo-1.17-autolink.pdf: demo.md
+out/test-1.17-autolink.pdf: test.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.17) $< --from markdown+autolink_bare_uris --filter pandoc-fignos $(PDFFLAGS) -o $@
 
-out/demo-1.17-cleveref.pdf: demo.md
+out/test-1.17-cleveref.pdf: test.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.17) $< --filter pandoc-fignos $(PDFFLAGS) --include-in-header=cleveref.tex -o $@
 
-out/demo-1.17-autolink-cleveref.pdf: demo.md
+out/test-1.17-autolink-cleveref.pdf: test.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.17) $< --from markdown+autolink_bare_uris --filter pandoc-fignos $(PDFFLAGS) --include-in-header=cleveref.tex -o $@
 
 
-out/demo-1.16.html: demo.md
+out/test-1.16.html: test.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.16) $< --filter pandoc-fignos $(HTMLFLAGS) -o $@
 
-out/demo-1.16.pdf: demo.md
+out/test-1.16.pdf: test.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.16) $< --filter pandoc-fignos $(PDFFLAGS) -o $@
 
-out/demo-1.16.tex: demo.md
+out/test-1.16.tex: test.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.16) $< --filter pandoc-fignos -o $@
 
-out/demo-1.16-py2.7.pdf: demo.md
+out/test-1.16-py2.7.pdf: test.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.16) $< -t json | $(PYTHON-2.7) ../pandoc_fignos.py latex --pandocversion=$(v1.16) | $(PANDOC-1.16) -f json $(PDFFLAGS) -o $@
 
-out/demo-1.16-py3.4.pdf: demo.md
+out/test-1.16-py3.4.pdf: test.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.16) $< -t json | $(PYTHON-3.4) ../pandoc_fignos.py latex --pandocversion=$(v1.16) | $(PANDOC-1.16) -f json $(PDFFLAGS) -o $@
 
-out/demo-1.16-autolink.pdf: demo.md
+out/test-1.16-autolink.pdf: test.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.16) $< --from markdown+autolink_bare_uris --filter pandoc-fignos $(PDFFLAGS) -o $@
 
-out/demo-1.16-cleveref.pdf: demo.md
+out/test-1.16-cleveref.pdf: test.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.16) $< --filter pandoc-fignos $(PDFFLAGS) --include-in-header=cleveref.tex -o $@
 
-out/demo-1.16-autolink-cleveref.pdf: demo.md
+out/test-1.16-autolink-cleveref.pdf: test.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.16) $< --from markdown+autolink_bare_uris --filter pandoc-fignos $(PDFFLAGS) --include-in-header=cleveref.tex -o $@
 
 
-out/demo-1.15.html: demo.md
+out/test-1.15.html: test.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.15) $< --filter pandoc-fignos $(HTMLFLAGS) -o $@
 
-out/demo-1.15.pdf: demo.md
+out/test-1.15.pdf: test.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.15) $< --filter pandoc-fignos $(PDFFLAGS) -o $@
 
-out/demo-1.15.tex: demo.md
+out/test-1.15.tex: test.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.15) $< --filter pandoc-fignos -o $@
 
-out/demo-1.15-py2.7.pdf: demo.md
+out/test-1.15-py2.7.pdf: test.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.15) $< -t json | $(PYTHON-2.7) ../pandoc_fignos.py latex --pandocversion=$(v1.15) | $(PANDOC-1.15) -f json $(PDFFLAGS) -o $@
 
-out/demo-1.15-py3.4.pdf: demo.md
+out/test-1.15-py3.4.pdf: test.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.15) $< -t json | $(PYTHON-3.4) ../pandoc_fignos.py latex --pandocversion=$(v1.15) | $(PANDOC-1.15) -f json $(PDFFLAGS) -o $@
 
-out/demo-1.15-autolink.pdf: demo.md
+out/test-1.15-autolink.pdf: test.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.15) $< --from markdown+autolink_bare_uris --filter pandoc-fignos $(PDFFLAGS) -o $@
 
-out/demo-1.15-cleveref.pdf: demo.md
+out/test-1.15-cleveref.pdf: test.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.15) $< --filter pandoc-fignos $(PDFFLAGS) --include-in-header=cleveref.tex -o $@
 
-out/demo-1.15-autolink-cleveref.pdf: demo.md
+out/test-1.15-autolink-cleveref.pdf: test.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-1.15) $< --from markdown+autolink_bare_uris --filter pandoc-fignos $(PDFFLAGS) --include-in-header=cleveref.tex -o $@
 
