@@ -1,6 +1,6 @@
 
 
-NOTICE: Clever referencing is now supported -- details below.  A code overhaul was performed during the implementation.  All regressions tests are passing.  If you find anything broken, please file a report on the [Issues tracker].
+NOTICE: Clever referencing is now supported -- details below.
 
 
 pandoc-fignos 0.13
@@ -13,6 +13,8 @@ Demonstration: Processing [demo.md] with `pandoc --filter pandoc-fignos` gives n
 This version of pandoc-fignos was tested using pandoc 1.17.0.2, 1.16.0.2 and 1.15.2.  It works under linux, Mac OS X and Windows.  Older versions and other platforms can be supported on request.
 
 Installation of the filter is straight-forward.  It is simple to use and has been tested extensively.  I am pleased to receive bug reports and feature requests on the project's [Issues tracker].
+
+If you like pandoc-fignos, please consider giving it a Star on GitHub and telling the pandoc community about it.
 
 See also: [pandoc-eqnos], [pandoc-tablenos]
 

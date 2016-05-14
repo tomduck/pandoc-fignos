@@ -117,6 +117,8 @@ def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
             if fmt in ('html', 'html5'):
                 # pylint: disable=unused-variable
                 attrs, caption, target = value[0]['c']
+                if attrs[0] == 'fig:': # Make up a unique description
+                    attrs[0] = attrs[0] + str(uuid.uuid4())
                 if LABEL_PATTERN.match(attrs[0]):
                     anchor = RawInline('html', '<a name="%s"></a>'%attrs[0])
                     return [Plain([anchor]), Para(value)]
