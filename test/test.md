@@ -1,24 +1,28 @@
 ---
-figure-name: Fig.
+figure-name: FIG
+fignos-plus-name: FIG.
+fignos-star-name: FIGURE
 ...
 
-Figures @fig:plot1, @fig:plot2, {@fig:plot3}a and {@fig:plot3}b:
+Figures @fig:1, {@fig:2}a and {@fig:2}b, and  {@fig:3}: 
 
-![Plot 1.](img/plot1.png){#fig:plot1}
+![Some data.](img/plot1.png){#fig:1}
 
-![Plot 2.](img/plot2.png){#fig:plot2}
+![More data.](img/plot2.png){#fig:2}
 
-![Plot 3.][ref-link]
+![Even more data. Reference to +@fig:1.][ref-link]
 
-[ref-link]: img/plot3.png {#fig:plot3}
+[ref-link]: img/plot3.png {#fig:3}
 
-Figure @fig:plot1 and Fig. {@fig:plot3}a.  Figures {@fig:plot1}-{@fig:plot3}, and Figs {@fig:plot1}-{@fig:plot2}-{@fig:plot3}.
+*@fig:1, {+@fig:2}a and fig. !@fig:3.
+
+Figures {@fig:1}-{@fig:3}, and figs. {@fig:1}-{@fig:2}-{@fig:3}.
 
 References in lists:
 
- 1. Figure @fig:plot1 and Fig. {@fig:plot3}a.
- 2. Figures {@fig:plot1}-{@fig:plot3}, and Figs. 
-    {@fig:plot1}-{@fig:plot2}-{@fig:plot3}.
+ 1. *@fig:1, {+@fig:2}a and fig. !@fig:3.
+ 2. Figures {@fig:1}-{@fig:3}, and figs. 
+    {@fig:1}-{@fig:2}-{@fig:3}.
 
 A [regular link](http://example.com/), an [*italicized link*](http://example.com/) and an email.address@mailinator.com.
 
@@ -30,7 +34,7 @@ A [regular link](http://example.com/), an [*italicized link*](http://example.com
 Corner cases
 ------------
 
-Note: Attributed images are supported by pandoc >= 1.16.  Using the attribute `width="50px"` with earlier versions has no effect.
+*Issue: Attributed images are supported by pandoc >= 1.16.  Using the attribute `width="50px"` with earlier versions has no effect.*
 
 ****
 
@@ -60,7 +64,9 @@ Figure:
 
 \newpage
 
-Figure {@fig:c1}:
+Figure @fig:c1:
+
+*Issue: references ending in colons do not convert for pandoc 1.15*
 
 ![Numbered and attributed (small).](img/plot3.png){#fig:c1 width="50px"}
 
