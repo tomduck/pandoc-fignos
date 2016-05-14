@@ -44,16 +44,17 @@ if sys.version_info > (3,):
 else:
     from urllib import unquote  # pylint: disable=no-name-in-module
 
-from pandocfilters import walk
-from pandocfilters import Str, Space, Para, Plain, RawBlock, RawInline
+from pandocfilters import walk, elt
+from pandocfilters import Image, Str, Space, Para, Plain, RawBlock, RawInline
 
-import pandocfiltering
-from pandocfiltering import STRTYPES, STDIN, STDOUT
-from pandocfiltering import get_meta, extract_attrs
-from pandocfiltering import repair_refs, use_refs_factory, replace_refs_factory
-from pandocfiltering import use_attrs_factory, filter_attrs_factory
+import pandocxnos
+from pandocxnos import STRTYPES, STDIN, STDOUT
+from pandocxnos import get_meta, extract_attrs
+from pandocxnos import repair_refs, process_refs_factory, replace_refs_factory
+from pandocxnos import attach_attrs_factory, detach_attrs_factory
 
 from pandocattributes import PandocAttributes
+
 
 # Read the command-line arguments
 parser = argparse.ArgumentParser(description='Pandoc figure numbers filter.')
@@ -61,9 +62,12 @@ parser.add_argument('fmt')
 parser.add_argument('--pandocversion', help='The pandoc version.')
 args = parser.parse_args()
 
-# Set/get PANDOCVERSION
-pandocfiltering.init(args.pandocversion)
-PANDOCVERSION = pandocfiltering.PANDOCVERSION
+# Initialize pandocxnos
+PANDOCVERSION = pandocxnos.init(args.pandocversion)
+
+# Override the Image element for pandoc < 1.16
+if PANDOCVERSION < '1.16':
+    Image = elt('Image', 2)
 
 # Pattern for matching labels
 LABEL_PATTERN = re.compile(r'(fig:[\w/-]*)')
@@ -79,44 +83,29 @@ cleveref_default = False          # Default setting for clever referencing
 
 # Actions --------------------------------------------------------------------
 
-def _extract_imageattrs(value, n):
-    """Extracts attributes from a list of values.  n is the index where the
-    attributes begin.  Extracted elements are deleted from the value list.
-    Attrs are returned in pandoc format.
+def _extract_attrs(x, n):
+    """Extracts attributes for an image.  n is the index where the
+    attributes begin.  Extracted elements are deleted from the element
+    list x.  Attrs are returned in pandoc format.
     """
     try:
-        return extract_attrs(value, n)
+        return extract_attrs(x, n)
 
     except (ValueError, IndexError):
         # Look for attributes attached to the image path, as occurs with
         # reference links.  Remove the encoding.
-        assert value[n-1]['t'] == 'Image'
-        image = value[n-1]
-
-        try:
-            seq = unquote(image['c'][1][0]).split()
-            path, s = seq[0], ' '.join(seq[1:])
-        except ValueError:
-            pass
+        assert x[n-1]['t'] == 'Image'
+        image = x[n-1]
+        path, attrs = unquote(image['c'][-1][0]).split(' ', 1)
+        if attrs:
+            image['c'][-1][0] = path  # Remove attr string from the path
+            return PandocAttributes(attrs.strip(), 'markdown').to_pandoc()
         else:
-            image['c'][1][0] = path  # Remove attr string from the path
-            return PandocAttributes(s.strip(), 'markdown').to_pandoc()
+            raise
 
-def use_attrs_image(key, value, fmt, meta):
-    """Attaches attributes to Image elements (pandoc < 1.16)."""
-    if PANDOCVERSION < '1.16':
-        action = use_attrs_factory('Image', extract_attrs=_extract_imageattrs)
-        return action(key, value, fmt, meta)
-    else:
-        return # Images are already attributed for pandoc >= 1.16
+attach_attrs_image = attach_attrs_factory(Image, extract_attrs=_extract_attrs)
+detach_attrs_image = detach_attrs_factory(Image)
 
-def filter_attrs_image(key, value, fmt, meta):
-    """Filters attributes from Image elements (pandoc < 1.16)."""
-    if PANDOCVERSION < '1.16':
-        action = filter_attrs_factory('Image', 2)
-        return action(key, value, fmt, meta)
-    else:
-        return # Images are already attributed for pandoc >= 1.16
 
 def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
     """Processes the figures."""
@@ -223,15 +212,16 @@ def main():
 
     # First pass
     altered = functools.reduce(lambda x, action: walk(x, action, fmt, meta),
-                               [repair_refs, use_attrs_image, process_figures,
-                                filter_attrs_image], doc)
+                               [attach_attrs_image, process_figures,
+                                detach_attrs_image], doc)
 
     # Second pass
-    use_refs = use_refs_factory(references.keys())
-    replace_refs = replace_refs_factory(references, cleveref_default, 'figure',
-                                        plusname, starname)
+    process_refs = process_refs_factory(references.keys())
+    replace_refs = replace_refs_factory(references, cleveref_default,
+                                        plusname, starname,'figure')
     altered = functools.reduce(lambda x, action: walk(x, action, fmt, meta),
-                               [use_refs, replace_refs], altered)
+                               [repair_refs, process_refs, replace_refs],
+                               altered)
 
 
     # Assemble supporting TeX
