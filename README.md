@@ -1,6 +1,6 @@
 
 
-NOTICE: Clever referencing is now supported -- details below.
+NOTICE: Clever referencing is now supported.  Details below.
 
 
 pandoc-fignos 0.13
@@ -13,8 +13,6 @@ Demonstration: Processing [demo.md] with `pandoc --filter pandoc-fignos` gives n
 This version of pandoc-fignos was tested using pandoc 1.17.0.2, 1.16.0.2 and 1.15.2.  It works under linux, Mac OS X and Windows.  Older versions and other platforms can be supported on request.
 
 Installation of the filter is straight-forward.  It is simple to use and has been tested extensively.  I am pleased to receive bug reports and feature requests on the project's [Issues tracker].
-
-If you like pandoc-fignos, please consider giving it a Star on GitHub and telling the pandoc community about it.
 
 See also: [pandoc-eqnos], [pandoc-tablenos]
 
@@ -126,6 +124,7 @@ Note: The disabling modifier "!" is used instead of "-" because [pandoc unnecess
 [epub2]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/out/demo2.epub
 [md2]: https://github.com/tomduck/pandoc-fignos/blob/master/demos/out/demo2.md
 [pandoc unnecessarily drops minus signs]: https://github.com/jgm/pandoc/issues/2901
+
 
 Customization
 -------------
