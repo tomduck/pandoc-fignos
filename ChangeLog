@@ -1,8 +1,8 @@
 
-pandoc-fignos 0.13 (2016-05-14)
+pandoc-fignos 0.13 (2016-05-15)
 
     * Added clever referencing (Issue #13).
-    * Moved library code to pandocfiltering project.
+    * Moved library code to pandocxnos project.
 
 
 pandoc-fignos 0.12 (2016-04-27)
