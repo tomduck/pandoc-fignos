@@ -148,17 +148,17 @@ def _process_image(value, fmt):
         value[1] += [RawInline('tex', r'\label{%s}'%attrs[0])]
     elif type(references[attrs[0]]) is int:
         value[1] = [Str(captionname), Space(),
-                    Str('%d.'%references[attrs[0]]), Space()] + list(caption)
+                    Str('%d:'%references[attrs[0]]), Space()] + list(caption)
     else:  # It is a string
         assert type(references[attrs[0]]) in STRTYPES
         # Handle both math and text
         text = references[attrs[0]]
         if text.startswith('$') and text.endswith('$'):
             math = text.replace(' ', r'\ ')[1:-1]
-            el = Math({"t":"InlineMath", "c":[]}, math)
+            els = [Math({"t":"InlineMath", "c":[]}, math), Str(':')]
         else:
-            el = Str(text)
-        value[1] = [Str('Table'), Space(), el, Space()] + list(caption)
+            els = [Str(text+':')]
+        value[1] = [Str('Table'), Space()]+ els + [Space()] + list(caption)
 
     return False, is_tagged, attrs
 
