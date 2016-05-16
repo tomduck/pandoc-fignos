@@ -27,9 +27,11 @@ References in lists:
 A [regular link](http://example.com/), an [*italicized link*](http://example.com/) and an email.address@mailinator.com.
 
 
+****
+
+
 \newpage
 
-****
 
 Corner cases
 ------------
@@ -62,7 +64,9 @@ Figure:
 
 ****
 
+
 \newpage
+
 
 Figure @fig:c1:
 
@@ -86,8 +90,6 @@ Figure {@fig:c3}:
 
 ****
 
-\newpage
-
 Image (non-breaking space after markdown), unattributed:
 
 ![Caption should not show.](img/plot3.png)\ 
@@ -100,21 +102,41 @@ Image (non-breaking space after markdown), attributed (small):
 
 ****
 
+
 \newpage
 
-Inline image with attributes (small; the "fig:" id should be ignored -- check for missing number in figure sequence)
+
+Inline image with attributes (small)
 ![Caption should not show.](img/plot3.png){#fig: width="50px"}
 and another without
 ![Caption should not show.](img/plot3.png)
 
 ****
 
-\newpage
-
-Here is a series of unreferenceable figures::
+Here is a series of unreferenceable figures:
 
 ![Unreferenceable 1.](img/plot1.png){#fig: width="50px"}
 
-![Unreferenceable 2.](img/plot2.png){#fig: width="50px"}
+![Unreferenceable 2.](img/plot1.png){#fig: width="50px"}
 
-![Unreferenceable 3.](img/plot3.png){#fig: width="50px"}
+![Unreferenceable 3.](img/plot1.png){#fig: width="50px"}
+
+
+****
+
+
+\newpage
+
+
+Figures @fig:tag1 and @fig:tag2 are tagged tables:
+
+![Tagged 1.](img/plot1.png){#fig:tag1 width="50px" tag=B.1}
+
+![Tagged 2.](img/plot1.png){#fig:tag2 width="50px" tag="$\mathrm{B.3'}$"}
+
+Check that the number for Fig. @fig:tag3 follows from those earlier.
+
+![Numbered.](img/plot1.png){#fig:tag3 width="50px"}
+
+****
+

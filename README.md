@@ -3,7 +3,7 @@
 NOTICE: Clever referencing is now supported.  Details below.
 
 
-pandoc-fignos 0.13
+pandoc-fignos 0.14
 ==================
 
 *pandoc-fignos* is a [pandoc] filter for numbering figures and figure references in markdown documents.
@@ -97,6 +97,8 @@ Demonstration: Processing [demo.md] with `pandoc --filter pandoc-fignos` gives n
 
 ### Extended Syntax ###
 
+#### Clever References ####
+
 Writing markdown like
 
     See fig. @fig:id.
@@ -124,6 +126,15 @@ Note: The disabling modifier "!" is used instead of "-" because [pandoc unnecess
 [epub2]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/out/demo2.epub
 [md2]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/out/demo2.md
 [pandoc unnecessarily drops minus signs]: https://github.com/jgm/pandoc/issues/2901
+
+
+#### Tagged Figures ####
+
+You may optionally override the figure number by placing a tag in a figure's attributes block as follows:
+
+    ![Caption.](image.png){#fig:id tag="B.1"}
+
+The tag may be arbitrary text, or an inline equation such as `$\mathrm{B.1'}$`.  Mixtures of the two are not currently supported.
 
 
 Customization

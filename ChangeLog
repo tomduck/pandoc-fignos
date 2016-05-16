@@ -1,4 +1,9 @@
 
+pandoc-fignos 0.14 (unreleased)
+
+    * Added figure tags.
+
+
 pandoc-fignos 0.13 (2016-05-15)
 
     * Added clever referencing (Issue #13).
