@@ -143,7 +143,7 @@ def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
             value[1] = list(caption) + \
               [RawInline('tex', r'\label{%s}'%attrs[0])]
         else:
-            value[1] = [Str('%s'%captionname), Space(),
+            value[1] = [Str(captionname), Space(),
                         Str('%d.'%references[attrs[0]]), Space()] + \
                         list(caption)
 
