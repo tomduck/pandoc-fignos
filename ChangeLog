@@ -1,5 +1,5 @@
 
-pandoc-fignos 0.14 (unreleased)
+pandoc-fignos 0.14 (2016-05-18)
 
     * Added figure tags.
     * Changed caption separator from period to colon for html output
