@@ -154,6 +154,9 @@ Pandoc-fignos may be customized by setting variables in the [metadata block] or 
   * `fignos-star-name` - Sets the name of a "*" reference 
     (e.g., change it from "Figure" to "Fig.").
 
+  * `xnos-cleveref-fake` - Sets cleveref faking On/Off (LaTeX/pdf
+    only).  See [Technical Details](#technical-details), below.
+
 [metadata block]: http://pandoc.org/README.html#extension-yaml_metadata_block
 
 Demonstration: Processing [demo3.md] with `pandoc --filter pandoc-fignos` gives numbered figures and references in [pdf][pdf3], [tex][tex3], [html][html3], [epub][epub3], [md][md3] and other formats.
@@ -175,8 +178,10 @@ For TeX/pdf output:
     references;
   * `\figurename` is set for the caption name; and
   * The clever referencing macros `\cref` and `\Cref` are used
-    if they are available (i.e., included in your pandoc template
-    via `\usepackage{cleveref}`), otherwise they are faked.
+    if they are available (i.e. included in your LaTeX template via
+    `\usepackage{cleveref}`), otherwise they are faked.  Set the 
+    meta variable `xnos-cleveref-fake` to `Off` to disable cleveref
+    faking.
 
 For all other formats the numbers, caption name, and clever references are hard-coded into the output.
 
