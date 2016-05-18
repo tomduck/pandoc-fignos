@@ -176,7 +176,9 @@ For TeX/pdf output:
 
   * The `\label` and `\ref` macros are used for figure labels and
     references;
-  * `\figurename` is set for the caption name; and
+  * `\figurename` is set for the caption name;
+  * Tags are supported by temporarily redefining `\thefigure` 
+    around a figure; and
   * The clever referencing macros `\cref` and `\Cref` are used
     if they are available (i.e. included in your LaTeX template via
     `\usepackage{cleveref}`), otherwise they are faked.  Set the 
