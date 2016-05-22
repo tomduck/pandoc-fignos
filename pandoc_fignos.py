@@ -204,6 +204,54 @@ def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
 
 # Main program ---------------------------------------------------------------
 
+# TeX for captions without the "Figure X:" prefix.  The idea here it to
+# define and temporarily install a modified \@makecaption using an
+# environment.  See https://stackoverflow.com/questions/2039690
+# for the standard definition.  The counter must be set to something unique
+# so that when we reset (and decrement) it duplicate names are avoided.
+# This must be done for hyperref counters as well; see Sect. 3.9 of
+# http://ctan.mirror.rafal.ca/macros/latex/contrib/hyperref/doc/manual.html.
+NOPREFIXCATPTION_TEX = r"""
+% Define macro that creates a caption without a prefix
+\makeatletter
+\long\def\@makenoprefixcaption#1#2{
+  \vskip\abovecaptionskip
+  \sbox\@tempboxa{#2}
+  \ifdim \wd\@tempboxa >\hsize
+    #2\par
+  \else
+    \global \@minipagefalse
+    \hb@xt@\hsize{\hfil\box\@tempboxa\hfil}
+  \fi
+  \vskip\belowcaptionskip}
+\makeatother
+
+% Save originals
+\makeatletter
+\newcounter{dummy}
+\let\@oldmakecaption=\@makecaption
+\let\oldthefigure=\thefigure
+\let\oldtheHfigure=\theHfigure
+\makeatother
+
+% Create environment to disable figure caption prefixes
+\makeatletter
+\newenvironment{no-prefix-figure-caption}{
+  % Replace macros
+  \let\@makecaption=\@makenoprefixcaption
+  \renewcommand\thefigure{dummy.\thedummy}
+  \renewcommand\theHfigure{dummy.\thedummy}
+  \stepcounter{dummy}
+}{
+  % Restore macros
+  \let\thefigure=\oldthefigure
+  \let\theHfigure=\oldtheHfigure
+  \let\@makecaption=\@oldmakecaption
+  \addtocounter{figure}{-1}
+}
+\makeatother
+"""
+
 def process(meta):
     """Saves metadata fields in global variables and returns a few
     computed fields."""
