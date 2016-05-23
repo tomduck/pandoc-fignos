@@ -32,7 +32,7 @@ pdf: out/test-1.17.pdf \
      out/test-1.15-py3.4.pdf \
      out/test-1.15-autolink.pdf \
      out/test-1.15-cleveref.pdf \
-     out/test-1.16-autolink-cleveref.pdf
+     out/test-1.15-autolink-cleveref.pdf
 
 
 html: out/test-1.17.html \
@@ -42,7 +42,9 @@ html: out/test-1.17.html \
 
 img: out/img/plot1.png out/img/plot2.png out/img/plot3.png 
 
-tex: out/test-1.17.tex
+tex: out/test-1.17.tex \
+     out/test-1.16.tex \
+     out/test-1.15.tex
 
 md: out/test-1.17.md
 

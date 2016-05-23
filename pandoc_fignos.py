@@ -44,14 +44,15 @@ if sys.version_info > (3,):
 else:
     from urllib import unquote  # pylint: disable=no-name-in-module
 
-from pandocfilters import walk, elt
+from pandocfilters import walk
 from pandocfilters import Image, Math, Str, Space, Para, RawBlock, RawInline
 
 import pandocxnos
 from pandocxnos import STRTYPES, STDIN, STDOUT
-from pandocxnos import get_meta, extract_attrs
+from pandocxnos import elt, get_meta, extract_attrs
 from pandocxnos import repair_refs, process_refs_factory, replace_refs_factory
 from pandocxnos import attach_attrs_factory, detach_attrs_factory
+from pandocxnos import insert_rawblocks_factory
 
 from pandocattributes import PandocAttributes
 
@@ -65,8 +66,9 @@ args = parser.parse_args()
 # Initialize pandocxnos
 PANDOCVERSION = pandocxnos.init(args.pandocversion)
 
-# Override the Image element for pandoc < 1.16
+# Element primitives
 if PANDOCVERSION < '1.16':
+    # Override the Image element for pandoc < 1.16
     Image = elt('Image', 2)
 
 # Pattern for matching labels
@@ -80,6 +82,9 @@ captionname = 'Figure'            # Used with \figurename
 plusname = ['fig.', 'figs.']      # Used with \cref
 starname = ['Figure', 'Figures']  # Used with \Cref
 cleveref_default = False          # Default setting for clever referencing
+
+# Flag for unnumbered figures
+has_unnumbered_figures = False
 
 
 # Actions --------------------------------------------------------------------
@@ -111,8 +116,7 @@ def _store_ref(attrs):
     """Stores the reference in the global references tracker.
     Returns True if this is a tagged table; False otherwise."""
 
-    # pylint: disable=global-statement
-    global Nreferences
+    global Nreferences  # pylint: disable=global-statement
 
     attrs = PandocAttributes(attrs, 'pandoc')
     if 'tag' in attrs.kvs:
@@ -130,11 +134,14 @@ def _store_ref(attrs):
 def _process_image(value, fmt):
     """Processes the image."""
 
+    global has_unnumbered_figures  # pylint: disable=global-statement
+
     # Parse the image
     attrs, caption = value[:2]
 
     # Bail out if the label does not conform
     if not attrs[0] or not LABEL_PATTERN.match(attrs[0]):
+        has_unnumbered_figures = True
         return True, None, None
 
     if attrs[0] == 'fig:': # Make up a unique description
@@ -166,20 +173,29 @@ def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
     """Processes the figures."""
 
     if key == 'Para' and len(value) == 1:  # May enclose a Figure
-        if value[0]['t'] == 'Image' and len(value[0]['c']) == 3 and \
-          value[0]['c'][2][1] == 'fig:':   # It does!
-
-            # Process the image
-            bail, is_tagged, attrs = _process_image(value[0]['c'], fmt)
-            if bail:
-                return
+        if value[0]['t'] == 'Image' and value[0]['c'][-1][1] == 'fig:':
+            # It does!
+            if len(value[0]['c']) == 2:  # Unattributed
+                return [RawBlock('tex', r'\begin{no-prefix-figure-caption}'),
+                        Para(value),
+                        RawBlock('tex', r'\end{no-prefix-figure-caption}')]
+            else:  # Process the image
+                unnumbered, is_tagged, attrs = \
+                  _process_image(value[0]['c'], fmt)
+                if unnumbered and fmt != 'latex':
+                    return
 
             # Context-dependent output
             if fmt == 'latex':
+                if unnumbered:
+                    return [
+                        RawBlock('tex', r'\begin{no-prefix-figure-caption}'),
+                        Para(value),
+                        RawBlock('tex', r'\end{no-prefix-figure-caption}')]
                 label = attrs[0]
                 if PANDOCVERSION >= '1.17':
                     # Remove id from the image attributes.  It is incorrectly
-                    # handled by pandoc's TeX writer for these versions
+                    # handled by pandoc's TeX writer for these versions.
                     if LABEL_PATTERN.match(attrs[0]):
                         attrs[0] = ''
                 if is_tagged:  # Code in the tags
@@ -188,13 +204,12 @@ def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
                                      references[label]])
                     pre = RawBlock('tex', tex)
                     # pylint: disable=star-args
-                    figure = elt('Image', 3)(*(value[0]['c']))
-                    figure['c'] = list(figure['c'])  # Needed for attr filtering
                     tex = '\n'.join([r'\let\thefigure=\oldthefigure',
                                      r'\addtocounter{figure}{-1}'])
                     post = RawBlock('tex', tex)
                     return [pre, Para(value), post]
-            elif fmt in ('html', 'html5'):  # Insert anchor
+            elif fmt in ('html', 'html5'):
+                # Insert anchor
                 # pylint: disable=unused-variable
                 attrs, caption, target = value[0]['c']
                 if LABEL_PATTERN.match(attrs[0]):
@@ -204,15 +219,16 @@ def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
 
 # Main program ---------------------------------------------------------------
 
-# TeX for captions without the "Figure X:" prefix.  The idea here it to
-# define and temporarily install a modified \@makecaption using an
-# environment.  See https://stackoverflow.com/questions/2039690
-# for the standard definition.  The counter must be set to something unique
-# so that when we reset (and decrement) it duplicate names are avoided.
-# This must be done for hyperref counters as well; see Sect. 3.9 of
+# Define \@makenoprefixcaption to make a caption without a prefix.  This
+# should replace \@makecaption as needed.  See the standard \@makecaption TeX
+# at https://stackoverflow.com/questions/2039690.  The macro gets installed
+# using an environment.  The \thefigure counter must be set to something unique
+# so that duplicate names are avoided.  This must be done the hyperref
+# counter \theHfigure as well; see Sect. 3.9 of
 # http://ctan.mirror.rafal.ca/macros/latex/contrib/hyperref/doc/manual.html.
-NOPREFIXCATPTION_TEX = r"""
-% Define macro that creates a caption without a prefix
+
+TEX0 = r"""
+% pandoc-xnos: macro to create a caption without a prefix
 \makeatletter
 \long\def\@makenoprefixcaption#1#2{
   \vskip\abovecaptionskip
@@ -225,32 +241,40 @@ NOPREFIXCATPTION_TEX = r"""
   \fi
   \vskip\belowcaptionskip}
 \makeatother
+""".strip()
 
-% Save originals
+TEX1 = r"""
+% pandoc-fignos: save original macros
 \makeatletter
-\newcounter{dummy}
 \let\@oldmakecaption=\@makecaption
 \let\oldthefigure=\thefigure
 \let\oldtheHfigure=\theHfigure
 \makeatother
+""".strip()
 
-% Create environment to disable figure caption prefixes
+TEX2 = r"""
+% pandoc-fignos: environment disables figure caption prefixes
 \makeatletter
+\newcounter{figno}
 \newenvironment{no-prefix-figure-caption}{
-  % Replace macros
   \let\@makecaption=\@makenoprefixcaption
-  \renewcommand\thefigure{dummy.\thedummy}
-  \renewcommand\theHfigure{dummy.\thedummy}
-  \stepcounter{dummy}
+  \renewcommand\thefigure{x.\thefigno}
+  \renewcommand\theHfigure{x.\thefigno}
+  \stepcounter{figno}
 }{
-  % Restore macros
   \let\thefigure=\oldthefigure
   \let\theHfigure=\oldtheHfigure
   \let\@makecaption=\@oldmakecaption
   \addtocounter{figure}{-1}
 }
 \makeatother
-"""
+""".strip()
+
+# TeX to set the caption name
+TEX3 = r"""
+%% pandoc-fignos: caption name
+\renewcommand{\figurename}{%s}
+""".strip()
 
 def process(meta):
     """Saves metadata fields in global variables and returns a few
@@ -322,16 +346,24 @@ def main():
                                altered)
 
 
-    # Assemble supporting TeX
+    # Insert supporting TeX
     if fmt == 'latex':
-        tex = ['% Fignos directives']
 
-        # Change caption name
+        rawblocks = []
+
+        if has_unnumbered_figures:
+            rawblocks += [RawBlock('tex', TEX0),
+                          RawBlock('tex', TEX1),
+                          RawBlock('tex', TEX2)]
+
         if captionname != 'Figure':
-            tex.append(r'\renewcommand{\figurename}{%s}'%captionname)
+            rawblocks += [RawBlock('tex', TEX3 % captionname)]
 
-        if len(tex) > 1:
-            altered[1] = [RawBlock('tex', '\n'.join(tex))] + altered[1]
+        insert_rawblocks = insert_rawblocks_factory(rawblocks)
+
+        altered = functools.reduce(lambda x, action: walk(x, action, fmt, meta),
+                                   [insert_rawblocks], altered)
+
 
     # Dump the results
     json.dump(altered, STDOUT)

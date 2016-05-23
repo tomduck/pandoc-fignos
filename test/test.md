@@ -44,23 +44,17 @@ Figure:
 
 ![Unnumbered and unattributed.](img/plot3.png)
 
-*[Issue #15](https://github.com/tomduck/pandoc-fignos/issues/15): pdf output has numbers.*
-
 ****
 
 Figure:
 
-![Unnumbered and with empty attributes.](img/plot3.png){}
-
-*[Issue #15](https://github.com/tomduck/pandoc-fignos/issues/15): pdf output has numbers.*
+![Unnumbered with empty attributes.](img/plot3.png){}
 
 ****
 
 Figure:
 
 ![Unnumbered and attributed (small).](img/plot3.png){#baz width="50px"}
-
-*[Issue #15](https://github.com/tomduck/pandoc-fignos/issues/15): pdf output has numbers.*
 
 ****
 
