@@ -159,7 +159,7 @@ def _process_figure(value, fmt):
 
     # Adjust caption depending on the output format
     if fmt == 'latex':  # Append a \label if this is referenceable
-        if attrs[0] not in unreferenceable:
+        if not fig['is_unreferenceable']:
             value[0]['c'][1] += [RawInline('tex', r'\label{%s}'%attrs[0])]
     else:  # Hard-code in the caption name and number/tag
         if type(references[attrs[0]]) is int:  # Numbered reference
@@ -197,7 +197,7 @@ def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
 
         # Context-dependent output
         attrs = fig['attrs']
-        if fig['is_unnumbered']:
+        if fig['is_unnumbered']:  # Unnumbered is also unreferenceable
             if fmt == 'latex':
                 return [
                     RawBlock('tex', r'\begin{no-prefix-figure-caption}'),
@@ -206,7 +206,6 @@ def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
             else:
                 return
         elif fmt == 'latex':
-            label = attrs[0]
             if PANDOCVERSION >= '1.17':
                 # Remove id from the image attributes.  It is incorrectly
                 # handled by pandoc's TeX writer for these versions.
@@ -215,7 +214,7 @@ def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
             if fig['is_tagged']:  # Code in the tags
                 tex = '\n'.join([r'\let\oldthefigure=\thefigure',
                                  r'\renewcommand\thefigure{%s}'%\
-                                 references[label]])
+                                 references[attrs[0]]])
                 pre = RawBlock('tex', tex)
                 # pylint: disable=star-args
                 tex = '\n'.join([r'\let\thefigure=\oldthefigure',
