@@ -1,7 +1,8 @@
 
 pandoc-fignos 0.15 (unreleased)
 
-    * Support for unnumbered figures in TeX/pdf (Issue #15)
+    * Support for unnumbered figures in TeX/pdf (Issue #15).
+    * Removed anchors and ids in output for unreferenceable figures.
 
 
 pandoc-fignos 0.14 (2016-05-18)
