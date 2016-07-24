@@ -20,7 +20,7 @@ Figures {@fig:1}-{@fig:3}, and figs. {@fig:1}-{@fig:2}-{@fig:3}.
 
 References in lists:
 
- 1. *@fig:1, {+@fig:2}a and fig. !@fig:3.
+ 1. \*@fig:1, {+@fig:2}a *and* fig. !@fig:3.
  2. Figures {@fig:1}-{@fig:3}, and figs. 
     {@fig:1}-{@fig:2}-{@fig:3}.
 
