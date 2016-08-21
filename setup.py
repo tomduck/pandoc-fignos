@@ -28,7 +28,7 @@ LONG_DESCRIPTION = """\
 A pandoc filter for numbering figures and figure references.
 """
 
-VERSION = '0.15'
+VERSION = '0.16'
 
 
 #-----------------------------------------------------------------------------
@@ -107,7 +107,7 @@ setup(
     url='https://github.com/tomduck/pandoc-fignos',
     download_url='https://github.com/tomduck/pandoc-fignos/tarball/'+VERSION,
 
-    install_requires=['pandoc-xnos>=0.4',
+    install_requires=['pandoc-xnos>=0.4.1',
                       'pandocfilters',
                       'pandoc-attributes'],
 

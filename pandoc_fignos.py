@@ -56,7 +56,6 @@ from pandocxnos import insert_rawblocks_factory
 
 from pandocattributes import PandocAttributes
 
-
 # Read the command-line arguments
 parser = argparse.ArgumentParser(description='Pandoc figure numbers filter.')
 parser.add_argument('fmt')
