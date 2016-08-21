@@ -37,9 +37,12 @@ More Tests
 
   * Attributed images are supported by pandoc >= 1.16.  Using
     attributes like `width="50px"` with earlier versions has 
-    no effect.
+    no effect. (wontfix)
 
   * References ending in colons do not convert for pandoc 1.15.
+    (wontfix; use curly-braces workaround)
+
+  * Tag B.3' is italicized in html output.  Why?
 
 
 ### Unnumbered figures ###
