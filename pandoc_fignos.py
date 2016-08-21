@@ -188,9 +188,12 @@ def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
 
         # Inspect the image
         if len(value[0]['c']) == 2:  # Unattributed, bail out
-            return [RawBlock('tex', r'\begin{no-prefix-figure-caption}'),
-                    Para(value),
-                    RawBlock('tex', r'\end{no-prefix-figure-caption}')]
+            if fmt == 'latex':
+                return [RawBlock('tex', r'\begin{no-prefix-figure-caption}'),
+                        Para(value),
+                        RawBlock('tex', r'\end{no-prefix-figure-caption}')]
+            else:
+                return
 
         # Process the figure
         fig = _process_figure(value, fmt)
