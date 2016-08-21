@@ -1,8 +1,5 @@
 
 
-NOTICE: Clever referencing is now supported.  Details below.
-
-
 pandoc-fignos 0.15
 ==================
 
