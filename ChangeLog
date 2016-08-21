@@ -1,4 +1,9 @@
 
+pandoc-fignos 0.16 (unreleased)
+
+    * Fixed bug for filenames with spaces (Issue #23).
+
+
 pandoc-fignos 0.15 (2016-08-21)
 
     * Support for unnumbered figures in TeX/pdf (Issue #15).

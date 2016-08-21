@@ -99,16 +99,22 @@ def _extract_attrs(x, n):
         return extract_attrs(x, n)
 
     except (ValueError, IndexError):
-        # Look for attributes attached to the image path, as occurs with
-        # reference links.  Remove the encoding.
-        assert x[n-1]['t'] == 'Image'
-        image = x[n-1]
-        path, attrs = unquote(image['c'][-1][0]).split(' ', 1)
-        if attrs:
-            image['c'][-1][0] = path  # Remove attr string from the path
-            return PandocAttributes(attrs.strip(), 'markdown').to_pandoc()
-        else:
-            raise
+
+        if PANDOCVERSION < '1.16':
+            # Look for attributes attached to the image path, as occurs with
+            # image references for pandoc < 1.16 (pandoc-fignos Issue #14).
+            # See http://pandoc.org/MANUAL.html#images for the syntax.
+            # Note: This code does not handle the "optional title" for
+            # image references (search for link_attributes in pandoc's docs).
+            assert x[n-1]['t'] == 'Image'
+            image = x[n-1]
+            s = image['c'][-1][0]
+            if '%20%7B' in s:
+                path = s[:s.index('%20%7B')]
+                attrs = unquote(s[s.index('%7B'):])
+                image['c'][-1][0] = path  # Remove attr string from the path
+                return PandocAttributes(attrs.strip(), 'markdown').to_pandoc()
+        raise
 
 attach_attrs_image = attach_attrs_factory(Image, extract_attrs=_extract_attrs)
 detach_attrs_image = detach_attrs_factory(Image)
