@@ -184,7 +184,7 @@ def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
 
     # Process figures wrapped in Para elements
     if key == 'Para' and len(value) == 1 and \
-      value[0]['t'] == 'Image' and value[0]['c'][-1][1] == 'fig:':
+      value[0]['t'] == 'Image' and value[0]['c'][-1][1].startswith('fig:'):
 
         # Inspect the image
         if len(value[0]['c']) == 2:  # Unattributed, bail out
