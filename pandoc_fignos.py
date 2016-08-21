@@ -212,8 +212,6 @@ def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
                     RawBlock('tex', r'\begin{no-prefix-figure-caption}'),
                     Para(value),
                     RawBlock('tex', r'\end{no-prefix-figure-caption}')]
-            else:
-                return
         elif fmt == 'latex':
             key = attrs[0]
             if PANDOCVERSION >= '1.17':
@@ -233,7 +231,6 @@ def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
                 return [pre, Para(value), post]
         elif fig['is_unreferenceable']:
             attrs[0] = ''  # The label isn't needed any further
-            return
         elif fmt in ('html', 'html5') and LABEL_PATTERN.match(attrs[0]):
             # Insert anchor
             anchor = RawBlock('html', '<a name="%s"></a>'%attrs[0])
