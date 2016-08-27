@@ -58,6 +58,8 @@ To apply the filter to a document, use the following option with pandoc:
 
 Note that any use of `--filter pandoc-citeproc` or `--bibliography=FILE` should come *after* the pandoc-fignos filter call.
 
+Another note: use of `caption` package is required `\usepackage{caption}`.
+
 
 Markdown Syntax
 ---------------
@@ -138,6 +140,8 @@ The tag may be arbitrary text, or an inline equation such as `$\mathrm{B.1'}$`. 
 
 Customization
 -------------
+
+To make caption bold as ACM style suggests include caption package with bold font: `\usepackage[font=bf,skip=\baselineskip]{caption}`.
 
 Pandoc-fignos may be customized by setting variables in the [metadata block] or on the command line (using `-M KEY=VAL`).  The following variables are supported:
 
