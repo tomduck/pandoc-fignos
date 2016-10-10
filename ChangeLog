@@ -2,7 +2,7 @@
 pandoc-fignos 0.16 (unreleased)
 
     * Fixed bug for filenames with spaces (Issue #23).
-    * Fixed bug where unreferenced figure not detected.
+    * Fixed no-prefix-figure-caption bug (Issue #23).
     * Require pandoc-xnos >= 0.4.1.
 
 
