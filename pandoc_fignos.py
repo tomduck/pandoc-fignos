@@ -52,7 +52,7 @@ from pandocxnos import STRTYPES, STDIN, STDOUT
 from pandocxnos import elt, get_meta, extract_attrs
 from pandocxnos import repair_refs, process_refs_factory, replace_refs_factory
 from pandocxnos import attach_attrs_factory, detach_attrs_factory
-from pandocxnos import insert_rawblocks_factory
+#from pandocxnos import insert_rawblocks_factory
 
 from pandocattributes import PandocAttributes
 
@@ -194,9 +194,10 @@ def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
         # Inspect the image
         if len(value[0]['c']) == 2:  # Unattributed, bail out
             if fmt == 'latex':
-                return [RawBlock('tex', r'\begin{no-prefix-figure-caption}'),
-                        Para(value),
-                        RawBlock('tex', r'\end{no-prefix-figure-caption}')]
+                pass
+                ## return [RawBlock('tex', r'\begin{no-prefix-figure-caption}'),
+                ##         Para(value),
+                ##         RawBlock('tex', r'\end{no-prefix-figure-caption}')]
             else:
                 return
 
@@ -207,10 +208,11 @@ def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
         attrs = fig['attrs']
         if fig['is_unnumbered']:  # Unnumbered is also unreferenceable
             if fmt == 'latex':
-                return [
-                    RawBlock('tex', r'\begin{no-prefix-figure-caption}'),
-                    Para(value),
-                    RawBlock('tex', r'\end{no-prefix-figure-caption}')]
+                pass
+                ## return [
+                ##     RawBlock('tex', r'\begin{no-prefix-figure-caption}'),
+                ##     Para(value),
+                ##     RawBlock('tex', r'\end{no-prefix-figure-caption}')]
         elif fmt == 'latex':
             key = attrs[0]
             if PANDOCVERSION >= '1.17':
@@ -238,62 +240,62 @@ def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
 
 # Main program ---------------------------------------------------------------
 
-# Define \@makenoprefixcaption to make a caption without a prefix.  This
-# should replace \@makecaption as needed.  See the standard \@makecaption TeX
-# at https://stackoverflow.com/questions/2039690.  The macro gets installed
-# using an environment.  The \thefigure counter must be set to something unique
-# so that duplicate names are avoided.  This must be done the hyperref
-# counter \theHfigure as well; see Sect. 3.9 of
-# http://ctan.mirror.rafal.ca/macros/latex/contrib/hyperref/doc/manual.html.
+## # Define \@makenoprefixcaption to make a caption without a prefix.  This
+## # should replace \@makecaption as needed.  See the standard \@makecaption TeX
+## # at https://stackoverflow.com/questions/2039690.  The macro gets installed
+## # using an environment.  The \thefigure counter must be set to something unique
+## # so that duplicate names are avoided.  This must be done the hyperref
+## # counter \theHfigure as well; see Sect. 3.9 of
+## # http://ctan.mirror.rafal.ca/macros/latex/contrib/hyperref/doc/manual.html.
 
-TEX0 = r"""
-% pandoc-xnos: macro to create a caption without a prefix
-\makeatletter
-\long\def\@makenoprefixcaption#1#2{
-  \vskip\abovecaptionskip
-  \sbox\@tempboxa{#2}
-  \ifdim \wd\@tempboxa >\hsize
-    #2\par
-  \else
-    \global \@minipagefalse
-    \hb@xt@\hsize{\hfil\box\@tempboxa\hfil}
-  \fi
-  \vskip\belowcaptionskip}
-\makeatother
-""".strip()
+## TEX0 = r"""
+## % pandoc-xnos: macro to create a caption without a prefix
+## \makeatletter
+## \long\def\@makenoprefixcaption#1#2{
+##   \vskip\abovecaptionskip
+##   \sbox\@tempboxa{#2}
+##   \ifdim \wd\@tempboxa >\hsize
+##     #2\par
+##   \else
+##     \global \@minipagefalse
+##     \hb@xt@\hsize{\hfil\box\@tempboxa\hfil}
+##   \fi
+##   \vskip\belowcaptionskip}
+## \makeatother
+## """.strip()
 
-TEX1 = r"""
-% pandoc-fignos: save original macros
-\makeatletter
-\let\@oldmakecaption=\@makecaption
-\let\oldthefigure=\thefigure
-\let\oldtheHfigure=\theHfigure
-\makeatother
-""".strip()
+## TEX1 = r"""
+## % pandoc-fignos: save original macros
+## \makeatletter
+## \let\@oldmakecaption=\@makecaption
+## \let\oldthefigure=\thefigure
+## \let\oldtheHfigure=\theHfigure
+## \makeatother
+## """.strip()
 
-TEX2 = r"""
-% pandoc-fignos: environment disables figure caption prefixes
-\makeatletter
-\newcounter{figno}
-\newenvironment{no-prefix-figure-caption}{
-  \let\@makecaption=\@makenoprefixcaption
-  \renewcommand\thefigure{x.\thefigno}
-  \renewcommand\theHfigure{x.\thefigno}
-  \stepcounter{figno}
-}{
-  \let\thefigure=\oldthefigure
-  \let\theHfigure=\oldtheHfigure
-  \let\@makecaption=\@oldmakecaption
-  \addtocounter{figure}{-1}
-}
-\makeatother
-""".strip()
+## TEX2 = r"""
+## % pandoc-fignos: environment disables figure caption prefixes
+## \makeatletter
+## \newcounter{figno}
+## \newenvironment{no-prefix-figure-caption}{
+##   \let\@makecaption=\@makenoprefixcaption
+##   \renewcommand\thefigure{x.\thefigno}
+##   \renewcommand\theHfigure{x.\thefigno}
+##   \stepcounter{figno}
+## }{
+##   \let\thefigure=\oldthefigure
+##   \let\theHfigure=\oldtheHfigure
+##   \let\@makecaption=\@oldmakecaption
+##   \addtocounter{figure}{-1}
+## }
+## \makeatother
+## """.strip()
 
-# TeX to set the caption name
-TEX3 = r"""
-%% pandoc-fignos: caption name
-\renewcommand{\figurename}{%s}
-""".strip()
+## # TeX to set the caption name
+## TEX3 = r"""
+## %% pandoc-fignos: caption name
+## \renewcommand{\figurename}{%s}
+## """.strip()
 
 def process(meta):
     """Saves metadata fields in global variables and returns a few
@@ -365,23 +367,23 @@ def main():
                                altered)
 
 
-    # Insert supporting TeX
-    if fmt == 'latex':
+    ## # Insert supporting TeX
+    ## if fmt == 'latex':
 
-        rawblocks = []
+    ##     rawblocks = []
 
-        if has_unnumbered_figures:
-            rawblocks += [RawBlock('tex', TEX0),
-                          RawBlock('tex', TEX1),
-                          RawBlock('tex', TEX2)]
+    ##     if has_unnumbered_figures:
+    ##         rawblocks += [RawBlock('tex', TEX0),
+    ##                       RawBlock('tex', TEX1),
+    ##                       RawBlock('tex', TEX2)]
 
-        if captionname != 'Figure':
-            rawblocks += [RawBlock('tex', TEX3 % captionname)]
+    ##     if captionname != 'Figure':
+    ##         rawblocks += [RawBlock('tex', TEX3 % captionname)]
 
-        insert_rawblocks = insert_rawblocks_factory(rawblocks)
+    ##     insert_rawblocks = insert_rawblocks_factory(rawblocks)
 
-        altered = functools.reduce(lambda x, action: walk(x, action, fmt, meta),
-                                   [insert_rawblocks], altered)
+    ##     altered = functools.reduce(lambda x, action: walk(x, action, fmt, meta),
+    ##                                [insert_rawblocks], altered)
 
 
     # Dump the results
