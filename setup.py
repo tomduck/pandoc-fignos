@@ -43,7 +43,7 @@ VERSION = '0.16'
 class custom_install(install):
     """Ensures setuptools uses custom install_scripts."""
     def run(self):
-        super().run()
+        super(custom_install, self).run()
 
 # Custom install_scripts command class for setup()
 class install_scripts_quoted_shebang(install_scripts):
@@ -54,7 +54,8 @@ class install_scripts_quoted_shebang(install_scripts):
           and '"' not in shebang:
             quoted_shebang = '#!"%s"' % shebang[2:].strip()
             contents = contents.replace(shebang, quoted_shebang)
-        super().write_script(script_name, contents, mode, *ignored)
+        super(install_scripts_quoted_shebang,
+              self).write_script(script_name, contents, mode, *ignored)
 
 # The custom command classes only need to be used on Windows machines
 if os.name == 'nt':
@@ -107,7 +108,7 @@ setup(
     url='https://github.com/tomduck/pandoc-fignos',
     download_url='https://github.com/tomduck/pandoc-fignos/tarball/'+VERSION,
 
-    install_requires=['pandoc-xnos>=0.4.1',
+    install_requires=['pandoc-xnos>=0.5',
                       'pandocfilters',
                       'pandoc-attributes'],
 
