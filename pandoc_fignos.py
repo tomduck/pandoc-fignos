@@ -187,7 +187,7 @@ def _process_figure(value, fmt):
 def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
     """Processes the figures."""
 
-    global has_unnumbered_figures
+    global has_unnumbered_figures  # pylint: disable=global-statement
 
     # Process figures wrapped in Para elements
     if key == 'Para' and len(value) == 1 and \
