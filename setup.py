@@ -40,13 +40,13 @@ VERSION = '0.16'
 # pylint: disable=invalid-name, too-few-public-methods
 
 # Custom install command class for setup()
-class custom_install(install):
+class custom_install(install, object=None):
     """Ensures setuptools uses custom install_scripts."""
     def run(self):
         super(custom_install, self).run()
 
 # Custom install_scripts command class for setup()
-class install_scripts_quoted_shebang(install_scripts):
+class install_scripts_quoted_shebang(install_scripts, object=None):
     """Ensure there are quotes around shebang paths with spaces."""
     def write_script(self, script_name, contents, mode="t", *ignored):
         shebang = str(contents.splitlines()[0])
