@@ -10,8 +10,8 @@ PANDOC-1.15 = pandoc-$(v1.15)
 PYTHON-2.7 = python2.7
 PYTHON-3.4 = python3.4
 
-PDFFLAGS = --variable geometry:margin=1in --standalone
-HTMLFLAGS = --standalone
+PDFFLAGS = --variable geometry:margin=1in --standalone --variable urlcolor=blue
+HTMLFLAGS = --standalone --variable urlcolor=blue
 
 all: pdf html img tex md
 
