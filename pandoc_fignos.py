@@ -233,7 +233,8 @@ def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
                 return [pre, Para(value), post]
         elif fig['is_unreferenceable']:
             attrs[0] = ''  # The label isn't needed any further
-        elif fmt in ('html', 'html5') and LABEL_PATTERN.match(attrs[0]):
+        elif PANDOCVERSION < '1.16' and fmt in ('html', 'html5') \
+          and LABEL_PATTERN.match(attrs[0]):
             # Insert anchor
             anchor = RawBlock('html', '<a name="%s"></a>'%attrs[0])
             return [anchor, Para(value)]
