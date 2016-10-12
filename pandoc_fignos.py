@@ -355,7 +355,7 @@ def main():
     # Process the metadata variables
     process(meta)
 
-    # First pass; do not process the metadata!
+    # First pass; don't walk metadata
     altered = functools.reduce(lambda x, action: walk(x, action, fmt, meta),
                                [attach_attrs_image, process_figures,
                                 detach_attrs_image], doc[1:])
