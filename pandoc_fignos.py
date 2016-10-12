@@ -355,10 +355,10 @@ def main():
     # Process the metadata variables
     process(meta)
 
-    # First pass
+    # First pass; do not process the metadata!
     altered = functools.reduce(lambda x, action: walk(x, action, fmt, meta),
                                [attach_attrs_image, process_figures,
-                                detach_attrs_image], doc)
+                                detach_attrs_image], doc[1:])
 
     # Second pass
     process_refs = process_refs_factory(references.keys())
@@ -389,7 +389,7 @@ def main():
 
 
     # Dump the results
-    json.dump(altered, STDOUT)
+    json.dump(doc[:1] + altered, STDOUT)
 
     # Flush stdout
     STDOUT.flush()
