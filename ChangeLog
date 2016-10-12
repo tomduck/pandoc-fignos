@@ -2,7 +2,6 @@
 pandoc-fignos 0.16 (unreleased)
 
     * Fixed bug for filenames with spaces (Issue #23).
-    * Fixed no-prefix-figure-caption bug (Issue #23).
     * Fixed python 2.7 install on Windows (Issue #26).
     * Require pandoc-xnos >= 0.5.
 
