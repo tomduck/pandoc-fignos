@@ -1,5 +1,9 @@
 
-pandoc-fignos 0.16 (2016-10-22)
+pandoc-fignos 0.18 (unreleased)
+
+
+
+pandoc-fignos 0.17 (2016-10-22)
 
     * Fixed bug for filenames with spaces (Issue #23).
     * Fixed metadata corruption bug (Issue #23).
