@@ -1,7 +1,7 @@
 
 
-pandoc-fignos 0.16
-==================
+pandoc-fignos 0.17.1
+====================
 
 *pandoc-fignos* is a [pandoc] filter for numbering figures and figure references in markdown documents.
 
