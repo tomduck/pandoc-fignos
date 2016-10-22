@@ -1,8 +1,10 @@
 
-pandoc-fignos 0.16 (unreleased)
+pandoc-fignos 0.16 (2016-10-22)
 
     * Fixed bug for filenames with spaces (Issue #23).
+    * Fixed metadata corruption bug (Issue #23).
     * Fixed python 2.7 install on Windows (Issue #26).
+    * Fixed cleveref bug for textless doc (Issue #27).
     * Require pandoc-xnos >= 0.5.
 
 
@@ -143,5 +145,5 @@ pandoc-fignos 0.2 (2015-06-01)
 
 pandoc-fignos 0.1 (2015-03-14)
 
-    * initial release
+    * initial release.
 
