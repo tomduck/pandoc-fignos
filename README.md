@@ -8,7 +8,7 @@ Demonstration: Processing [demo.md] with `pandoc --filter pandoc-fignos` gives n
 
 This version of pandoc-fignos was tested using pandoc 1.15 - 1.18.  It works under linux, Mac OS X and Windows.  Older versions and other platforms can be supported on request.  I am pleased to receive bug reports and feature requests on the project's [Issues tracker].
 
-If you find pandoc-fignos useful, please encourage further development by giving it a star [on GitHub].
+If you find pandoc-fignos useful, then please encourage further development by giving it a star [on GitHub].
 
 See also: [pandoc-eqnos], [pandoc-tablenos]
 
