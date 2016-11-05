@@ -108,7 +108,7 @@ setup(
     url='https://github.com/tomduck/pandoc-fignos',
     download_url='https://github.com/tomduck/pandoc-fignos/tarball/'+VERSION,
 
-    install_requires=['pandoc-xnos>=0.5',
+    install_requires=['pandoc-xnos>=0.6',
                       'pandocfilters',
                       'pandoc-attributes'],
 

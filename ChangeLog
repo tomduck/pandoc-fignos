@@ -1,6 +1,7 @@
 
-pandoc-fignos 0.18 (unreleased)
+pandoc-fignos 0.18 (2016-11-05)
 
+    * Updated for pandoc 1.18 (Issue #30)
 
 
 pandoc-fignos 0.17.1 (2016-10-22)

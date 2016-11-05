@@ -62,14 +62,6 @@ parser.add_argument('fmt')
 parser.add_argument('--pandocversion', help='The pandoc version.')
 args = parser.parse_args()
 
-# Initialize pandocxnos
-PANDOCVERSION = pandocxnos.init(args.pandocversion)
-
-# Element primitives
-if PANDOCVERSION < '1.16':
-    # Override the Image element for pandoc < 1.16
-    Image = elt('Image', 2)
-
 # Pattern for matching labels
 LABEL_PATTERN = re.compile(r'(fig:[\w/-]*)')
 
@@ -85,6 +77,8 @@ cleveref_default = False          # Default setting for clever referencing
 
 # Flag for unnumbered figures
 has_unnumbered_figures = False
+
+PANDOCVERSION = None
 
 
 # Actions --------------------------------------------------------------------
@@ -114,10 +108,6 @@ def _extract_attrs(x, n):
                 image['c'][-1][0] = path  # Remove attr string from the path
                 return PandocAttributes(attrs.strip(), 'markdown').to_pandoc()
         raise
-
-attach_attrs_image = attach_attrs_factory(Image, extract_attrs=_extract_attrs)
-detach_attrs_image = detach_attrs_factory(Image)
-
 
 def _process_figure(value, fmt):
     """Processes the figure.  Returns a dict containing figure properties."""
@@ -347,18 +337,37 @@ def process(meta):
 def main():
     """Filters the document AST."""
 
+    # pylint: disable=global-statement
+    global PANDOCVERSION
+    global Image
+
     # Get the output format, document and metadata
     fmt = args.fmt
     doc = json.loads(STDIN.read())
-    meta = doc[0]['unMeta']
+
+    # Initialize pandocxnos
+    # pylint: disable=too-many-function-args
+    PANDOCVERSION = pandocxnos.init(args.pandocversion, doc)
+
+    # Element primitives
+    if PANDOCVERSION < '1.16':
+        Image = elt('Image', 2)
+
+    # Chop up the doc
+    meta = doc['meta'] if PANDOCVERSION >= '1.18' else doc[0]['unMeta']
+    blocks = doc['blocks'] if PANDOCVERSION >= '1.18' else doc[1:]
 
     # Process the metadata variables
     process(meta)
 
-    # First pass; don't walk metadata
+    # First pass
+    attach_attrs_image = attach_attrs_factory(Image,
+                                              extract_attrs=_extract_attrs)
+    detach_attrs_image = detach_attrs_factory(Image)
+
     altered = functools.reduce(lambda x, action: walk(x, action, fmt, meta),
                                [attach_attrs_image, process_figures,
-                                detach_attrs_image], doc[1:])
+                                detach_attrs_image], blocks)
 
     # Second pass
     process_refs = process_refs_factory(references.keys())
@@ -387,9 +396,14 @@ def main():
         altered = functools.reduce(lambda x, action: walk(x, action, fmt, meta),
                                    [insert_rawblocks], altered)
 
+    # Update the doc
+    if PANDOCVERSION >= '1.18':
+        doc['blocks'] = altered
+    else:
+        doc = doc[:1] + altered
 
     # Dump the results
-    json.dump(doc[:1] + altered, STDOUT)
+    json.dump(doc, STDOUT)
 
     # Flush stdout
     STDOUT.flush()
