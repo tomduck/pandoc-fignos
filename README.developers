@@ -16,20 +16,6 @@ To install the most recent sources from github using pip:
 Testing
 -------
 
-To test pandoc-fignos using a specific version of python:
-
- a) Copy pandoc_fignos.py into the test directory;
-
- b) Apply a pipe chain to test.md as follows:
-
-    ~~~~
-    $ pandoc test.md -t json | \
-             python2.7 pandoc_fignos.py latex --pandocversion=1.17.0.2 | \
-             pandoc -f json -o test.pdf
-    ~~~
-
-    Be sure to supply the correct pandoc version to the pandoc-fignos filter.
-
 A suite of regression tests are provided in test/.  Read the README.md in that
 directory for instructions.
 
