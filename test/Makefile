@@ -37,10 +37,12 @@ pdf: out/test-1.18.pdf \
      out/test-1.15-cleveref.pdf
 
 
-html: out/test-1.17.html \
+html: out/test-1.18.html \
+      out/test-1.17.html \
       out/test-1.16.html \
       out/test-1.15.html \
       img
+
 
 img: out/img/plot1.png out/img/plot2.png out/img/plot3.png 
 

@@ -341,7 +341,7 @@ def main():
     global PANDOCVERSION
     global Image
 
-    # Get the output format, document and metadata
+    # Get the output format and document
     fmt = args.fmt
     doc = json.loads(STDIN.read())
 
@@ -364,7 +364,6 @@ def main():
     attach_attrs_image = attach_attrs_factory(Image,
                                               extract_attrs=_extract_attrs)
     detach_attrs_image = detach_attrs_factory(Image)
-
     altered = functools.reduce(lambda x, action: walk(x, action, fmt, meta),
                                [attach_attrs_image, process_figures,
                                 detach_attrs_image], blocks)
