@@ -37,12 +37,10 @@ More Tests
 
   * Attributed images are supported by pandoc >= 1.16.  Using
     attributes like `width="50px"` with earlier versions has 
-    no effect. (wontfix)
+    no effect. (won't fix)
 
   * References ending in colons do not convert for pandoc 1.15.
-    (wontfix; use curly-braces workaround)
-
-  * Tag B.3' is italicized in html output.  Why?
+    (won't fix; use curly-braces workaround)
 
 
 ### Unnumbered figures ###
@@ -110,7 +108,7 @@ Figures @fig:tag1 and @fig:tag2 are tagged figures:
 
 ![Tagged 1.](img/plot1.png){#fig:tag1 width="50px" tag=B.1}
 
-![Tagged 2.](img/plot1.png){#fig:tag2 width="50px" tag="$\mathrm{B.3'}$"}
+![Tagged 2.](img/plot1.png){#fig:tag2 width="50px" tag="$\text{B.3}'$"}
 
 Check that the number for Fig. @fig:tag3 follows from those earlier.
 
