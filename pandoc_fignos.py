@@ -169,7 +169,7 @@ def _process_figure(value, fmt):
                 els = [Math({"t":"InlineMath", "c":[]}, math), Str(':')]
             else:  # Text
                 els = [Str(text+':')]
-            value[0]['c'][1] = [Str('Table'), Space()]+ els + [Space()] + \
+            value[0]['c'][1] = [Str(captionname), Space()]+ els + [Space()] + \
               list(caption)
 
     return fig
