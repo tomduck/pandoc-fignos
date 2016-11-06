@@ -59,8 +59,6 @@ To apply the filter to a document, use the following option with pandoc:
 
 Note that any use of `--filter pandoc-citeproc` or `--bibliography=FILE` should come *after* the pandoc-fignos filter call.
 
-Another note: use of `caption` package is required `\usepackage{caption}`.
-
 
 Markdown Syntax
 ---------------
@@ -135,8 +133,6 @@ The tag may be arbitrary text, or an inline equation such as `$\mathrm{B.1'}$`. 
 Customization
 -------------
 
-To make caption bold as ACM style suggests include caption package with bold font: `\usepackage[font=bf,skip=\baselineskip]{caption}`.
-
 Pandoc-fignos may be customized by setting variables in the [metadata block] or on the command line (using `-M KEY=VAL`).  The following variables are supported:
 
   * `fignos-caption-name` - Sets the name at the beginning of a
@@ -168,15 +164,22 @@ Demonstration: Processing [demo3.md] with `pandoc --filter pandoc-fignos` gives 
 
 #### Pandoc Flags ####
 
-Some of pandoc's command-line flags impact numbering:
+Some of pandoc's command-line flags impact figure numbering:
 
 `-N`, `--number-sections`
-  ~ Numbers section (or chapter) headings in LaTeX, ConTeXt, html,
-    and epub output.  Figure numbers are given in X.Y format, where
-    X is the section (or chapter) number and Y is the equation
+  ~ Numbers section (or chapter) headings in LaTeX/pdf, ConTeXt,
+    html, and epub output.  Figure numbers are given in X.Y format,
+    where X is the section (or chapter) number and Y is the equation
     number.  Equation numbers restart at 1 for each section (or
     chapter).  See also the `--top-level-division` flag and
     `documentclass` meta variable.
+
+
+#### Latex/PDF Specializations ####
+
+To make the figure caption label bold, add `\usepackage[labelfont=bf]{caption}` to the LaTeX header.  See pandoc's `--include-in-header` flag, and also the [LaTeX caption package] documentation.
+
+[LaTeX caption package]: https://www.ctan.org/pkg/caption
 
 
 Technical Details
