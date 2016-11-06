@@ -1,6 +1,6 @@
 
-pandoc-fignos 0.18
-==================
+pandoc-fignos 0.18.1
+====================
 
 *pandoc-fignos* is a [pandoc] filter for numbering figures and figure references in markdown documents.
 
@@ -127,7 +127,7 @@ You may optionally override the figure number by placing a tag in a figure's att
 
     ![Caption.](image.png){#fig:id tag="B.1"}
 
-The tag may be arbitrary text, or an inline equation such as `$\mathrm{B.1'}$`.  Mixtures of the two are not currently supported.
+The tag may be arbitrary text, or an inline equation such as `$\text{B.1}'$`.  Mixtures of the two are not currently supported.
 
 
 Customization

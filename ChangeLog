@@ -1,5 +1,10 @@
 
-pandoc-fignos 0.18 (2016-11-05)
+pandoc-fignos 0.18.1 (2016-11-06)
+
+    * Fixed incorrect labelling of tagged figures.
+
+
+pandoc-fignos 0.18 (2016-11-05).
 
     * Updated for pandoc 1.18 (Issue #30)
 
