@@ -1,4 +1,10 @@
 
+pandoc-fignos 0.18.2 (2016-11-17)
+
+    * Python 2.7.3 bug addressed with pandoc-xnos 0.7 (Issue #32).
+    * Clarified purpose of this filter in README.md (Issue #31).
+
+
 pandoc-fignos 0.18.1 (2016-11-06)
 
     * Fixed incorrect labelling of tagged figures.

@@ -1,8 +1,8 @@
 
-pandoc-fignos 0.18.1
+pandoc-fignos 0.18.2
 ====================
 
-*pandoc-fignos* is a [pandoc] filter for numbering figures and figure references in markdown documents.
+*pandoc-fignos* is a [pandoc] filter that numbers figures and figure references in processed markdown documents.  A cross-referencing syntax is added to markdown for this purpose.
 
 Demonstration: Processing [demo.md] with `pandoc --filter pandoc-fignos` gives numbered figures and references in [pdf], [tex], [html], [epub], [md] and other formats.
 
@@ -29,31 +29,18 @@ See also: [pandoc-eqnos], [pandoc-tablenos]
 Contents
 --------
 
- 1. [Rationale](#rationale)
- 2. [Usage](#usage)
- 3. [Markdown Syntax](#markdown-syntax)
- 4. [Customization](#customization)
- 5. [Technical Details](#technical-details)
- 6. [Installation](#installation)
- 7. [Getting Help](#getting-help)
-
-
-Rationale
----------
-
-Figure numbers and references are frequently used in academic writing, but are not supported natively by pandoc.  Pandoc-fignos is an add-on filter that provides the missing functionality.
-
-The markdown syntax used by pandoc-fignos was developed in [pandoc Issue #813] -- see [this post] by [@scaramouche1].  It seems likely that this will be close to what pandoc ultimately adopts.  Pandoc-fignos is a transitional package for those who need figure numbers and references now.
-
-[pandoc Issue #813]: https://github.com/jgm/pandoc/issues/813
-[this post]: https://github.com/jgm/pandoc/issues/813#issuecomment-70423503
-[@scaramouche1]: https://github.com/scaramouche1
+ 1. [Usage](#usage)
+ 2. [Markdown Syntax](#markdown-syntax)
+ 3. [Customization](#customization)
+ 4. [Technical Details](#technical-details)
+ 5. [Installation](#installation)
+ 6. [Getting Help](#getting-help)
 
 
 Usage
 -----
 
-To apply the filter to a document, use the following option with pandoc:
+To apply the filter during document processing, use the following option with pandoc:
 
     --filter pandoc-fignos
 
@@ -63,17 +50,13 @@ Note that any use of `--filter pandoc-citeproc` or `--bibliography=FILE` should 
 Markdown Syntax
 ---------------
 
-To number a figure, add the label `fig:id` to its attributes:
+Figure references are not supported natively by pandoc's flavour of markdown.  The syntax extension used by pandoc-fignos was developed in [pandoc Issue #813] -- see [this post] by [@scaramouche1].
+
+To mark a figure for numbering, add the label `fig:id` to its attributes:
 
     ![Caption.](image.png){#fig:id}
 
-The prefix `#fig:` is required. `id` should be replaced with a unique identifier composed of letters, numbers, dashes, slashes and underscores.  If `id` is omitted then the figure will be numbered but unreferenceable.
-
-Alternatively, use attributed links:
-
-    ![Caption.][link]
-
-    [link]: image.png {#fig:id}
+Alternatively, use [reference link] attributes.  The prefix `#fig:` is required. `id` should be replaced with a unique identifier composed of letters, numbers, dashes, slashes and underscores.  If `id` is omitted then the figure will be numbered but unreferenceable.
 
 To reference the figure, use
 
@@ -86,6 +69,11 @@ or
 Curly braces around a reference are stripped from the output.
 
 Demonstration: Processing [demo.md] with `pandoc --filter pandoc-fignos` gives numbered figures and references in [pdf], [tex], [html], [epub], [md] and other formats.
+
+[pandoc Issue #813]: https://github.com/jgm/pandoc/issues/813
+[this post]: https://github.com/jgm/pandoc/issues/813#issuecomment-70423503
+[@scaramouche1]: https://github.com/scaramouche1
+[reference link]: http://pandoc.org/MANUAL.html#reference-links
 
 
 #### Clever References ####
@@ -102,15 +90,13 @@ to have the reference name (i.e., "fig.") automatically generated.  The above fo
 
      *@fig:id
 
-instead.  If clever referencing is enabled by default (see [Customization](#customization), below), you can disable it for a given reference using
+instead.  If clever referencing is enabled by default (see [Customization](#customization), below), you can disable it for a given reference using![The disabling modifier "!" is used instead of "-" because [pandoc unnecessarily drops minus signs] in front of references.]
 
     !@fig:id
 
 Demonstration: Processing [demo2.md] with `pandoc --filter pandoc-fignos` gives numbered figures and references in [pdf][pdf2], [tex][tex2], [html][html2], [epub][epub2], [md][md2] and other formats.
 
 Note: If you use `*fig:id` and emphasis (e.g., `*italics*`) in the same sentence, then you must backslash escape the `*` in the clever reference; e.g., `\*fig:id`.
-
-Note: The disabling modifier "!" is used instead of "-" because [pandoc unnecessarily drops minus signs] in front of references.
 
 [demo2.md]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/demo2.md
 [pdf2]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/out/demo2.pdf
