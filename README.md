@@ -50,7 +50,7 @@ Note that any use of `--filter pandoc-citeproc` or `--bibliography=FILE` should 
 Markdown Syntax
 ---------------
 
-Figure references are not supported natively by pandoc's flavour of markdown.  The syntax extension used by pandoc-fignos was developed in [pandoc Issue #813] -- see [this post] by [@scaramouche1].
+The markdown syntax extension used by pandoc-fignos was developed in [pandoc Issue #813] -- see [this post] by [@scaramouche1].
 
 To mark a figure for numbering, add the label `fig:id` to its attributes:
 
