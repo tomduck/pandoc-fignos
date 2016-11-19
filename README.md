@@ -90,9 +90,10 @@ to have the reference name (i.e., "fig.") automatically generated.  The above fo
 
      *@fig:id
 
-instead.  If clever referencing is enabled by default (see [Customization](#customization), below), you can disable it for a given reference using![The disabling modifier "!" is used instead of "-" because [pandoc unnecessarily drops minus signs] in front of references.]
+instead.  If clever referencing is enabled by default (see [Customization](#customization), below), you can disable it for a given reference using<sup>[1](#footnote1)</sup>
 
     !@fig:id
+
 
 Demonstration: Processing [demo2.md] with `pandoc --filter pandoc-fignos` gives numbered figures and references in [pdf][pdf2], [tex][tex2], [html][html2], [epub][epub2], [md][md2] and other formats.
 
@@ -104,7 +105,6 @@ Note: If you use `*fig:id` and emphasis (e.g., `*italics*`) in the same sentence
 [html2]: https://rawgit.com/tomduck/pandoc-fignos/master/demos/out/demo2.html
 [epub2]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/out/demo2.epub
 [md2]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/out/demo2.md
-[pandoc unnecessarily drops minus signs]: https://github.com/jgm/pandoc/issues/2901
 
 
 #### Tagged Figures ####
@@ -250,3 +250,11 @@ Getting Help
 If you have any difficulties with pandoc-fignos, or would like to see a new feature, please [file an Issue] on GitHub.
 
 [file an Issue]: https://github.com/tomduck/pandoc-fignos/issues
+
+
+----
+
+
+<a name="footnote1">1</a>: The disabling modifier "!" is used instead of "-" because [pandoc unnecessarily drops minus signs] in front of references.
+
+[pandoc unnecessarily drops minus signs]: https://github.com/jgm/pandoc/issues/2901
