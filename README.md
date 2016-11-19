@@ -254,6 +254,7 @@ If you have any difficulties with pandoc-fignos, or would like to see a new feat
 
 ----
 
+**Footnotes**
 
 <a name="footnote1">1</a>: The disabling modifier "!" is used instead of "-" because [pandoc unnecessarily drops minus signs] in front of references.
 
