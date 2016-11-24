@@ -1,7 +1,7 @@
 
-all: out/demo.pdf out/demo.tex out/demo.html out/demo.epub out/demo.md \
-     out/demo2.pdf out/demo2.tex out/demo2.html out/demo2.epub out/demo2.md \
-     out/demo3.pdf out/demo3.tex out/demo3.html out/demo3.epub out/demo3.md
+all: out/demo.pdf out/demo.tex out/demo.html out/demo.epub out/demo.docx \
+     out/demo2.pdf out/demo2.tex out/demo2.html out/demo2.epub out/demo2.docx \
+     out/demo3.pdf out/demo3.tex out/demo3.html out/demo3.epub out/demo3.docx
 
 out/%.pdf: %.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
@@ -24,7 +24,7 @@ out/%.epub: %.md
 
 out/%.docx: %.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
-	pandoc $< -t epub3 --filter pandoc-fignos --variable urlcolor=blue -o $@
+	pandoc $< -t docx --filter pandoc-fignos --variable urlcolor=blue -o $@
 
 out/%.md: %.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
