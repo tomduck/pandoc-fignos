@@ -14,10 +14,11 @@ PYTHON-3.4 = python3.4
 
 PDFFLAGS = --variable geometry:margin=1in --standalone --variable urlcolor=blue
 HTMLFLAGS = --standalone --variable urlcolor=blue
-DOCXFLAGS =
+
+IMAGES = img/fig-1.png img/fig-2.png img/fig-3.png
+
 
 all: pdf html docx img
-
 
 pdf: out/test-1.18.pdf \
      out/test-1.18-py2.7.pdf \
@@ -34,51 +35,39 @@ pdf: out/test-1.18.pdf \
      out/test-1.15.pdf \
      out/test-1.15-py2.7.pdf \
      out/test-1.15-py3.4.pdf \
-     out/test-1.15-cleveref.pdf \
-     img
+     out/test-1.15-cleveref.pdf
+
+html: out/test-1.18.html
+
+docx: out/test-1.18.docx
 
 
-html: out/test-1.18.html \
-      out/test-1.17.html \
-      out/test-1.16.html \
-      out/test-1.15.html \
-      img
-
-
-docx: out/test-1.18.docx img
-
-
-img: out/img/fig-1.png out/img/fig-2.png out/img/fig-3.png
-
-
-out/test-%.html: test.md
+out/test-%.html: test.md $(IMAGES)
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-$*) $< --filter pandoc-fignos $(HTMLFLAGS) -o $@
+	@if [ ! -d out/img ]; then mkdir -p out/img; fi
+	cp img/fig-?.png out/img
 
-out/test-%-py2.7.pdf: test.md
+out/test-%-py2.7.pdf: test.md $(IMAGES)
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-$*) $< -t json $(PDFFLAGS) | $(PYTHON-2.7) ../pandoc_fignos.py latex --pandocversion=$(v$*) | $(PANDOC-$*) -f json $(PDFFLAGS) -o $@
 
-out/test-%-py3.4.pdf: test.md
+out/test-%-py3.4.pdf: test.md $(IMAGES)
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-$*) $< -t json $(PDFFLAGS) | $(PYTHON-3.4) ../pandoc_fignos.py latex --pandocversion=$(v$*) | $(PANDOC-$*) -f json $(PDFFLAGS) -o $@
 
-out/test-%-cleveref.pdf: test.md
+out/test-%-cleveref.pdf: test.md $(IMAGES)
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-$*) $< --filter pandoc-fignos $(PDFFLAGS) --include-in-header=cleveref.tex -o $@
 
-out/test-%.pdf: test.md
+out/test-%.pdf: test.md $(IMAGES)
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-$*) $< --filter pandoc-fignos $(PDFFLAGS) -o $@
 
-out/test-%.docx: test.md
+out/test-%.docx: test.md $(IMAGES)
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
-	$(PANDOC-$*) $< --filter pandoc-fignos $(DOCXFLAGS) -o $@
+	$(PANDOC-$*) $< --filter pandoc-fignos -o $@
 
-
-out/img/fig-%.png: img/fig-%.png
-	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
-	cp $< $@
 
 
 .PHONY: clean
