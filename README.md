@@ -1,6 +1,10 @@
 
-pandoc-fignos 0.18.2
-====================
+
+NEW: Clickable references in docx!
+
+
+pandoc-fignos 0.19
+==================
 
 *pandoc-fignos* is a [pandoc] filter for numbering figures and figure references in processed markdown documents.  A cross-referencing syntax is added to markdown for this purpose.
 

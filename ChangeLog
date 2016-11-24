@@ -1,4 +1,9 @@
 
+pandoc-fignos 0.19 (unreleased)
+
+    * Clickable internal links for docx (Issue #25).
+
+
 pandoc-fignos 0.18.2 (2016-11-17)
 
     * Python 2.7.3 bug addressed with pandoc-xnos 0.7 (Issue #32).

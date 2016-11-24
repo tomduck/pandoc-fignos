@@ -43,6 +43,7 @@ html: out/test-1.18.html \
       out/test-1.15.html \
       img
 
+docx: out/test-1.18.docx
 
 img: out/img/plot1.png out/img/plot2.png out/img/plot3.png 
 
@@ -66,6 +67,10 @@ out/test-%-cleveref.pdf: test.md
 out/test-%.pdf: test.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-$*) $< --filter pandoc-fignos $(PDFFLAGS) -o $@
+
+out/test-%.docx: test.md
+	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
+	$(PANDOC-$*) $< --filter pandoc-fignos -o $@
 
 
 out/img/plot%.png: img/plot%.png

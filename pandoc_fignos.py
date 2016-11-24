@@ -220,7 +220,7 @@ def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
                 tex = '\n'.join([r'\let\thefigure=\oldthefigure',
                                  r'\addtocounter{figure}{-1}'])
                 post = RawBlock('tex', tex)
-                return [pre, Para(value), post]
+                return [pre, Para(value), post]            
         elif fig['is_unreferenceable']:
             attrs[0] = ''  # The label isn't needed any further
         elif PANDOCVERSION < '1.16' and fmt in ('html', 'html5') \
@@ -228,6 +228,15 @@ def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
             # Insert anchor
             anchor = RawBlock('html', '<a name="%s"></a>'%attrs[0])
             return [anchor, Para(value)]
+        elif fmt == 'docx':
+            # As per http://officeopenxml.com/WPhyperlink.php
+            bookmarkstart = \
+              RawBlock('openxml',
+                       '<w:p><w:bookmarkStart w:id="0" w:name="%s"/><w:r><w:t>'
+                       %attrs[0])
+            bookmarkend = \
+              RawBlock('openxml', '</w:t></w:r><w:bookmarkEnd w:id="0"/></w:p>')
+            return [bookmarkstart, Para(value), bookmarkend]
 
 
 # Main program ---------------------------------------------------------------
