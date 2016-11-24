@@ -14,7 +14,7 @@ out/%.tex: %.md
 
 out/%.html: %.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
-	pandoc $< -t html --standalone --filter pandoc-fignos -o $@
+	pandoc $< --standalone --filter pandoc-fignos -o $@
 	cp -R img out
 
 out/%.epub: %.md
@@ -23,15 +23,15 @@ out/%.epub: %.md
 
 out/%.docx: %.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
-	pandoc $< -t docx --filter pandoc-fignos -o $@
+	pandoc $< --filter pandoc-fignos -o $@
 
 out/%.md: %.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
-	pandoc $< -t markdown --filter pandoc-fignos -o $@
+	pandoc $< --filter pandoc-fignos -o $@
 
 out/%.json: %.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
-	pandoc $< -t json -o $@
+	pandoc $< -o $@
 
 restore: clean
 	git checkout out/demo.epub
