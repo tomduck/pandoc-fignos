@@ -10,29 +10,28 @@ out/%.pdf: %.md
 
 out/%.tex: %.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
-	pandoc $< --filter pandoc-fignos --variable urlcolor=blue -o $@
+	pandoc $< --filter pandoc-fignos -o $@
 
 out/%.html: %.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
-	pandoc $< -t html --standalone --filter pandoc-fignos \
-                      --variable urlcolor=blue -o $@
+	pandoc $< -t html --standalone --filter pandoc-fignos -o $@
 	cp -R img out
 
 out/%.epub: %.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
-	pandoc $< -t epub3 --filter pandoc-fignos --variable urlcolor=blue -o $@
+	pandoc $< -t epub3 --filter pandoc-fignos -o $@
 
 out/%.docx: %.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
-	pandoc $< -t docx --filter pandoc-fignos --variable urlcolor=blue -o $@
+	pandoc $< -t docx --filter pandoc-fignos -o $@
 
 out/%.md: %.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
-	pandoc $< -t markdown --filter pandoc-fignos --variable urlcolor=blue -o $@
+	pandoc $< -t markdown --filter pandoc-fignos -o $@
 
 out/%.json: %.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
-	pandoc $< -t json --variable urlcolor=blue -o $@
+	pandoc $< -t json -o $@
 
 restore: clean
 	git checkout out/demo.epub
