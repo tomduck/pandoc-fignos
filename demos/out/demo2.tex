@@ -1,37 +1,35 @@
-% Cleveref macros
+% pandoc-xnos: cleveref fakery
+\newcommand{\plusnamesingular}{}
+\newcommand{\starnamesingular}{}
+\newcommand{\xrefname}[1]{\protect\renewcommand{\plusnamesingular}{#1}}
+\newcommand{\Xrefname}[1]{\protect\renewcommand{\starnamesingular}{#1}}
+\providecommand{\cref}{\plusnamesingular~\ref}
+\providecommand{\Cref}{\starnamesingular~\ref}
 \providecommand{\crefformat}[2]{}
 \providecommand{\Crefformat}[2]{}
+
+% pandoc-xnos: cleveref formatting
 \crefformat{figure}{fig.~#2#1#3}
 \Crefformat{figure}{Figure~#2#1#3}
 
-% Cleveref fakery
-\providecommand{\plusnamesingular}{}
-\providecommand{\starnamesingular}{}
-\providecommand{\cref}{\plusnamesingular~\ref}
-\providecommand{\Cref}{\starnamesingular~\ref}
+Reference to \xrefname{fig.}\cref{fig:1}.
 
-Some data are shown in
-\protect\renewcommand{\plusnamesingular}{fig.}\cref{fig:data}.
-
-\begin{figure}[htbp]
+\begin{figure}
 \centering
-\includegraphics{img/plot1.png}
-\caption{Some data.\label{fig:data}}
+\includegraphics[width=1.00000in]{img/fig-1.png}
+\caption{The number one.\label{fig:1}}
 \end{figure}
 
-\begin{figure}[htbp]
+\begin{figure}
 \centering
-\includegraphics{img/plot2.png}
-\caption{More data.\label{fig:more}}
+\includegraphics[width=1.00000in]{img/fig-2.png}
+\caption{The number two.\label{fig:2}}
 \end{figure}
 
-\protect\renewcommand{\starnamesingular}{Figure}\Cref{fig:more}a and
-\protect\renewcommand{\plusnamesingular}{fig.}\cref{fig:more}b give more
-data.
+\Xrefname{Figure}\Cref{fig:2} is given above.
 
-\begin{figure}[htbp]
+\begin{figure}
 \centering
-\includegraphics{img/plot3.png}
-\caption{Even more
-data.\label{fig:0791c5a5-b93d-49ef-b2ab-03f3985cdd49}}
+\includegraphics[width=1.00000in]{img/fig-3.png}
+\caption{The number three.}
 \end{figure}

@@ -5,28 +5,34 @@ all: out/demo.pdf out/demo.tex out/demo.html out/demo.epub out/demo.md \
 
 out/%.pdf: %.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
-	pandoc $< --filter pandoc-fignos --variable geometry:margin=1in -o $@
+	pandoc $< --filter pandoc-fignos --variable geometry:margin=1in \
+              --variable urlcolor=blue -o $@
 
 out/%.tex: %.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
-	pandoc $< --filter pandoc-fignos -o $@
+	pandoc $< --filter pandoc-fignos --variable urlcolor=blue -o $@
 
 out/%.html: %.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
-	pandoc $< -t html --standalone --filter pandoc-fignos -o $@
+	pandoc $< -t html --standalone --filter pandoc-fignos \
+                      --variable urlcolor=blue -o $@
 	cp -R img out
 
 out/%.epub: %.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
-	pandoc $< -t epub3 --filter pandoc-fignos -o $@
+	pandoc $< -t epub3 --filter pandoc-fignos --variable urlcolor=blue -o $@
+
+out/%.docx: %.md
+	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
+	pandoc $< -t epub3 --filter pandoc-fignos --variable urlcolor=blue -o $@
 
 out/%.md: %.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
-	pandoc $< -t markdown --filter pandoc-fignos -o $@
+	pandoc $< -t markdown --filter pandoc-fignos --variable urlcolor=blue -o $@
 
 out/%.json: %.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
-	pandoc $< -t json -o $@
+	pandoc $< -t json --variable urlcolor=blue -o $@
 
 restore: clean
 	git checkout out/demo.epub
@@ -47,9 +53,9 @@ restore: clean
 	git checkout out/demo3.pdf
 	git checkout out/demo3.tex
 
-	git checkout out/img/plot1.png
-	git checkout out/img/plot2.png
-	git checkout out/img/plot3.png
+	git checkout out/img/fig-1.png
+	git checkout out/img/fig-2.png
+	git checkout out/img/fig-3.png
 
 
 .PHONY: clean

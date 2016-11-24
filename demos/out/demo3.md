@@ -1,10 +1,9 @@
-Some data are shown in fig. 1.
+Reference to fig. [1](#fig:1).
 
-![FIG 1. Some data.](img/plot1.png){#fig:data}
+![FIG 1: The number one.](img/fig-1.png){#fig:1 width="1in"}
 
-![FIG 2. More data.](img/plot2.png){#fig:more}
+![FIG 2: The number two.](img/fig-2.png){#fig:2 width="1in"}
 
-Figure 2a and fig. 2b give more data.
+Figure [2](#fig:2) is given above.
 
-![FIG 3. Even more
-data.](img/plot3.png){#fig:e57e61c1-5bcf-4d58-8e9a-0e12a4ece8bb}
+![FIG 3: The number three.](img/fig-3.png){width="1in"}

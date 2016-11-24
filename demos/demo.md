@@ -1,10 +1,10 @@
 
-Some data are shown in fig. @fig:data.
+Reference to fig. @fig:1.
 
-![Some data.](img/plot1.png){#fig:data}
+![The number one.](img/fig-1.png){#fig:1 width=1in}
 
-![More data.](img/plot2.png){#fig:more}
+![The number two.](img/fig-2.png){#fig:2 width=1in}
 
-Figure {@fig:more}a and fig. {@fig:more}b give more data.
+Figure @fig:2 is given above.
 
-![Even more data.](img/plot3.png){#fig:}
+![The number three.](img/fig-3.png){#fig: width=1in}
