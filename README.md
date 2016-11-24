@@ -8,7 +8,7 @@ pandoc-fignos 0.19
 
 *pandoc-fignos* is a [pandoc] filter for numbering figures and figure references in processed markdown documents.  A cross-referencing syntax is added to markdown for this purpose.
 
-Demonstration: Processing [demo.md] with `pandoc --filter pandoc-fignos` gives numbered figures and references in [pdf], [tex], [html], [epub], [docx] and other formats.  A design goal of pandoc-fignos is that all output formats should be equally supported.
+Demonstration: Processing [demo.md] with `pandoc --filter pandoc-fignos` gives numbered figures and references in [pdf], [tex], [html], [epub], [docx] and other formats.
 
 This version of pandoc-fignos was tested using pandoc 1.15 - 1.18.  It works under linux, Mac OS X and Windows.  Older versions and other platforms can be supported on request.  I am pleased to receive bug reports and feature requests on the project's [Issues tracker].
 
