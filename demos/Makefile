@@ -39,18 +39,21 @@ restore: clean
 	git checkout out/demo.md
 	git checkout out/demo.pdf
 	git checkout out/demo.tex
+	git checkout out/demo.docx
 
 	git checkout out/demo2.epub
 	git checkout out/demo2.html
 	git checkout out/demo2.md
 	git checkout out/demo2.pdf
 	git checkout out/demo2.tex
+	git checkout out/demo2.docx
 
 	git checkout out/demo3.epub
 	git checkout out/demo3.html
 	git checkout out/demo3.md
 	git checkout out/demo3.pdf
 	git checkout out/demo3.tex
+	git checkout out/demo3.docx
 
 	git checkout out/img/fig-1.png
 	git checkout out/img/fig-2.png
