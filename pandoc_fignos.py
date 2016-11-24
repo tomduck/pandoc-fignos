@@ -174,6 +174,7 @@ def _process_figure(value, fmt):
 
     return fig
 
+# pylint: disable=too-many-branches
 def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
     """Processes the figures."""
 
@@ -220,7 +221,7 @@ def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
                 tex = '\n'.join([r'\let\thefigure=\oldthefigure',
                                  r'\addtocounter{figure}{-1}'])
                 post = RawBlock('tex', tex)
-                return [pre, Para(value), post]            
+                return [pre, Para(value), post]
         elif fig['is_unreferenceable']:
             attrs[0] = ''  # The label isn't needed any further
         elif PANDOCVERSION < '1.16' and fmt in ('html', 'html5') \
