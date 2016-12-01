@@ -173,7 +173,7 @@ To make internal links target the top of a figure (rather than its caption), add
 Technical Details
 -----------------
 
-TeX/pdf output:
+TeX/pdf:
 
   * The `\label` and `\ref` macros are used for figure labels and
     references (links are automatically generated);
@@ -186,7 +186,7 @@ TeX/pdf output:
     meta variable `xnos-cleveref-fake` to `Off` to disable cleveref
     faking.
 
-Other formats:
+Other:
 
   * Links to figures use html's and docx's native capabilities; and
 
