@@ -206,13 +206,19 @@ Pandoc-fignos requires [python], a programming language that comes pre-installed
 
 Install pandoc-fignos as root using the shell command
 
-    pip install pandoc-fignos 
+    pip install pandoc-fignos
 
 To upgrade to the most recent release, use
 
-    pip install --upgrade pandoc-fignos 
+    pip install --upgrade pandoc-fignos
 
 Pip is a program that downloads and installs modules from the Python Package Index, [PyPI].  It should come installed with your python distribution.
+
+Test the installation as a regular user with
+
+    which pandoc-fignos
+
+This will tell you where pandoc-fignos is installed.  If it is not found, then you should submit a report to our [Issues tracker].
 
 [PyPI]: https://pypi.python.org/pypi
 
@@ -231,6 +237,15 @@ During the install you may be asked to run
 owing to the ancient version of setuptools that Debian provides.  The command should be executed as root.  You may now follow the [standard installation] procedure given above.
 
 [standard installation]: #standard-installation
+
+
+#### Installing on Mac OS X ####
+
+To install as root on Mac OS X, you will need to use the `sudo` command.  For example:
+
+    sudo pip install pandoc-fignos
+
+Testing with `which` should be done as a regular user (i.e., without using `sudo`).
 
 
 #### Installing on Windows ####
@@ -253,9 +268,7 @@ Once python is installed, start the "Command Prompt" program.  Depending on wher
 Getting Help
 ------------
 
-If you have any difficulties with pandoc-fignos, or would like to see a new feature, please [file an Issue] on GitHub.
-
-[file an Issue]: https://github.com/tomduck/pandoc-fignos/issues
+If you have any difficulties with pandoc-fignos, or would like to see a new feature, please submit a report to our [Issues tracker].
 
 
 ----
