@@ -166,7 +166,7 @@ Some of pandoc's command-line flags impact figure numbering:
 
 #### Latex/PDF Specializations ####
 
-To make the figure caption label bold, add `\usepackage[labelfont=bf]{caption}` to the LaTeX header.  See pandoc's `--include-in-header` flag, and also the [LaTeX caption package] documentation.
+To make internal links target the top of a figure (rather than its caption), add `\usepackage{caption}` to the `header-includes` field of your document's YAML metadata.  To make the figure caption label bold, add `\usepackage[labelfont=bf]{caption}` instead.  See the [LaTeX caption package] documentation for additional features.
 
 [LaTeX caption package]: https://www.ctan.org/pkg/caption
 
@@ -174,10 +174,10 @@ To make the figure caption label bold, add `\usepackage[labelfont=bf]{caption}` 
 Technical Details
 -----------------
 
-For TeX/pdf output:
+TeX/pdf output:
 
   * The `\label` and `\ref` macros are used for figure labels and
-    references;
+    references (links are automatically generated);
   * `\figurename` is set for the caption name;
   * Tags are supported by temporarily redefining `\thefigure` 
     around a figure; and
@@ -187,9 +187,12 @@ For TeX/pdf output:
     meta variable `xnos-cleveref-fake` to `Off` to disable cleveref
     faking.
 
-For all other formats the numbers, caption name, and clever references are hard-coded into the output.
+Other formats:
 
-Links are constructed for both html and pdf output.
+  * Links to figures use html's and docx's native capabilities; and
+
+  * The numbers, caption name, and (clever) references are hard-coded
+    into the output.
 
 
 Installation

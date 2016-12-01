@@ -1,6 +1,3 @@
-% pandoc-fignos: caption name
-\renewcommand{\figurename}{FIG}
-
 % pandoc-xnos: cleveref fakery
 \newcommand{\plusnamesingular}{}
 \newcommand{\starnamesingular}{}
@@ -12,10 +9,10 @@
 \providecommand{\Crefformat}[2]{}
 
 % pandoc-xnos: cleveref formatting
-\crefformat{figure}{fig.~#2#1#3}
+\crefformat{figure}{Fig.~#2#1#3}
 \Crefformat{figure}{Figure~#2#1#3}
 
-Reference to \xrefname{fig.}\cref{fig:1}.
+Reference to \xrefname{Fig.}\cref{fig:1}.
 
 \begin{figure}
 \centering

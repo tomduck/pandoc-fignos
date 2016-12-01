@@ -1,16 +1,21 @@
 
-all: out/demo.pdf out/demo.tex out/demo.html out/demo.epub out/demo.docx \
-     out/demo2.pdf out/demo2.tex out/demo2.html out/demo2.epub out/demo2.docx \
-     out/demo3.pdf out/demo3.tex out/demo3.html out/demo3.epub out/demo3.docx
+extensions = .pdf .html .epub .tex .docx .json .md
+
+dest = $(addprefix out/demo,$(extensions)) \
+       $(addprefix out/demo2,$(extensions)) \
+       $(addprefix out/demo3,$(extensions))
+
+
+all: $(dest)
+
+
+$(filter out/demo.%,$(dest)): demo.md
+$(filter out/demo2.%,$(dest)): demo2.md
+$(filter out/demo3.%,$(dest)): demo3.md
 
 out/%.pdf: %.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
-	pandoc $< --filter pandoc-fignos --variable geometry:margin=1in \
-              --variable urlcolor=blue -o $@
-
-out/%.tex: %.md
-	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
-	pandoc $< --filter pandoc-fignos -o $@
+	pandoc $< --filter pandoc-fignos --variable urlcolor=blue -o $@
 
 out/%.html: %.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
@@ -21,39 +26,17 @@ out/%.epub: %.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	pandoc $< -t epub3 --filter pandoc-fignos -o $@
 
-out/%.docx: %.md
+out/%:
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
-	pandoc $< --filter pandoc-fignos -o $@
+	pandoc $^ --filter pandoc-fignos -o $@
 
-out/%.md: %.md
-	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
-	pandoc $< --filter pandoc-fignos -o $@
-
-out/%.json: %.md
-	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
-	pandoc $< -o $@
 
 restore: clean
-	git checkout out/demo.epub
-	git checkout out/demo.html
-	git checkout out/demo.md
-	git checkout out/demo.pdf
-	git checkout out/demo.tex
-	git checkout out/demo.docx
-
-	git checkout out/demo2.epub
-	git checkout out/demo2.html
-	git checkout out/demo2.md
-	git checkout out/demo2.pdf
-	git checkout out/demo2.tex
-	git checkout out/demo2.docx
-
-	git checkout out/demo3.epub
-	git checkout out/demo3.html
-	git checkout out/demo3.md
-	git checkout out/demo3.pdf
-	git checkout out/demo3.tex
-	git checkout out/demo3.docx
+	for num in "" 2 3 ; do \
+      for ext in $(extensions) ; do \
+        git checkout out/demo$$num$$ext ; \
+      done ; \
+    done
 
 	git checkout out/img/fig-1.png
 	git checkout out/img/fig-2.png

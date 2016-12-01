@@ -2,6 +2,8 @@
 figure-name: FIG
 fignos-plus-name: FIG.
 fignos-star-name: FIGURE
+header-includes: 
+  - \usepackage{caption}
 ...
 
 Figures @fig:1, {@fig:2}a and {@fig:2}b, and {@fig:3}: 

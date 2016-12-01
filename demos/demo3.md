@@ -1,6 +1,7 @@
 ---
 fignos-cleveref: On
-fignos-caption-name: FIG
+fignos-plus-name: Fig.
+header-includes: \usepackage{caption}
 ...
 
 Reference to @fig:1.
