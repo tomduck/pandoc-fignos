@@ -252,7 +252,7 @@ To install as root on Mac OS X, you will need to use the `sudo` command.  For ex
 
     sudo pip install pandoc-fignos
 
-Testing with `which` should be done as a regular user (i.e., without using `sudo`).
+Troubleshooting with `which` should be done as a regular user (i.e., without using `sudo`).
 
 
 #### Installing on Windows ####
