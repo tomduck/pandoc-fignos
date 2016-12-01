@@ -2,8 +2,7 @@
 figure-name: FIG
 fignos-plus-name: FIG.
 fignos-star-name: FIGURE
-header-includes: 
-  - \usepackage{caption}
+header-includes: \usepackage[skip=14pt,belowskip=-4pt]{caption}
 ...
 
 Figures @fig:1, {@fig:2}a and {@fig:2}b, and {@fig:3}: 
@@ -27,7 +26,6 @@ References in lists:
     {@fig:1}-{@fig:2}-{@fig:3}.
 
 A [regular link](http://example.com/), an [*italicized link*](http://example.com/) and an email.address@mailinator.com.
-
 
 
 \newpage
