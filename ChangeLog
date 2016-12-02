@@ -1,4 +1,7 @@
 
+pandoc-fignos 0.20 (unreleased)
+
+
 pandoc-fignos 0.19 (2016-11-30)
 
     * Clickable internal links for docx (Issue #25).

@@ -52,6 +52,7 @@ from pandocxnos import STRTYPES, STDIN, STDOUT
 from pandocxnos import elt, get_meta, extract_attrs
 from pandocxnos import repair_refs, process_refs_factory, replace_refs_factory
 from pandocxnos import attach_attrs_factory, detach_attrs_factory
+from pandocxnos import insert_secnos_factory, delete_secnos_factory
 from pandocxnos import insert_rawblocks_factory
 
 from pandocattributes import PandocAttributes
@@ -374,9 +375,12 @@ def main():
     attach_attrs_image = attach_attrs_factory(Image,
                                               extract_attrs=_extract_attrs)
     detach_attrs_image = detach_attrs_factory(Image)
+    insert_secnos = insert_secnos_factory(Image)
+    delete_secnos = delete_secnos_factory(Image)
     altered = functools.reduce(lambda x, action: walk(x, action, fmt, meta),
-                               [attach_attrs_image, process_figures,
-                                detach_attrs_image], blocks)
+                               [attach_attrs_image, insert_secnos,
+                                process_figures, delete_secnos,
+                               detach_attrs_image], blocks)
 
     # Second pass
     process_refs = process_refs_factory(references.keys())
