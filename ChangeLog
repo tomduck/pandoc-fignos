@@ -1,7 +1,8 @@
 
 pandoc-fignos 0.20 (2016-12-05)
 
-    * Added numbering figures by section for html and pdf.
+    * Added numbering figures by section for html and pdf
+      (pandoc-eqnos Issue #15).
 
 
 pandoc-fignos 0.19 (2016-11-30)
