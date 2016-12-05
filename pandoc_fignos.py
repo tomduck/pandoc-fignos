@@ -66,7 +66,7 @@ args = parser.parse_args()
 # Pattern for matching labels
 LABEL_PATTERN = re.compile(r'(fig:[\w/-]*)')
 
-Nreferences = 0        # The numbered references count (i.e., excluding tags)
+Nreferences = 0        # Global references counter
 references = {}        # Global references tracker
 unreferenceable = []   # List of labels that are unreferenceable
 
@@ -78,6 +78,10 @@ cleveref_default = False          # Default setting for clever referencing
 
 # Flag for unnumbered figures
 has_unnumbered_figures = False
+
+# Variables for tracking section numbers
+numbersections = False
+cursec = None
 
 PANDOCVERSION = None
 
@@ -110,12 +114,15 @@ def _extract_attrs(x, n):
                 return PandocAttributes(attrs.strip(), 'markdown').to_pandoc()
         raise
 
+
+# pylint: disable=too-many-branches
 def _process_figure(value, fmt):
     """Processes the figure.  Returns a dict containing figure properties."""
 
     # pylint: disable=global-statement
-    global Nreferences
-    global has_unnumbered_figures
+    global Nreferences             # Global references counter
+    global has_unnumbered_figures  # Flags unnumbered figures were found
+    global cursec                  # Current section
 
     # Parse the image
     attrs, caption = value[0]['c'][:2]
@@ -139,8 +146,16 @@ def _process_figure(value, fmt):
         fig['is_unreferenceable'] = True
         unreferenceable.append(attrs[0])
 
-    # Save to the global references tracker
+    # For html, hard-code in the section numbers as tags
     kvs = PandocAttributes(attrs, 'pandoc').kvs
+    if numbersections and fmt in ['html', 'html5'] and not 'tag' in kvs:
+        if kvs['secno'] != cursec:
+            cursec = kvs['secno']
+            Nreferences = 1
+        kvs['tag'] = cursec + '.' + str(Nreferences)
+        Nreferences += 1
+
+    # Save to the global references tracker
     fig['is_tagged'] = 'tag' in kvs
     if fig['is_tagged']:
         # Remove any surrounding quotes
@@ -305,7 +320,7 @@ def process(meta):
     computed fields."""
 
     # pylint: disable=global-statement
-    global captionname, cleveref_default, plusname, starname
+    global captionname, cleveref_default, plusname, starname, numbersections
 
     # Read in the metadata fields and do some checking
 
@@ -344,6 +359,9 @@ def process(meta):
         for name in starname:
             assert type(name) in STRTYPES
 
+    if 'xnos-number-sections' in meta and meta['xnos-number-sections']['c']:
+        numbersections = True
+
 
 def main():
     """Filters the document AST."""
@@ -380,7 +398,7 @@ def main():
     altered = functools.reduce(lambda x, action: walk(x, action, fmt, meta),
                                [attach_attrs_image, insert_secnos,
                                 process_figures, delete_secnos,
-                               detach_attrs_image], blocks)
+                                detach_attrs_image], blocks)
 
     # Second pass
     process_refs = process_refs_factory(references.keys())
