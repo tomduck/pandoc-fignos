@@ -63,6 +63,9 @@ out/test-%.docx: test.md $(IMAGES)
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-$*) $< --filter pandoc-fignos -o $@
 
+out/test-%.json: test.md
+	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
+	$(PANDOC-$*) $< --filter pandoc-fignos -o $@
 
 
 .PHONY: clean
