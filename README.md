@@ -3,7 +3,7 @@
 NEW: Clickable references in docx; Figure numbers by section in LaTeX/pdf and html.
 
 
-pandoc-fignos 0.20
+pandoc-fignos 0.21
 ==================
 
 *pandoc-fignos* is a [pandoc] filter for numbering figures and figure references in processed markdown documents.  A cross-referencing syntax is added to markdown for this purpose.
