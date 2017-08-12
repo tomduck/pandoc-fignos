@@ -136,7 +136,7 @@ Pandoc-fignos may be customized by setting variables in the [metadata block] or 
   * `fignos-star-name` - Sets the name of a "*" reference 
     (e.g., change it from "Figure" to "Fig.").
 
-  * `xnos-section-numbers` - Set to `On` to indicate that you used
+  * `xnos-number-sections` - Set to `On` to indicate that you used
     `--section-numbers` on the command-line.  See
     [Pandoc Flags](#pandoc-flags), below.
 
@@ -159,8 +159,8 @@ Demonstration: Processing [demo3.md] with `pandoc --filter pandoc-fignos` gives 
 
 The `--number-sections` option enables section numbers in pandoc.  Figure numbers by section (e.g., "Fig. 2.1") can be obtained as follows:
 
- 1) **html:** Add `xnos-section-numbers: On` to your YAML metadata or
-    use the `-M xnos-section-numbers=On` option with pandoc.  This
+ 1) **html:** Add `xnos-number-sections: On` to your YAML metadata or
+    use the `-M xnos-number-sections=On` option with pandoc.  This
     variable is ignored for other output formats.
 
  2) **LaTeX/pdf:** Add 
