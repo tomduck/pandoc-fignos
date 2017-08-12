@@ -33,9 +33,8 @@ Tagging:
     $ git push origin <tag>
 
 
-Uploading to pypi:
+Uploading to pypi (update the version number):
 
-    $ python setup.py register -r pypi
-    $ python setup.py sdist upload -r pypi
+    $ twine upload dist/pandoc_fignos-0.20.1-py*
 
-(from http://peterdowns.com/posts/first-time-with-pypi.html)
+(from https://pypi.python.org/pypi/twine)
