@@ -2,7 +2,7 @@
 
 """pandoc-fignos: a pandoc filter that inserts figure nos. and refs."""
 
-# Copyright 2015, 2016 Thomas J. Duck.
+# Copyright 2015-2017 Thomas J. Duck.
 # All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -169,7 +169,7 @@ def _process_figure(value, fmt):
         references[attrs[0]] = Nreferences
 
     # Adjust caption depending on the output format
-    if fmt == 'latex':  # Append a \label if this is referenceable
+    if fmt in ['latex', 'beamer']:  # Append a \label if this is referenceable
         if not fig['is_unreferenceable']:
             value[0]['c'][1] += [RawInline('tex', r'\label{%s}'%attrs[0])]
     else:  # Hard-code in the caption name and number/tag
@@ -221,7 +221,7 @@ def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
                     RawBlock('tex', r'\begin{no-prefix-figure-caption}'),
                     Para(value),
                     RawBlock('tex', r'\end{no-prefix-figure-caption}')]
-        elif fmt == 'latex':
+        elif fmt in ['latex', 'beamer']:
             key = attrs[0]
             if PANDOCVERSION >= '1.17':
                 # Remove id from the image attributes.  It is incorrectly

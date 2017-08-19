@@ -35,6 +35,6 @@ Tagging:
 
 Uploading to pypi (update the version number):
 
-    $ twine upload dist/pandoc_fignos-0.20.1-py*
+    $ twine upload dist/pandoc_fignos-0.21-py*
 
 (from https://pypi.python.org/pypi/twine)
