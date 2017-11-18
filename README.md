@@ -1,16 +1,16 @@
 
 
-*NEW: Beamer slideshow support.*
+*NOTE:  This will become the 1.0.0 release if no pandoc-2.0 compatibility Issues are reported.*
 
 
-pandoc-fignos 0.21.1
-====================
+pandoc-fignos 1.0.0-rc.1
+========================
 
 *pandoc-fignos* is a [pandoc] filter for numbering figures and figure references in processed markdown documents.  A cross-referencing syntax is added to markdown for this purpose.
 
 Demonstration: Processing [demo3.md] with `pandoc --filter pandoc-fignos` gives numbered figures and references in [pdf][pdf3], [tex][tex3], [html][html3], [epub][epub3], [docx][docx3] and other formats (including beamer slideshows).
 
-This version of pandoc-fignos was tested using pandoc 1.15.2 - 1.19.2.  It works under linux, Mac OS X and Windows.  Older versions and other platforms can be supported on request.  I am pleased to receive bug reports and feature requests on the project's [Issues tracker].
+This version of pandoc-fignos was tested using pandoc 1.15.2 - 2.0.2.  It works under linux, Mac OS X and Windows.  Older versions and other platforms can be supported on request.  I am pleased to receive bug reports and feature requests on the project's [Issues tracker].
 
 If you find pandoc-fignos useful, then please encourage further development by giving it a star [on GitHub].
 

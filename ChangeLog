@@ -1,4 +1,9 @@
 
+pandoc-fignos 1.0.0-rc.1 (2017-11-18)
+
+    * Release candidate updated for pandoc 2.0.
+
+
 pandoc-fignos 0.21.1 (2017-09-19)
 
     * Fixes for beamer (pandoc-fignos Issue #38).
