@@ -2,6 +2,12 @@
 
 *NOTE:  This is a release candidate.  It will become the 1.0.0 release if no pandoc-2.0 compatibility Issues are reported.*
 
+*To install it with pip, you must use the `--pre` flag.  e.g.:*
+
+~~~
+$ pip3 install --upgrade --pre pandoc-fignos
+~~~
+
 
 pandoc-fignos 1.0.0rc1
 ======================
