@@ -39,6 +39,6 @@ Creating a source distribution:
 
 Uploading to pypi (update the version number):
 
-    $ twine upload dist/pandoc-fignos-0.21.1.tar.gz
+    $ twine upload dist/pandoc-fignos-1.0.0-rc.1.tar.gz
 
 (from https://pypi.python.org/pypi/twine).
