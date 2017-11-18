@@ -1,10 +1,12 @@
 
+v2.0 = 2.0.2
 v1.19 = 1.19.2
 v1.18 = 1.18
 v1.17 = 1.17.2
 v1.16 = 1.16.0.2
 v1.15 = 1.15.2
 
+PANDOC-2.0 = pandoc-$(v2.0)
 PANDOC-1.19 = pandoc-$(v1.19)
 PANDOC-1.18 = pandoc-$(v1.18)
 PANDOC-1.17 = pandoc-$(v1.17)
@@ -22,9 +24,11 @@ IMAGES = img/fig-1.png img/fig-2.png img/fig-3.png
 
 all: pdf html docx img
 
-pdf: out/test-1.19.pdf \
-     out/test-1.19-py2.7.pdf \
-     out/test-1.19-py3.4.pdf \
+pdf: out/test-2.0.pdf \
+     out/test-2.0-py2.7.pdf \
+     out/test-2.0-py3.4.pdf \
+     out/test-2.0-cleveref.pdf \
+     out/test-1.19.pdf \
      out/test-1.19-cleveref.pdf \
      out/test-1.18.pdf \
      out/test-1.18-cleveref.pdf \
@@ -32,9 +36,9 @@ pdf: out/test-1.19.pdf \
      out/test-1.16.pdf \
      out/test-1.15.pdf
 
-html: out/test-1.19.html
+html: out/test-2.0.html
 
-docx: out/test-1.19.docx
+docx: out/test-2.0.docx
 
 
 out/test-%.html: test.md $(IMAGES)
