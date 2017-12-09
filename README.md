@@ -5,20 +5,18 @@
 *To install it with pip, you must use the `--pre` flag.  e.g.:*
 
 ~~~
-$ pip3 install --upgrade --pre pandoc-fignos
+$ pip install --upgrade --pre pandoc-fignos
 ~~~
 
 
 pandoc-fignos 1.0.0rc2
 ======================
 
-*pandoc-fignos* is a [pandoc] filter that extends the markdown document syntax for figure numbering and cross-referencing.
+*pandoc-fignos* is a [pandoc] filter that extends markdown for figure numbering and cross-referencing.
 
 Demonstration: Processing [demo3.md] with `pandoc --filter pandoc-fignos` gives numbered figures and references in [pdf][pdf3], [tex][tex3], [html][html3], [epub][epub3], [docx][docx3] and other formats (including beamer slideshows).
 
-This version of pandoc-fignos was tested using pandoc 1.15.2 - 2.0.4.  It works under linux, Mac OS X and Windows.  Older versions and other platforms can be supported on request.  I am pleased to receive bug reports and feature requests on the project's [Issues tracker].
-
-If you find pandoc-fignos useful, then please encourage further development by giving it a star [on GitHub].
+This version of pandoc-fignos was tested using pandoc 1.15.2 - 2.0.4.  It works under linux, Mac OS X and Windows.  I am pleased to receive bug reports and feature requests on the project's [Issues tracker].  If you find pandoc-fignos useful, then please give it a star [on GitHub].
 
 See also: [pandoc-eqnos], [pandoc-tablenos]
 
@@ -43,7 +41,7 @@ Contents
 Usage
 -----
 
-To apply the filter during document processing, use the following option with pandoc:
+Use the following option with pandoc:
 
     --filter pandoc-fignos
 
@@ -55,7 +53,7 @@ Markdown Syntax
 
 The markdown syntax extension used by pandoc-fignos was developed in [pandoc Issue #813] -- see [this post] by [@scaramouche1].
 
-To mark a figure for numbering, add the label `fig:id` to its attributes:
+To mark a figure for numbering, add an id to its attributes:
 
     ![Caption.](image.png){#fig:id}
 
