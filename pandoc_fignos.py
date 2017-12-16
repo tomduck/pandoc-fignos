@@ -199,7 +199,7 @@ def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
     # Process figures wrapped in Para elements
     if key == 'Para' and len(value) == 1 and \
       value[0]['t'] == 'Image' and value[0]['c'][-1][1].startswith('fig:'):
-
+        
         # Inspect the image
         if len(value[0]['c']) == 2:  # Unattributed, bail out
             has_unnumbered_figures = True
@@ -395,10 +395,12 @@ def main():
     detach_attrs_image = detach_attrs_factory(Image)
     insert_secnos = insert_secnos_factory(Image)
     delete_secnos = delete_secnos_factory(Image)
+    filters = [insert_secnos, process_figures, delete_secnos] \
+      if PANDOCVERSION >= '1.16' else \
+      [attach_attrs_image, insert_secnos, process_figures,
+       delete_secnos, detach_attrs_image]
     altered = functools.reduce(lambda x, action: walk(x, action, fmt, meta),
-                               [attach_attrs_image, insert_secnos,
-                                process_figures, delete_secnos,
-                                detach_attrs_image], blocks)
+                               filters, blocks)
 
     # Second pass
     process_refs = process_refs_factory(references.keys())
@@ -407,7 +409,6 @@ def main():
     altered = functools.reduce(lambda x, action: walk(x, action, fmt, meta),
                                [repair_refs, process_refs, replace_refs],
                                altered)
-
 
     # Insert supporting TeX
     if fmt == 'latex':

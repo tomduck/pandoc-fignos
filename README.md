@@ -12,11 +12,11 @@ $ pip install --upgrade --pre pandoc-fignos
 pandoc-fignos 1.0.0rc2
 ======================
 
-*pandoc-fignos* is a [pandoc] filter that extends markdown for figure numbering and cross-referencing.
+*pandoc-fignos* is a [pandoc] filter for numbering figures and figure references.  An extension to markdown is provided for this purpose.
 
 Demonstration: Processing [demo3.md] with `pandoc --filter pandoc-fignos` gives numbered figures and references in [pdf][pdf3], [tex][tex3], [html][html3], [epub][epub3], [docx][docx3] and other formats (including beamer slideshows).
 
-This version of pandoc-fignos was tested using pandoc 1.15.2 - 2.0.4.  It works under linux, Mac OS X and Windows.  I am pleased to receive bug reports and feature requests on the project's [Issues tracker].  If you find pandoc-fignos useful, then please give it a star [on GitHub].
+This version of pandoc-fignos was tested using pandoc 1.15.2 - 2.0.5.  It works under linux, Mac OS X and Windows.  I am pleased to receive bug reports and feature requests on the project's [Issues tracker].  If you find pandoc-fignos useful, then please give it a star [on GitHub].
 
 See also: [pandoc-eqnos], [pandoc-tablenos]
 
