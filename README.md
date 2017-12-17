@@ -9,7 +9,7 @@ $ pip install --upgrade --pre pandoc-fignos
 ~~~
 
 
-pandoc-fignos 1.0.0rc2
+pandoc-fignos 1.0.0rc3
 ======================
 
 *pandoc-fignos* is a [pandoc] filter for numbering figures and figure references.  An extension to markdown is provided for this purpose.

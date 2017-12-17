@@ -48,14 +48,13 @@ from pandocfilters import walk
 from pandocfilters import Image, Math, Str, Space, Para, RawBlock, RawInline
 
 import pandocxnos
+from pandocxnos import PandocAttributes
 from pandocxnos import STRTYPES, STDIN, STDOUT
 from pandocxnos import elt, get_meta, extract_attrs
 from pandocxnos import repair_refs, process_refs_factory, replace_refs_factory
 from pandocxnos import attach_attrs_factory, detach_attrs_factory
 from pandocxnos import insert_secnos_factory, delete_secnos_factory
 from pandocxnos import insert_rawblocks_factory
-
-from pandocattributes import PandocAttributes
 
 # Read the command-line arguments
 parser = argparse.ArgumentParser(description='Pandoc figure numbers filter.')

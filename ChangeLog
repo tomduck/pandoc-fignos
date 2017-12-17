@@ -1,7 +1,7 @@
-pandoc-fignos 1.0.0rc2 (2017-12-16)
+pandoc-fignos 1.0.0rc3 (2017-12-16)
 
     * Fixed a corner case attributes processing bug (Issue #41).
-    * Added workaround for a pandoc-attributes install error
+    * Removed dependency on pandoc-attributes
       (pandoc-fignos Issue #42).
 
 
