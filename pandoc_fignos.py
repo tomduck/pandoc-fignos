@@ -74,6 +74,7 @@ captionname = 'Figure'            # Used with \figurename
 plusname = ['fig.', 'figs.']      # Used with \cref
 starname = ['Figure', 'Figures']  # Used with \Cref
 cleveref_default = False          # Default setting for clever referencing
+capitalize = False                # Default setting for capitalizing plusname
 
 # Flag for unnumbered figures
 has_unnumbered_figures = False
@@ -198,7 +199,7 @@ def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
     # Process figures wrapped in Para elements
     if key == 'Para' and len(value) == 1 and \
       value[0]['t'] == 'Image' and value[0]['c'][-1][1].startswith('fig:'):
-        
+
         # Inspect the image
         if len(value[0]['c']) == 2:  # Unattributed, bail out
             has_unnumbered_figures = True
@@ -319,7 +320,12 @@ def process(meta):
     computed fields."""
 
     # pylint: disable=global-statement
-    global captionname, cleveref_default, plusname, starname, numbersections
+    global capitalize
+    global captionname
+    global cleveref_default
+    global plusname
+    global starname
+    global numbersections
 
     # Read in the metadata fields and do some checking
 
@@ -337,6 +343,14 @@ def process(meta):
     if 'fignos-cleveref' in meta:
         cleveref_default = get_meta(meta, 'fignos-cleveref')
         assert cleveref_default in [True, False]
+
+    if 'fignos-capitalize' in meta:
+        capitalize = get_meta(meta, 'fignos-capitalize')
+        assert capitalize in [True, False]
+
+    if 'fignos-capitalise' in meta:
+        capitalize = get_meta(meta, 'fignos-capitalise')
+        assert capitalize in [True, False]
 
     if 'fignos-plus-name' in meta:
         tmp = get_meta(meta, 'fignos-plus-name')
@@ -404,7 +418,9 @@ def main():
     # Second pass
     process_refs = process_refs_factory(references.keys())
     replace_refs = replace_refs_factory(references, cleveref_default,
-                                        plusname, starname, 'figure')
+                                        plusname if not capitalize else
+                                        [name.title() for name in plusname],
+                                        starname, 'figure')
     altered = functools.reduce(lambda x, action: walk(x, action, fmt, meta),
                                [repair_refs, process_refs, replace_refs],
                                altered)

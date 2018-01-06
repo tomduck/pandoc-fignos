@@ -128,16 +128,19 @@ Customization
 
 Pandoc-fignos may be customized by setting variables in the [metadata block] or on the command line (using `-M KEY=VAL`).  The following variables are supported:
 
+  * `fignos-capitalise` - Capitalizes the names of "+" references
+    (e.g., change it from "fig." to "Fig.");
+
   * `fignos-caption-name` - Sets the name at the beginning of a
     caption (e.g., change it from "Figure to "Fig." or "图");
 
   * `fignos-cleveref` or just `cleveref` - Set to `On` to assume "+"
     clever references by default;
 
-  * `fignos-plus-name` - Sets the name of a "+" reference 
+  * `fignos-plus-name` - Sets the name of a "+" reference
     (e.g., change it from "fig." to "figure"); and
 
-  * `fignos-star-name` - Sets the name of a "*" reference 
+  * `fignos-star-name` - Sets the name of a "*" reference
     (e.g., change it from "Figure" to "Fig.").
 
   * `xnos-number-sections` - Set to `On` to indicate that you used
@@ -146,6 +149,7 @@ Pandoc-fignos may be customized by setting variables in the [metadata block] or 
 
   * `xnos-cleveref-fake` - Sets cleveref faking On/Off (LaTeX/pdf
     only).  See [Technical Details](#technical-details), below.
+
 
 [metadata block]: http://pandoc.org/README.html#extension-yaml_metadata_block
 
@@ -167,7 +171,7 @@ The `--number-sections` option enables section numbers in pandoc.  Figure number
     use the `-M xnos-number-sections=On` option with pandoc.  This
     variable is ignored for other output formats.
 
- 2) **LaTeX/pdf:** Add 
+ 2) **LaTeX/pdf:** Add
     `header-includes: \numberwithin{figure}{section}` to your YAML
     metadata.  If you need multiple header includes, then add
     something like this:
@@ -204,13 +208,17 @@ TeX/pdf:
   * The `\label` and `\ref` macros are used for figure labels and
     references (links are automatically generated);
   * `\figurename` is set for the caption name;
-  * Tags are supported by temporarily redefining `\thefigure` 
+  * Tags are supported by temporarily redefining `\thefigure`
     around a figure; and
   * The clever referencing macros `\cref` and `\Cref` are used
     if they are available (i.e. included in your LaTeX template via
-    `\usepackage{cleveref}`), otherwise they are faked.  Set the 
+    `\usepackage{cleveref}`), otherwise they are faked.  Set the
     meta variable `xnos-cleveref-fake` to `Off` to disable cleveref
     faking.
+  * Note that cleveref's `capitalise` parameter does not affect
+    because pandoc-fignos' references because of how pandoc-xnos
+    handles `\cref` and `\Cref` format specifications.
+    Instead, use the `fignos-capitalise` meta variable.
 
 Other:
 
