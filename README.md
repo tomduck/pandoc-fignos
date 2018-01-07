@@ -53,11 +53,11 @@ Markdown Syntax
 
 The markdown syntax extension used by pandoc-fignos was developed in [pandoc Issue #813] -- see [this post] by [@scaramouche1].
 
-To mark a figure for numbering, add an id to its attributes:
+To mark a figure for numbering, add an identifier to its attributes:
 
     ![Caption.](image.png){#fig:id}
 
-Alternatively, use [reference link] attributes.  The prefix `#fig:` is required. `id` should be replaced with a unique identifier composed of letters, numbers, dashes, slashes and underscores.  If `id` is omitted then the figure will be numbered but unreferenceable.
+Alternatively, use [reference link] attributes.  The prefix `#fig:` is required. `id` should be replaced with a unique string composed of letters, numbers, dashes and underscores.  If `id` is omitted then the figure will be numbered but unreferenceable.
 
 To reference the figure, use
 
