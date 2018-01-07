@@ -1,3 +1,10 @@
+pandoc-fignos 1.0.0 (2018-01-07)
+
+    * Version number bumped to 1.0.0.
+    * Put span around html caption label (e.g., "Fig. 1") to
+      allow styling.
+
+
 pandoc-fignos 1.0.0rc3 (2017-12-16)
 
     * Fixed a corner case attributes processing bug (Issue #41).
