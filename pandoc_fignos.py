@@ -188,8 +188,12 @@ def _process_figure(value, fmt):
                 els = [Math({"t":"InlineMath", "c":[]}, math), Str(':')]
             else:  # Text
                 els = [Str(text+':')]
-            value[0]['c'][1] = [Str(captionname), Space()]+ els + [Space()] + \
-              list(caption)
+            value[0]['c'][1] = \
+                [RawInline('html', r'<span>'), Str(captionname), Space()] + \
+                els + [RawInline('html', r'</span>')] \
+                if fmt in ['html', 'html5'] else \
+                [Str(captionname), Space()] + els
+            value[0]['c'][1] += [Space()] + list(caption)
 
     return fig
 
