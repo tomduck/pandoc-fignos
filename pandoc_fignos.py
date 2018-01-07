@@ -2,7 +2,7 @@
 
 """pandoc-fignos: a pandoc filter that inserts figure nos. and refs."""
 
-# Copyright 2015-2017 Thomas J. Duck.
+# Copyright 2015-2018 Thomas J. Duck.
 # All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -173,9 +173,13 @@ def _process_figure(value, fmt):
             value[0]['c'][1] += [RawInline('tex', r'\label{%s}'%attrs[0])]
     else:  # Hard-code in the caption name and number/tag
         if type(references[attrs[0]]) is int:  # Numbered reference
-            value[0]['c'][1] = [Str(captionname), Space(),
-                                Str('%d:'%references[attrs[0]]), Space()] + \
-                               list(caption)
+            value[0]['c'][1] = [RawInline('html', r'<span>'),
+                                Str(captionname), Space(),
+                                Str('%d:'%references[attrs[0]]),
+                                RawInline('html', r'</span>')] \
+                if fmt in ['html', 'html5'] else \
+                [Str(captionname), Space(), Str('%d:'%references[attrs[0]])]
+            value[0]['c'][1] += [Space()] + list(caption)
         else:  # Tagged reference
             assert type(references[attrs[0]]) in STRTYPES
             text = references[attrs[0]]
@@ -198,7 +202,7 @@ def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
     # Process figures wrapped in Para elements
     if key == 'Para' and len(value) == 1 and \
       value[0]['t'] == 'Image' and value[0]['c'][-1][1].startswith('fig:'):
-        
+
         # Inspect the image
         if len(value[0]['c']) == 2:  # Unattributed, bail out
             has_unnumbered_figures = True
