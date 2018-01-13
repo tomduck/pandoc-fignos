@@ -73,7 +73,7 @@ unreferenceable = []   # List of labels that are unreferenceable
 captionname = 'Figure'            # Used with \figurename
 plusname = ['fig.', 'figs.']      # Used with \cref
 starname = ['Figure', 'Figures']  # Used with \Cref
-cleveref_default = False          # Default setting for clever referencing
+use_cleveref_default = False      # Default setting for clever referencing
 
 # Flag for unnumbered figures
 has_unnumbered_figures = False
@@ -327,7 +327,7 @@ def process(meta):
     computed fields."""
 
     # pylint: disable=global-statement
-    global captionname, cleveref_default, plusname, starname, numbersections
+    global captionname, use_cleveref_default, plusname, starname, numbersections
 
     # Read in the metadata fields and do some checking
 
@@ -339,12 +339,12 @@ def process(meta):
         assert type(captionname) in STRTYPES
 
     if 'cleveref' in meta:
-        cleveref_default = get_meta(meta, 'cleveref')
-        assert cleveref_default in [True, False]
+        use_cleveref_default = get_meta(meta, 'cleveref')
+        assert use_cleveref_default in [True, False]
 
     if 'fignos-cleveref' in meta:
-        cleveref_default = get_meta(meta, 'fignos-cleveref')
-        assert cleveref_default in [True, False]
+        use_cleveref_default = get_meta(meta, 'fignos-cleveref')
+        assert use_cleveref_default in [True, False]
 
     if 'fignos-plus-name' in meta:
         tmp = get_meta(meta, 'fignos-plus-name')
@@ -411,7 +411,8 @@ def main():
 
     # Second pass
     process_refs = process_refs_factory(references.keys())
-    replace_refs = replace_refs_factory(references, cleveref_default,
+    replace_refs = replace_refs_factory(references,
+                                        use_cleveref_default, False,
                                         plusname, starname, 'figure')
     altered = functools.reduce(lambda x, action: walk(x, action, fmt, meta),
                                [repair_refs, process_refs, replace_refs],
