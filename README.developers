@@ -3,6 +3,14 @@
 This file provides developer notes.
 
 
+Branches
+--------
+
+Development is mostly done in the `nextrelease` branch.  When complete
+(and tested), the changes are merged into the `master` branch and a new
+release is prepared.
+
+    
 Install Alternatives
 --------------------
 
@@ -12,7 +20,7 @@ To install the most recent sources from github using pip:
 
 (to upgrade use the --upgrade flag).
 
-To upgrade from the nextrelease branch, use
+To upgrade from the `nextrelease` branch, use
 
     # pip install --upgrade git+https://github.com/tomduck/pandoc-fignos.git@nextrelease
 
