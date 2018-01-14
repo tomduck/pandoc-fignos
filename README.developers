@@ -1,6 +1,12 @@
 
+Developer Notes
+===============
 
-This file provides developer notes.
+Contributions to this project are welcome.  There are a number of outstanding
+Issues that need to be addressed.  Before you begin, please give me a heads-up
+so that we don't work at cross-purposes.
+
+Substantial contributions of code will be acknowledged in the AUTHORS file.
 
 
 Branches
@@ -34,7 +40,9 @@ directory for instructions.
 
 Preparing a Release
 -------------------
-    
+
+(note to self)
+
 Tagging:
 
     $ git tag -a <tag> -m <message>
@@ -47,6 +55,6 @@ Creating a source distribution:
 
 Uploading to pypi (update the version number):
 
-    $ twine upload dist/pandoc-fignos-1.1.0.tar.gz
+    $ twine upload dist/pandoc-fignos-1.2.0.tar.gz
 
 (from https://pypi.python.org/pypi/twine).

@@ -1,6 +1,6 @@
 
 
-New: Added `fignos-capitalise` meta variable to capitalise clever references (e.g., change "fig." to "Fig.").
+**New in 1.2.0:** Added `fignos-capitalise` meta variable to capitalise clever references (e.g., change "fig." to "Fig.").
 
 
 pandoc-fignos 1.2.0
@@ -10,7 +10,7 @@ pandoc-fignos 1.2.0
 
 Demonstration: Processing [demo3.md] with `pandoc --filter pandoc-fignos` gives numbered figures and references in [pdf][pdf3], [tex][tex3], [html][html3], [epub][epub3], [docx][docx3] and other formats (including beamer slideshows).
 
-This version of pandoc-fignos was tested using pandoc 1.15.2 - 2.1.  It works under linux, Mac OS X and Windows.  I am pleased to receive bug reports and feature requests on the project's [Issues tracker].  If you find pandoc-fignos useful, then please give it a star [on GitHub].
+This version of pandoc-fignos was tested using pandoc 1.15.2 - 2.1.  It works under linux, Mac OS X and Windows.  I am pleased to receive bug reports and feature requests on the project's [Issues tracker].  If you find pandoc-fignos useful, then please kindly give it a star [on GitHub].
 
 See also: [pandoc-eqnos], [pandoc-tablenos]
 
@@ -91,7 +91,7 @@ to have the reference name (i.e., "fig.") automatically generated.  The above fo
 
      *@fig:id
 
-instead.  If clever referencing is enabled by default (see [Customization](#customization), below), you can disable it for a given reference using<sup>[1](#footnote1)</sup>
+instead.  If clever referencing is enabled by default (see [Customization](#customization), below), then you can disable it for a given reference using<sup>[1](#footnote1)</sup>
 
     !@fig:id
 
@@ -209,10 +209,10 @@ TeX/pdf:
     `\usepackage{cleveref}`), otherwise they are faked.  Set the
     meta variable `xnos-cleveref-fake` to `Off` to disable cleveref
     faking.
-  * Note that cleveref's `capitalise` parameter does not affect
-    pandoc-fignos' references because of how pandoc-xnos
-    handles `\cref` and `\Cref` format specifications.
-    Instead, use the `fignos-capitalise` meta variable.
+  * The clever reference names are set using `\crefformat` and
+    `\Crefformat`.  For this reason the cleveref package's
+    `capitalise` parameter has no effect.  Use the
+    `fignos-capitalise` meta variable instead.
 
 Other:
 
@@ -270,12 +270,12 @@ To determine which version of pandoc-fignos you have installed, use
 
     pip show pandoc-fignos
 
-Please be sure you have the latest version installed before reporting a bug on our [Issues tracker]
+Please be sure you have the latest version installed before reporting a bug on our [Issues tracker].
 
 
 #### Installing on linux ####
 
-If you are running linux, pip may be packaged separately from python.  On Debian-based systems (including Ubuntu), you can install pip as root using
+If you are running linux, then pip may be packaged separately from python.  On Debian-based systems (including Ubuntu), you can install pip as root using
 
     apt-get update
     apt-get install python-pip
@@ -318,7 +318,7 @@ Once python is installed, start the "Command Prompt" program.  Depending on wher
 Getting Help
 ------------
 
-If you have any difficulties with pandoc-fignos, or would like to see a new feature, please submit a report to our [Issues tracker].
+If you have any difficulties with pandoc-fignos, or would like to see a new feature, then please submit a report to our [Issues tracker].
 
 
 ----

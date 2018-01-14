@@ -364,8 +364,6 @@ def process(meta):
             assert capitalize in [True, False]
             break
 
-        assert capitalize in [True, False]
-
     if 'fignos-plus-name' in meta:
         tmp = get_meta(meta, 'fignos-plus-name')
         if type(tmp) is list:
