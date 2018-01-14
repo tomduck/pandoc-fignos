@@ -1,3 +1,8 @@
+pandoc-fignos 1.2.0 (unreleased)
+
+    * Added fignos-capitalise meta variable (pull request #44).
+
+
 pandoc-fignos 1.1.0 (2018-01-13)
 
     * Update for compatibility with pandoc-xnos 0.15.

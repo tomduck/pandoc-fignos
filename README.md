@@ -1,6 +1,9 @@
 
 
-pandoc-fignos 1.1.0
+New: Added `fignos-capitalise` meta variable to capitalise clever references (e.g., change "fig." to "Fig.").
+
+
+pandoc-fignos 1.2.0
 ===================
 
 *pandoc-fignos* is a [pandoc] filter for numbering figures and figure references.  An extension to markdown is provided for this purpose.
@@ -119,13 +122,13 @@ Customization
 
 Pandoc-fignos may be customized by setting variables in the [metadata block] or on the command line (using `-M KEY=VAL`).  The following variables are supported:
 
-  * `fignos-capitalise` - Capitalizes the names of "+" references
-    (e.g., change it from "fig." to "Fig.");
+  * `fignos-capitalise` or `xnos-capitalise` - Capitalizes the names
+     of "+" references (e.g., change from "fig." to "Fig.");
 
   * `fignos-caption-name` - Sets the name at the beginning of a
     caption (e.g., change it from "Figure to "Fig." or "图");
 
-  * `fignos-cleveref` or just `cleveref` - Set to `On` to assume "+"
+  * `fignos-cleveref` or `xnos-cleveref` - Set to `On` to assume "+"
     clever references by default;
 
   * `fignos-plus-name` - Sets the name of a "+" reference
@@ -207,7 +210,7 @@ TeX/pdf:
     meta variable `xnos-cleveref-fake` to `Off` to disable cleveref
     faking.
   * Note that cleveref's `capitalise` parameter does not affect
-    because pandoc-fignos' references because of how pandoc-xnos
+    pandoc-fignos' references because of how pandoc-xnos
     handles `\cref` and `\Cref` format specifications.
     Instead, use the `fignos-capitalise` meta variable.
 

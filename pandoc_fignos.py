@@ -74,7 +74,7 @@ captionname = 'Figure'            # Used with \figurename
 plusname = ['fig.', 'figs.']      # Used with \cref
 starname = ['Figure', 'Figures']  # Used with \Cref
 
-use_cleveref_default = False          # Default setting for clever referencing
+use_cleveref_default = False      # Default setting for clever referencing
 capitalize = False                # Default setting for capitalizing plusname
 
 # Flag for unnumbered figures
@@ -324,6 +324,7 @@ TEX3 = r"""
 \renewcommand{\figurename}{%s}
 """.strip()
 
+
 def process(meta):
     """Saves metadata fields in global variables and returns a few
     computed fields."""
@@ -338,27 +339,31 @@ def process(meta):
 
     # Read in the metadata fields and do some checking
 
-    if 'fignos-caption-name' in meta:
-        captionname = get_meta(meta, 'fignos-caption-name')
-        assert type(captionname) in STRTYPES
-    elif 'figure-name' in meta:  # Deprecated
-        captionname = get_meta(meta, 'figure-name')
-        assert type(captionname) in STRTYPES
+    for name in ['fignos-caption-name', 'figure-name']:
+        # 'figure-name' is deprecated
+        if name in meta:
+            captionname = get_meta(meta, name)
+            assert type(captionname) in STRTYPES
+            break
 
-    if 'cleveref' in meta:
-        use_cleveref_default = get_meta(meta, 'cleveref')
-        assert use_cleveref_default in [True, False]
+    for name in ['fignos-cleveref', 'xnos-cleveref', 'cleveref']:
+        # 'xnos-cleveref' enables cleveref in all 3 of fignos/eqnos/tablenos
+        # 'cleveref' is deprecated
+        if name in meta:
+            use_cleveref_default = get_meta(meta, name)
+            assert use_cleveref_default in [True, False]
+            break
 
-    if 'fignos-cleveref' in meta:
-        use_cleveref_default = get_meta(meta, 'fignos-cleveref')
-        assert use_cleveref_default in [True, False]
+    for name in ['fignos-capitalize', 'fignos-capitalise',
+                 'xnos-capitalize', 'xnos-capitalise']:
+        # 'fignos-capitalise' is an alternative spelling
+        # 'xnos-capitalise' enables capitalise in all 3 of fignos/eqnos/tablenos
+        # 'xnos-capitalize' is an alternative spelling
+        if name in meta:
+            capitalize = get_meta(meta, name)
+            assert capitalize in [True, False]
+            break
 
-    if 'fignos-capitalize' in meta:
-        capitalize = get_meta(meta, 'fignos-capitalize')
-        assert capitalize in [True, False]
-
-    if 'fignos-capitalise' in meta:
-        capitalize = get_meta(meta, 'fignos-capitalise')
         assert capitalize in [True, False]
 
     if 'fignos-plus-name' in meta:
