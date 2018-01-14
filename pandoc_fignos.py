@@ -2,7 +2,7 @@
 
 """pandoc-fignos: a pandoc filter that inserts figure nos. and refs."""
 
-# Copyright 2015-2017 Thomas J. Duck.
+# Copyright 2015-2018 Thomas J. Duck.
 # All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -73,7 +73,8 @@ unreferenceable = []   # List of labels that are unreferenceable
 captionname = 'Figure'            # Used with \figurename
 plusname = ['fig.', 'figs.']      # Used with \cref
 starname = ['Figure', 'Figures']  # Used with \Cref
-cleveref_default = False          # Default setting for clever referencing
+
+use_cleveref_default = False          # Default setting for clever referencing
 capitalize = False                # Default setting for capitalizing plusname
 
 # Flag for unnumbered figures
@@ -174,9 +175,13 @@ def _process_figure(value, fmt):
             value[0]['c'][1] += [RawInline('tex', r'\label{%s}'%attrs[0])]
     else:  # Hard-code in the caption name and number/tag
         if type(references[attrs[0]]) is int:  # Numbered reference
-            value[0]['c'][1] = [Str(captionname), Space(),
-                                Str('%d:'%references[attrs[0]]), Space()] + \
-                               list(caption)
+            value[0]['c'][1] = [RawInline('html', r'<span>'),
+                                Str(captionname), Space(),
+                                Str('%d:'%references[attrs[0]]),
+                                RawInline('html', r'</span>')] \
+                if fmt in ['html', 'html5'] else \
+                [Str(captionname), Space(), Str('%d:'%references[attrs[0]])]
+            value[0]['c'][1] += [Space()] + list(caption)
         else:  # Tagged reference
             assert type(references[attrs[0]]) in STRTYPES
             text = references[attrs[0]]
@@ -185,8 +190,12 @@ def _process_figure(value, fmt):
                 els = [Math({"t":"InlineMath", "c":[]}, math), Str(':')]
             else:  # Text
                 els = [Str(text+':')]
-            value[0]['c'][1] = [Str(captionname), Space()]+ els + [Space()] + \
-              list(caption)
+            value[0]['c'][1] = \
+                [RawInline('html', r'<span>'), Str(captionname), Space()] + \
+                els + [RawInline('html', r'</span>')] \
+                if fmt in ['html', 'html5'] else \
+                [Str(captionname), Space()] + els
+            value[0]['c'][1] += [Space()] + list(caption)
 
     return fig
 
@@ -322,7 +331,7 @@ def process(meta):
     # pylint: disable=global-statement
     global capitalize
     global captionname
-    global cleveref_default
+    global use_cleveref_default
     global plusname
     global starname
     global numbersections
@@ -337,12 +346,12 @@ def process(meta):
         assert type(captionname) in STRTYPES
 
     if 'cleveref' in meta:
-        cleveref_default = get_meta(meta, 'cleveref')
-        assert cleveref_default in [True, False]
+        use_cleveref_default = get_meta(meta, 'cleveref')
+        assert use_cleveref_default in [True, False]
 
     if 'fignos-cleveref' in meta:
-        cleveref_default = get_meta(meta, 'fignos-cleveref')
-        assert cleveref_default in [True, False]
+        use_cleveref_default = get_meta(meta, 'fignos-cleveref')
+        assert use_cleveref_default in [True, False]
 
     if 'fignos-capitalize' in meta:
         capitalize = get_meta(meta, 'fignos-capitalize')
@@ -417,7 +426,8 @@ def main():
 
     # Second pass
     process_refs = process_refs_factory(references.keys())
-    replace_refs = replace_refs_factory(references, cleveref_default,
+    replace_refs = replace_refs_factory(references,
+                                        use_cleveref_default, False,
                                         plusname if not capitalize else
                                         [name.title() for name in plusname],
                                         starname, 'figure')

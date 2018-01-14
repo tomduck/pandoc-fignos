@@ -1,6 +1,6 @@
 """setup.py - install script for pandoc-fignos."""
 
-# Copyright 2015-2017 Thomas J. Duck.
+# Copyright 2015-2018 Thomas J. Duck.
 # All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -28,7 +28,7 @@ LONG_DESCRIPTION = """\
 A pandoc filter for numbering figures and figure references.
 """
 
-VERSION = '1.0.0rc3'
+VERSION = '1.1.0'
 
 
 #-----------------------------------------------------------------------------
@@ -108,7 +108,7 @@ setup(
     url='https://github.com/tomduck/pandoc-fignos',
     download_url='https://github.com/tomduck/pandoc-fignos/tarball/'+VERSION,
 
-    install_requires=['pandoc-xnos>=0.13'],
+    install_requires=['pandoc-xnos>=0.15'],
 
     py_modules=['pandoc_fignos'],
     entry_points={'console_scripts':['pandoc-fignos = pandoc_fignos:main']},
