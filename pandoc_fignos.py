@@ -32,17 +32,12 @@
 
 # pylint: disable=invalid-name
 
+import sys
 import re
 import functools
 import argparse
 import json
 import uuid
-
-import sys
-if sys.version_info > (3,):
-    from urllib.request import unquote  # pylint: disable=no-name-in-module
-else:
-    from urllib import unquote  # pylint: disable=no-name-in-module
 
 from pandocfilters import walk
 from pandocfilters import Image, Math, Str, Space, Para, RawBlock, RawInline
@@ -55,6 +50,12 @@ from pandocxnos import repair_refs, process_refs_factory, replace_refs_factory
 from pandocxnos import attach_attrs_factory, detach_attrs_factory
 from pandocxnos import insert_secnos_factory, delete_secnos_factory
 from pandocxnos import insert_rawblocks_factory
+
+if sys.version_info > (3,):
+    from urllib.request import unquote  # pylint: disable=no-name-in-module
+else:
+    from urllib import unquote  # pylint: disable=no-name-in-module
+
 
 # Read the command-line arguments
 parser = argparse.ArgumentParser(description='Pandoc figure numbers filter.')
@@ -149,7 +150,7 @@ def _process_figure(value, fmt):
 
     # For html, hard-code in the section numbers as tags
     kvs = PandocAttributes(attrs, 'pandoc').kvs
-    if numbersections and fmt in ['html', 'html5'] and not 'tag' in kvs:
+    if numbersections and fmt in ['html', 'html5'] and 'tag' not in kvs:
         if kvs['secno'] != cursec:
             cursec = kvs['secno']
             Nreferences = 1
@@ -174,7 +175,7 @@ def _process_figure(value, fmt):
         if not fig['is_unreferenceable']:
             value[0]['c'][1] += [RawInline('tex', r'\label{%s}'%attrs[0])]
     else:  # Hard-code in the caption name and number/tag
-        if type(references[attrs[0]]) is int:  # Numbered reference
+        if isinstance(references[attrs[0]], int):  # Numbered reference
             value[0]['c'][1] = [RawInline('html', r'<span>'),
                                 Str(captionname), Space(),
                                 Str('%d:'%references[attrs[0]]),
@@ -183,7 +184,7 @@ def _process_figure(value, fmt):
                 [Str(captionname), Space(), Str('%d:'%references[attrs[0]])]
             value[0]['c'][1] += [Space()] + list(caption)
         else:  # Tagged reference
-            assert type(references[attrs[0]]) in STRTYPES
+            assert isinstance(references[attrs[0]], STRTYPES)
             text = references[attrs[0]]
             if text.startswith('$') and text.endswith('$'):  # Math
                 math = text.replace(' ', r'\ ')[1:-1]
@@ -199,7 +200,7 @@ def _process_figure(value, fmt):
 
     return fig
 
-# pylint: disable=too-many-branches
+# pylint: disable=too-many-branches, too-many-return-statements
 def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
     """Processes the figures."""
 
@@ -216,8 +217,7 @@ def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
                 return [RawBlock('tex', r'\begin{no-prefix-figure-caption}'),
                         Para(value),
                         RawBlock('tex', r'\end{no-prefix-figure-caption}')]
-            else:
-                return
+            return None
 
         # Process the figure
         fig = _process_figure(value, fmt)
@@ -262,6 +262,8 @@ def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
             bookmarkend = \
               RawBlock('openxml', '</w:t></w:r><w:bookmarkEnd w:id="0"/></w:p>')
             return [bookmarkstart, Para(value), bookmarkend]
+
+    return None
 
 
 # Main program ---------------------------------------------------------------
@@ -342,7 +344,7 @@ def process(meta):
         # 'figure-name' is deprecated
         if name in meta:
             captionname = get_meta(meta, name)
-            assert type(captionname) in STRTYPES
+            assert isinstance(captionname, STRTYPES)
             break
 
     for name in ['fignos-cleveref', 'xnos-cleveref', 'cleveref']:
@@ -363,23 +365,23 @@ def process(meta):
 
     if 'fignos-plus-name' in meta:
         tmp = get_meta(meta, 'fignos-plus-name')
-        if type(tmp) is list:
+        if isinstance(tmp, list):
             plusname = tmp
         else:
             plusname[0] = tmp
         assert len(plusname) == 2
         for name in plusname:
-            assert type(name) in STRTYPES
+            assert isinstance(name, STRTYPES)
 
     if 'fignos-star-name' in meta:
         tmp = get_meta(meta, 'fignos-star-name')
-        if type(tmp) is list:
+        if isinstance(tmp, list):
             starname = tmp
         else:
             starname[0] = tmp
         assert len(starname) == 2
         for name in starname:
-            assert type(name) in STRTYPES
+            assert isinstance(name, STRTYPES)
 
     if 'xnos-number-sections' in meta:
         numbersections = check_bool(get_meta(meta, 'xnos-number-sections'))
