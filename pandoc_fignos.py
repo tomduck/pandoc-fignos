@@ -50,7 +50,7 @@ from pandocfilters import Image, Math, Str, Space, Para, RawBlock, RawInline
 import pandocxnos
 from pandocxnos import PandocAttributes
 from pandocxnos import STRTYPES, STDIN, STDOUT
-from pandocxnos import elt, get_meta, extract_attrs
+from pandocxnos import elt, check_bool, get_meta, extract_attrs
 from pandocxnos import repair_refs, process_refs_factory, replace_refs_factory
 from pandocxnos import attach_attrs_factory, detach_attrs_factory
 from pandocxnos import insert_secnos_factory, delete_secnos_factory
@@ -242,7 +242,6 @@ def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
                                  r'\renewcommand\thefigure{%s}'%\
                                  references[key]])
                 pre = RawBlock('tex', tex)
-                # pylint: disable=star-args
                 tex = '\n'.join([r'\let\thefigure=\oldthefigure',
                                  r'\addtocounter{figure}{-1}'])
                 post = RawBlock('tex', tex)
@@ -350,8 +349,7 @@ def process(meta):
         # 'xnos-cleveref' enables cleveref in all 3 of fignos/eqnos/tablenos
         # 'cleveref' is deprecated
         if name in meta:
-            use_cleveref_default = get_meta(meta, name)
-            assert use_cleveref_default in [True, False]
+            use_cleveref_default = check_bool(get_meta(meta, name))
             break
 
     for name in ['fignos-capitalize', 'fignos-capitalise',
@@ -360,8 +358,7 @@ def process(meta):
         # 'xnos-capitalise' enables capitalise in all 3 of fignos/eqnos/tablenos
         # 'xnos-capitalize' is an alternative spelling
         if name in meta:
-            capitalize = get_meta(meta, name)
-            assert capitalize in [True, False]
+            capitalize = check_bool(get_meta(meta, name))
             break
 
     if 'fignos-plus-name' in meta:
@@ -384,8 +381,8 @@ def process(meta):
         for name in starname:
             assert type(name) in STRTYPES
 
-    if 'xnos-number-sections' in meta and meta['xnos-number-sections']['c']:
-        numbersections = True
+    if 'xnos-number-sections' in meta:
+        numbersections = check_bool(get_meta(meta, 'xnos-number-sections'))
 
 
 def main():

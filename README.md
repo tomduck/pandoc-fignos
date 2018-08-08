@@ -1,7 +1,8 @@
 
 
-**New in 1.2.0:** Added `fignos-capitalise` meta variable to capitalise clever references (e.g., change "fig." to "Fig.").
+**New in 1.3.0:** Boolean metadata values must now be one of `true, `True` `TRUE`, `false`, `False`, or `FALSE`.  This is following a [change of behaviour](https://pandoc.org/releases.html#pandoc-2.2.2-16-july-2018) with pandoc 2.2.2.
 
+**New in 1.2.0:** Added `fignos-capitalise` meta variable to capitalise clever references (e.g., change "fig." to "Fig.").
 
 pandoc-fignos 1.3.0
 ===================
@@ -10,7 +11,7 @@ pandoc-fignos 1.3.0
 
 Demonstration: Processing [demo3.md] with `pandoc --filter pandoc-fignos` gives numbered figures and references in [pdf][pdf3], [tex][tex3], [html][html3], [epub][epub3], [docx][docx3] and other formats (including beamer slideshows).
 
-This version of pandoc-fignos was tested using pandoc 1.15.2 - 2.1.  It works under linux, Mac OS X and Windows.  I am pleased to receive bug reports and feature requests on the project's [Issues tracker].  If you find pandoc-fignos useful, then please kindly give it a star [on GitHub].
+This version of pandoc-fignos was tested using pandoc 1.15.2 - 2.2.3.2.  It works under linux, Mac OS X and Windows.  I am pleased to receive bug reports and feature requests on the project's [Issues tracker].  If you find pandoc-fignos useful, then please kindly give it a star [on GitHub].
 
 See also: [pandoc-eqnos], [pandoc-tablenos]
 
@@ -128,7 +129,7 @@ Pandoc-fignos may be customized by setting variables in the [metadata block] or 
   * `fignos-caption-name` - Sets the name at the beginning of a
     caption (e.g., change it from "Figure to "Fig." or "图");
 
-  * `fignos-cleveref` or `xnos-cleveref` - Set to `On` to assume "+"
+  * `fignos-cleveref` or `xnos-cleveref` - Set to `True` to assume "+"
     clever references by default;
 
   * `fignos-plus-name` - Sets the name of a "+" reference
@@ -137,11 +138,11 @@ Pandoc-fignos may be customized by setting variables in the [metadata block] or 
   * `fignos-star-name` - Sets the name of a "*" reference
     (e.g., change it from "Figure" to "Fig.").
 
-  * `xnos-number-sections` - Set to `On` to indicate that you used
+  * `xnos-number-sections` - Set to `True` to indicate that you used
     `--section-numbers` on the command-line.  See
     [Pandoc Flags](#pandoc-flags), below.
 
-  * `xnos-cleveref-fake` - Sets cleveref faking On/Off (LaTeX/pdf
+  * `xnos-cleveref-fake` - Sets cleveref faking on/off (LaTeX/pdf
     only).  See [Technical Details](#technical-details), below.
 
 
@@ -161,9 +162,9 @@ Demonstration: Processing [demo3.md] with `pandoc --filter pandoc-fignos` gives 
 
 The `--number-sections` option enables section numbers in pandoc.  Figure numbers by section (e.g., "Fig. 2.1") can be obtained as follows:
 
- 1) **html:** Add `xnos-number-sections: On` to your YAML metadata or
-    use the `-M xnos-number-sections=On` option with pandoc.  This
-    variable is ignored for other output formats.
+ 1) **html:** Add `xnos-number-sections: True` to your YAML metadata
+    or use the `-M xnos-number-sections=True` option with pandoc. 
+    This variable is ignored for other output formats.
 
  2) **LaTeX/pdf:** Add
     `header-includes: \numberwithin{figure}{section}` to your YAML
@@ -207,7 +208,7 @@ TeX/pdf:
   * The clever referencing macros `\cref` and `\Cref` are used
     if they are available (i.e. included in your LaTeX template via
     `\usepackage{cleveref}`), otherwise they are faked.  Set the
-    meta variable `xnos-cleveref-fake` to `Off` to disable cleveref
+    meta variable `xnos-cleveref-fake` to `False` to disable cleveref
     faking.
   * The clever reference names are set using `\crefformat` and
     `\Crefformat`.  For this reason the cleveref package's
