@@ -257,10 +257,10 @@ def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
             # As per http://officeopenxml.com/WPhyperlink.php
             bookmarkstart = \
               RawBlock('openxml',
-                       '<w:p><w:bookmarkStart w:id="0" w:name="%s"/><w:r><w:t>'
+                       '<w:bookmarkStart w:id="0" w:name="%s"/>'
                        %attrs[0])
             bookmarkend = \
-              RawBlock('openxml', '</w:t></w:r><w:bookmarkEnd w:id="0"/></w:p>')
+              RawBlock('openxml', '<w:bookmarkEnd w:id="0"/>')
             return [bookmarkstart, Para(value), bookmarkend]
 
     return None
