@@ -1,5 +1,5 @@
 ---
-fignos-cleveref: On
+fignos-cleveref: true
 fignos-plus-name: Fig.
 header-includes: \usepackage{caption}
 ...
