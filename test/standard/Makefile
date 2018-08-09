@@ -55,11 +55,11 @@ out/test-%.html: test.md $(IMAGES)
 
 out/test-%-py2.7.pdf: test.md $(IMAGES)
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
-	$(PANDOC-$*) $< -t json $(PDFFLAGS) | $(PYTHON-2.7) ../pandoc_fignos.py latex --pandocversion=$(v$*) | $(PANDOC-$*) -f json $(PDFFLAGS) -o $@
+	$(PANDOC-$*) $< -t json $(PDFFLAGS) | $(PYTHON-2.7) ../../pandoc_fignos.py latex --pandocversion=$(v$*) | $(PANDOC-$*) -f json $(PDFFLAGS) -o $@
 
 out/test-%-py3.6.pdf: test.md $(IMAGES)
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
-	$(PANDOC-$*) $< -t json $(PDFFLAGS) | $(PYTHON-3.6) ../pandoc_fignos.py latex --pandocversion=$(v$*) | $(PANDOC-$*) -f json $(PDFFLAGS) -o $@
+	$(PANDOC-$*) $< -t json $(PDFFLAGS) | $(PYTHON-3.6) ../../pandoc_fignos.py latex --pandocversion=$(v$*) | $(PANDOC-$*) -f json $(PDFFLAGS) -o $@
 
 out/test-%-cleveref.pdf: test.md $(IMAGES)
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
