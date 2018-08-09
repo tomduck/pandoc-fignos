@@ -4,6 +4,7 @@
 
 **New in 1.2.0:** Added `fignos-capitalise` meta variable to capitalise clever references (e.g., change "fig." to "Fig.").
 
+
 pandoc-fignos 1.3.0
 ===================
 
