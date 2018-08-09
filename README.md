@@ -128,7 +128,7 @@ Pandoc-fignos may be customized by setting variables in the [metadata block] or 
   * `fignos-caption-name` - Sets the name at the beginning of a
     caption (e.g., change it from "Figure to "Fig." or "图");
 
-  * `fignos-cleveref` or `xnos-cleveref` - Set to `On` to assume "+"
+  * `fignos-cleveref` or `xnos-cleveref` - Set to `true` to assume "+"
     clever references by default;
 
   * `fignos-plus-name` - Sets the name of a "+" reference
@@ -137,7 +137,7 @@ Pandoc-fignos may be customized by setting variables in the [metadata block] or 
   * `fignos-star-name` - Sets the name of a "*" reference
     (e.g., change it from "Figure" to "Fig.").
 
-  * `xnos-number-sections` - Set to `On` to indicate that you used
+  * `xnos-number-sections` - Set to `true` to indicate that you used
     `--section-numbers` on the command-line.  See
     [Pandoc Flags](#pandoc-flags), below.
 
