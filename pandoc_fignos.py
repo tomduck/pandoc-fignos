@@ -363,7 +363,11 @@ def process(meta):
         if name in meta:
             capitalize = check_bool(get_meta(meta, name))
             break
-
+    for name in ['fignos-caption-sep', 'xnos-caption-sep']:
+        if name in meta:
+            caption_sep = get_meta(meta, name)
+            break
+            
     if 'fignos-plus-name' in meta:
         tmp = get_meta(meta, 'fignos-plus-name')
         if isinstance(tmp, list):
