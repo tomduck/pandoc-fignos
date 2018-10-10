@@ -74,6 +74,7 @@ unreferenceable = []   # List of labels that are unreferenceable
 captionname = 'Figure'            # Used with \figurename
 plusname = ['fig.', 'figs.']      # Used with \cref
 starname = ['Figure', 'Figures']  # Used with \Cref
+caption_sep = ':'
 
 use_cleveref_default = False      # Default setting for clever referencing
 capitalize = False                # Default setting for capitalizing plusname
@@ -173,29 +174,29 @@ def _process_figure(value, fmt):
     # Adjust caption depending on the output format
     if fmt in ['latex', 'beamer']:  # Append a \label if this is referenceable
         if not fig['is_unreferenceable']:
-            value[0]['c'][1] += [RawInline('tex', r'\label{%s}'%attrs[0])]
+            value[0]['c'][1] += [RawInline('tex', r'\label{%s}' % attrs[0])]
     else:  # Hard-code in the caption name and number/tag
         if isinstance(references[attrs[0]], int):  # Numbered reference
-            value[0]['c'][1] = [RawInline('html', r'<span>'),
-                                Str(captionname), Space(),
-                                Str('%d:'%references[attrs[0]]),
-                                RawInline('html', r'</span>')] \
-                if fmt in ['html', 'html5'] else \
-                [Str(captionname), Space(), Str('%d:'%references[attrs[0]])]
+            value[0]['c'][1] = [Str(captionname), Space(),
+                                Str('%d%s' % (references[attrs[0]], caption_sep))]
+            if fmt in ['html', 'html5']:
+                value[0]['c'][1] = [RawInline('html', r'<span>')] \
+                    + value[0]['c'][1] \
+                    + [RawInline('html', r'</span>')]
             value[0]['c'][1] += [Space()] + list(caption)
         else:  # Tagged reference
             assert isinstance(references[attrs[0]], STRTYPES)
             text = references[attrs[0]]
             if text.startswith('$') and text.endswith('$'):  # Math
                 math = text.replace(' ', r'\ ')[1:-1]
-                els = [Math({"t":"InlineMath", "c":[]}, math), Str(':')]
+                els = [Math({"t":"InlineMath", "c":[]}, math), Str(caption_sep)]
             else:  # Text
-                els = [Str(text+':')]
-            value[0]['c'][1] = \
-                [RawInline('html', r'<span>'), Str(captionname), Space()] + \
-                els + [RawInline('html', r'</span>')] \
-                if fmt in ['html', 'html5'] else \
-                [Str(captionname), Space()] + els
+                els = [Str("%s%s" % (text, caption_sep))]
+            value[0]['c'][1] = [Str(captionname), Space()] + els
+            if fmt in ['html', 'html5']:
+                value[0]['c'][1] = [RawInline('html', r'<span>')] \
+                    + value[0]['c'][1] \
+                    + [RawInline('html', r'</span>')]            
             value[0]['c'][1] += [Space()] + list(caption)
 
     return fig
