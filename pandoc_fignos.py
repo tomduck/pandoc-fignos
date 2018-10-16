@@ -338,6 +338,7 @@ def process(meta):
     global plusname
     global starname
     global numbersections
+    global caption_sep
 
     # Read in the metadata fields and do some checking
 
