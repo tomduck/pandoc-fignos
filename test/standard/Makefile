@@ -56,9 +56,9 @@ pdf: out/test-2.7.pdf \
      out/test-1.16.pdf \
      out/test-1.15.pdf
 
-html: out/test-2.3.html
+html: out/test-2.7.html
 
-docx: out/test-2.3.docx
+docx: out/test-2.7.docx
 
 
 out/test-%.html: test.md $(IMAGES)
