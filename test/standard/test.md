@@ -19,6 +19,8 @@ Figures @fig:1, {@fig:2}a and {@fig:2}b, and {@fig:3}:
 
 Figures {@fig:1}-{@fig:3}, and figs. {@fig:1}-{@fig:2}-{@fig:3}.
 
+[Figure [@fig:1].]{}
+
 References in lists:
 
  1. \*@fig:1, {+@fig:2}a *and* fig. !@fig:3.

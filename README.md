@@ -1,4 +1,6 @@
 
+**New in 1.X.X:** Support for docx equation numbering by section.
+
 **New in 1.3.0:** Boolean metadata values must now be one of `true`, `True` `TRUE`, `false`, `False`, or `FALSE`.  This is following a [change of behaviour](https://pandoc.org/releases.html#pandoc-2.2.2-16-july-2018) with pandoc 2.2.2.
 
 **New in 1.2.0:** Added `fignos-capitalise` meta variable to capitalise clever references (e.g., change "fig." to "Fig.").
@@ -138,9 +140,14 @@ Pandoc-fignos may be customized by setting variables in the [metadata block] or 
   * `fignos-star-name` - Sets the name of a "*" reference
     (e.g., change it from "Figure" to "Fig.").
 
-  * `xnos-number-sections` - Set to `True` to indicate that you used
-    `--section-numbers` on the command-line.  See
-    [Pandoc Flags](#pandoc-flags), below.
+  * `xnos-number-sections` - Set to `True` so that figures are
+    numbered per section (i.e. Fig. 1.1, 1.2, etc in Section 1, and
+    Fig 2.1, 2.2, etc in Section 2).  See
+    [Figure Numbering by Section](#figure-numbering-by-section),
+    below.
+
+    This feature is only presently enabled for html, LaTeX/pdf, and
+    docx.
 
   * `xnos-cleveref-fake` - Sets cleveref faking on/off (LaTeX/pdf
     only).  See [Technical Details](#technical-details), below.
@@ -158,13 +165,13 @@ Demonstration: Processing [demo3.md] with `pandoc --filter pandoc-fignos` gives 
 [docx3]: https://rawgit.com/tomduck/pandoc-fignos/master/demos/out/demo3.docx
 
 
-#### Figure Numbers by Section ####
+#### Figure Numbering by Section ####
 
-The `--number-sections` option enables section numbers in pandoc.  Figure numbers by section (e.g., "Fig. 2.1") can be obtained as follows:
+Pandoc's `--number-sections` option enables section numbering for LaTeX/pdf and html output.  For docx, use of [custom styles](https://pandoc.org/MANUAL.html#custom-styles) instead.  Figure numbering by section (e.g., "Fig. 2.1") can then be obtained as follows:
 
- 1) **html:** Add `xnos-number-sections: True` to your YAML metadata
-    or use the `-M xnos-number-sections=True` option with pandoc. 
-    This variable is ignored for other output formats.
+ 1) **html and docx:** Add `xnos-number-sections: True` to your YAML
+    metadata or use the `-M xnos-number-sections=True` option with
+    pandoc.  This variable is ignored for other output formats.
 
  2) **LaTeX/pdf:** Add
     `header-includes: \numberwithin{figure}{section}` to your YAML
@@ -186,6 +193,8 @@ The `--number-sections` option enables section numbers in pandoc.  Figure number
     dropped.
 
     LaTeX header-includes are ignored for html output.
+
+Section numbering can be achieved in docx through use of [custom styles](https://pandoc.org/MANUAL.html#custom-styles).
 
 
 #### Latex/PDF Specializations ####
