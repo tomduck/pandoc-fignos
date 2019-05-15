@@ -167,7 +167,7 @@ Demonstration: Processing [demo3.md] with `pandoc --filter pandoc-fignos` gives 
 
 #### Figure Numbering by Section ####
 
-Pandoc's `--number-sections` option enables section numbering for LaTeX/pdf and html output.  For docx, use of [custom styles](https://pandoc.org/MANUAL.html#custom-styles) instead.  Figure numbering by section (e.g., "Fig. 2.1") can then be obtained as follows:
+Pandoc's `--number-sections` option enables section numbering for LaTeX/pdf and html output.  For docx, use [custom styles](https://pandoc.org/MANUAL.html#custom-styles) instead.  Figure numbering by section (e.g., "Fig. 2.1") can then be obtained as follows:
 
  1) **html and docx:** Add `xnos-number-sections: True` to your YAML
     metadata or use the `-M xnos-number-sections=True` option with
@@ -193,8 +193,6 @@ Pandoc's `--number-sections` option enables section numbering for LaTeX/pdf and 
     dropped.
 
     LaTeX header-includes are ignored for html output.
-
-Section numbering can be achieved in docx through use of [custom styles](https://pandoc.org/MANUAL.html#custom-styles).
 
 
 #### Latex/PDF Specializations ####
