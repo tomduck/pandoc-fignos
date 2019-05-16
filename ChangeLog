@@ -1,3 +1,8 @@
+pandoc-fignos 1.4.0 (2019-05-15)
+
+    * Resolve references from within bracketed spans (Issue #58).
+
+
 pandoc-fignos 1.3.2 (2019-05-15)
 
     * Enabled figure numbering by section for docx (addresses
