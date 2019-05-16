@@ -1,4 +1,6 @@
 
+**New in 1.4.1:** Fixed support for docx equation numbering by section.
+
 **New in 1.4.0:** Support for references in bracketed spans.
 
 **New in 1.3.2:** Support for docx equation numbering by section.
@@ -332,6 +334,8 @@ If you have any difficulties with pandoc-fignos, or would like to see a new feat
 
 What's New
 ----------
+
+**New in 1.4.1:** Fixed support for docx equation numbering by section.
 
 **New in 1.4.0:** Support for references in bracketed spans.
 
