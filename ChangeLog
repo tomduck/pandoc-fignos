@@ -1,3 +1,8 @@
+pandoc-fignos 1.4.1 (2019-05-16)
+
+    * Bug fix for figure numbering by section for docx (Issue #58).
+
+
 pandoc-fignos 1.4.0 (2019-05-15)
 
     * Support for references in bracketed spans (Issue #58).

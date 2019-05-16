@@ -45,8 +45,8 @@ Preparing a Release
 
 Tagging:
 
-    $ git tag -a 1.4.0 -m "New release."
-    $ git push origin 1.4.0
+    $ git tag -a 1.4.1 -m "New release."
+    $ git push origin 1.4.1
 
 
 Creating a source distribution:
@@ -55,6 +55,6 @@ Creating a source distribution:
 
 Uploading to pypi (update the version number):
 
-    $ twine upload dist/pandoc-fignos-1.4.0.tar.gz
+    $ twine upload dist/pandoc-fignos-1.4.1.tar.gz
 
 (from https://pypi.python.org/pypi/twine).
