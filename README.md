@@ -1,14 +1,14 @@
 
+**New in 1.4.2:** `pandoc-fignos --version` now gives the version.
+
 **New in 1.4.1:** Fixed support for docx equation numbering by section.
 
 **New in 1.4.0:** Support for references in bracketed spans.
 
-**New in 1.3.2:** Support for docx equation numbering by section.
-
 [more...](#whats-new)
 
 
-pandoc-fignos 1.4.1
+pandoc-fignos 1.4.2
 ===================
 
 *pandoc-fignos* is a [pandoc] filter for numbering figures and figure references when converting markdown documents to other formats.
@@ -280,6 +280,10 @@ This will tell you where pandoc-fignos is installed.  If it is not found, then p
 To determine which version of pandoc-fignos you have installed, use
 
     pip show pandoc-fignos
+
+As of pandoc-fignos 1.4.2 you can also use
+
+    pandoc-eqnos --version
 
 Please be sure you have the latest version installed before reporting a bug on our [Issues tracker].
 

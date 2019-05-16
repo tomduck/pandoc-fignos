@@ -1,3 +1,8 @@
+pandoc-fignos 1.4.2 (2019-05-16)
+
+    * `pandoc-fignos --version` now gives the verson.
+
+
 pandoc-fignos 1.4.1 (2019-05-16)
 
     * Bug fix for figure numbering by section for docx (Issue #58).

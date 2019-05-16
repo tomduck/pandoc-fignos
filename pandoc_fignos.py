@@ -52,6 +52,8 @@ from pandocxnos import attach_attrs_factory, detach_attrs_factory
 from pandocxnos import insert_secnos_factory, delete_secnos_factory
 from pandocxnos import insert_rawblocks_factory
 
+__version__ = '1.4.2'
+
 if sys.version_info > (3,):
     from urllib.request import unquote  # pylint: disable=no-name-in-module
 else:
@@ -60,6 +62,8 @@ else:
 
 # Read the command-line arguments
 parser = argparse.ArgumentParser(description='Pandoc figure numbers filter.')
+parser.add_argument('--version', action='version',
+                    version='%(prog)s {version}'.format(version=__version__))
 parser.add_argument('fmt')
 parser.add_argument('--pandocversion', help='The pandoc version.')
 args = parser.parse_args()

@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import re, io
 
 import ez_setup
 ez_setup.use_setuptools()
@@ -28,7 +29,11 @@ LONG_DESCRIPTION = """\
 A pandoc filter for numbering figures and figure references.
 """
 
-VERSION = '1.4.1'
+# From https://stackoverflow.com/a/39671214
+__version__ = re.search(
+    r'__version__\s*=\s*[\'"]([^\'"]*)[\'"]',
+    io.open('pandoc_fignos.py', encoding='utf_8_sig').read()
+    ).group(1)
 
 
 #-----------------------------------------------------------------------------
@@ -97,7 +102,7 @@ else:
 
 setup(
     name='pandoc-fignos',
-    version=VERSION,
+    version=__version__,
 
     author='Thomas J. Duck',
     author_email='tomduck@tomduck.ca',
@@ -106,7 +111,8 @@ setup(
     license='GPL',
     keywords='pandoc figure numbers filter',
     url='https://github.com/tomduck/pandoc-fignos',
-    download_url='https://github.com/tomduck/pandoc-fignos/tarball/'+VERSION,
+    download_url='https://github.com/tomduck/pandoc-fignos/tarball/' + \
+                 __version__,
 
     install_requires=['pandoc-xnos>=1.2.0,<2'],
 
