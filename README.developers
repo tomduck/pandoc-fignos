@@ -45,8 +45,8 @@ Preparing a Release
 
 Tagging:
 
-    $ git tag -a <tag> -m <message>
-    $ git push origin <tag>
+    $ git tag -a 1.4.0 -m "New release."
+    $ git push origin 1.4.0
 
 
 Creating a source distribution:
