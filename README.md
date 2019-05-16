@@ -3,9 +3,7 @@
 
 **New in 1.3.2:** Support for docx equation numbering by section.
 
-**New in 1.3.0:** Boolean metadata values must now be one of `true`, `True` `TRUE`, `false`, `False`, or `FALSE`.  This is following a [change of behaviour](https://pandoc.org/releases.html#pandoc-2.2.2-16-july-2018) with pandoc 2.2.2.
-
-**New in 1.2.0:** Added `fignos-capitalise` meta variable to capitalise clever references (e.g., change "fig." to "Fig.").
+[more...](#whats-new)
 
 
 pandoc-fignos 1.4.0
@@ -35,6 +33,7 @@ Contents
  4. [Technical Details](#technical-details)
  5. [Installation](#installation)
  6. [Getting Help](#getting-help)
+ 7. [What's New](#whats-new)
 
 
 Usage
@@ -329,6 +328,18 @@ Getting Help
 ------------
 
 If you have any difficulties with pandoc-fignos, or would like to see a new feature, then please submit a report to our [Issues tracker].
+
+
+What's New
+----------
+
+**New in 1.4.0:** Support for references in bracketed spans.
+
+**New in 1.3.2:** Support for docx equation numbering by section.
+
+**New in 1.3.0:** Boolean metadata values must now be one of `true`, `True` `TRUE`, `false`, `False`, or `FALSE`.  This is following a [change of behaviour](https://pandoc.org/releases.html#pandoc-2.2.2-16-july-2018) with pandoc 2.2.2.
+
+**New in 1.2.0:** Added `fignos-capitalise` meta variable to capitalise clever references (e.g., change "fig." to "Fig.").
 
 
 ----
