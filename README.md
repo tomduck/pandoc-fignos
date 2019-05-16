@@ -75,11 +75,11 @@ Demonstration: Processing [demo.md] with `pandoc --filter pandoc-fignos` gives n
 [@scaramouche1]: https://github.com/scaramouche1
 [reference link]: http://pandoc.org/MANUAL.html#reference-links
 [demo.md]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/demo.md
-[pdf]: https://rawgit.com/tomduck/pandoc-fignos/master/demos/out/demo.pdf
-[tex]: https://rawgit.com/tomduck/pandoc-fignos/master/demos/out/demo.tex
-[html]: https://rawgit.com/tomduck/pandoc-fignos/master/demos/out/demo.html
-[epub]: https://rawgit.com/tomduck/pandoc-fignos/master/demos/out/demo.epub
-[docx]: https://rawgit.com/tomduck/pandoc-fignos/master/demos/out/demo.docx
+[pdf]: https://raw.githack.com/tomduck/pandoc-fignos/master/demos/out/demo.pdf
+[tex]: https://raw.githack.com/tomduck/pandoc-fignos/master/demos/out/demo.tex
+[html]: https://raw.githack.com/tomduck/pandoc-fignos/master/demos/out/demo.html
+[epub]: https://raw.githack.com/tomduck/pandoc-fignos/master/demos/out/demo.epub
+[docx]: https://raw.githack.com/tomduck/pandoc-fignos/master/demos/out/demo.docx
 
 
 #### Clever References ####
@@ -106,11 +106,11 @@ Demonstration: Processing [demo2.md] with `pandoc --filter pandoc-fignos` gives 
 Note: If you use `*fig:id` and emphasis (e.g., `*italics*`) in the same sentence, then you must backslash escape the `*` in the clever reference; e.g., `\*fig:id`.
 
 [demo2.md]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/demo2.md
-[pdf2]: https://rawgit.com/tomduck/pandoc-fignos/master/demos/out/demo2.pdf
-[tex2]: https://rawgit.com/tomduck/pandoc-fignos/master/demos/out/demo2.tex
-[html2]: https://rawgit.com/tomduck/pandoc-fignos/master/demos/out/demo2.html
-[epub2]: https://rawgit.com/tomduck/pandoc-fignos/master/demos/out/demo2.epub
-[docx2]: https://rawgit.com/tomduck/pandoc-fignos/master/demos/out/demo2.docx
+[pdf2]: https://raw.githack.com/tomduck/pandoc-fignos/master/demos/out/demo2.pdf
+[tex2]: https://raw.githack.com/tomduck/pandoc-fignos/master/demos/out/demo2.tex
+[html2]: https://raw.githack.com/tomduck/pandoc-fignos/master/demos/out/demo2.html
+[epub2]: https://raw.githack.com/tomduck/pandoc-fignos/master/demos/out/demo2.epub
+[docx2]: https://raw.githack.com/tomduck/pandoc-fignos/master/demos/out/demo2.docx
 
 
 #### Tagged Figures ####
@@ -160,11 +160,11 @@ Pandoc-fignos may be customized by setting variables in the [metadata block] or 
 Demonstration: Processing [demo3.md] with `pandoc --filter pandoc-fignos` gives numbered figures and references in [pdf][pdf3], [tex][tex3], [html][html3], [epub][epub3], [docx][docx3] and other formats.
 
 [demo3.md]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/demo3.md
-[pdf3]: https://rawgit.com/tomduck/pandoc-fignos/master/demos/out/demo3.pdf
-[tex3]: https://rawgit.com/tomduck/pandoc-fignos/master/demos/out/demo3.tex
-[html3]: https://rawgit.com/tomduck/pandoc-fignos/master/demos/out/demo3.html
-[epub3]: https://rawgit.com/tomduck/pandoc-fignos/master/demos/out/demo3.epub
-[docx3]: https://rawgit.com/tomduck/pandoc-fignos/master/demos/out/demo3.docx
+[pdf3]: https://raw.githack.com/tomduck/pandoc-fignos/master/demos/out/demo3.pdf
+[tex3]: https://raw.githack.com/tomduck/pandoc-fignos/master/demos/out/demo3.tex
+[html3]: https://raw.githack.com/tomduck/pandoc-fignos/master/demos/out/demo3.html
+[epub3]: https://raw.githack.com/tomduck/pandoc-fignos/master/demos/out/demo3.epub
+[docx3]: https://raw.githack.com/tomduck/pandoc-fignos/master/demos/out/demo3.docx
 
 
 #### Figure Numbering by Section ####
