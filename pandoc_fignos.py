@@ -278,7 +278,7 @@ def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
 # should replace \@makecaption as needed.  See the standard \@makecaption TeX
 # at https://stackoverflow.com/questions/2039690.  The macro gets installed
 # using an environment.  The \thefigure counter must be set to something unique
-# so that duplicate names are avoided.  This must be done the hyperref
+# so that duplicate names are avoided.  This must be done for the hyperref
 # counter \theHfigure as well; see Sect. 3.9 of
 # http://ctan.mirror.rafal.ca/macros/latex/contrib/hyperref/doc/manual.html.
 

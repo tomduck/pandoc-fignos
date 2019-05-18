@@ -3,7 +3,11 @@
 """
 Setuptools bootstrapping installer.
 
+Maintained at https://github.com/pypa/setuptools/tree/bootstrap.
+
 Run this script to install or upgrade setuptools.
+
+This method is DEPRECATED. Check https://github.com/pypa/setuptools/issues/581 for more details.
 """
 
 import os
@@ -16,7 +20,6 @@ import subprocess
 import platform
 import textwrap
 import contextlib
-import warnings
 
 from distutils import log
 
@@ -30,9 +33,15 @@ try:
 except ImportError:
     USER_SITE = None
 
-DEFAULT_VERSION = "17.0"
-DEFAULT_URL = "https://pypi.python.org/packages/source/s/setuptools/"
+# 33.1.1 is the last version that supports setuptools self upgrade/installation.
+DEFAULT_VERSION = "33.1.1"
+DEFAULT_URL = "https://pypi.io/packages/source/s/setuptools/"
 DEFAULT_SAVE_DIR = os.curdir
+DEFAULT_DEPRECATION_MESSAGE = "ez_setup.py is deprecated and when using it setuptools will be pinned to {0} since it's the last version that supports setuptools self upgrade/installation, check https://github.com/pypa/setuptools/issues/581 for more info; use pip to install setuptools"
+
+MEANINGFUL_INVALID_ZIP_ERR_MSG = 'Maybe {0} is corrupted, delete it and try again.'
+
+log.warn(DEFAULT_DEPRECATION_MESSAGE.format(DEFAULT_VERSION))
 
 
 def _python_cmd(*args):
@@ -98,8 +107,16 @@ def archive_context(filename):
     old_wd = os.getcwd()
     try:
         os.chdir(tmpdir)
-        with ContextualZipFile(filename) as archive:
-            archive.extractall()
+        try:
+            with ContextualZipFile(filename) as archive:
+                archive.extractall()
+        except zipfile.BadZipfile as err:
+            if not err.args:
+                err.args = ('', )
+            err.args = err.args + (
+                MEANINGFUL_INVALID_ZIP_ERR_MSG.format(filename),
+            )
+            raise
 
         # going in the directory
         subdir = os.path.join(tmpdir, os.listdir(tmpdir)[0])
@@ -114,18 +131,19 @@ def archive_context(filename):
 
 def _do_download(version, download_base, to_dir, download_delay):
     """Download Setuptools."""
-    egg = os.path.join(to_dir, 'setuptools-%s-py%d.%d.egg'
-                       % (version, sys.version_info[0], sys.version_info[1]))
+    py_desig = 'py{sys.version_info[0]}.{sys.version_info[1]}'.format(sys=sys)
+    tp = 'setuptools-{version}-{py_desig}.egg'
+    egg = os.path.join(to_dir, tp.format(**locals()))
     if not os.path.exists(egg):
         archive = download_setuptools(version, download_base,
-                                      to_dir, download_delay)
+            to_dir, download_delay)
         _build_egg(egg, archive, to_dir)
     sys.path.insert(0, egg)
 
     # Remove previously-imported pkg_resources if present (see
     # https://bitbucket.org/pypa/setuptools/pull-request/7/ for details).
     if 'pkg_resources' in sys.modules:
-        del sys.modules['pkg_resources']
+        _unload_pkg_resources()
 
     import setuptools
     setuptools.bootstrap_install_from = egg
@@ -189,6 +207,11 @@ def _conflict_bail(VC_err, version):
 
 
 def _unload_pkg_resources():
+    sys.meta_path = [
+        importer
+        for importer in sys.meta_path
+        if importer.__class__.__module__ != 'pkg_resources.extern'
+    ]
     del_modules = [
         name for name in sys.modules
         if name.startswith('pkg_resources')
@@ -222,8 +245,8 @@ def download_file_powershell(url, target):
     ps_cmd = (
         "[System.Net.WebRequest]::DefaultWebProxy.Credentials = "
         "[System.Net.CredentialCache]::DefaultCredentials; "
-        "(new-object System.Net.WebClient).DownloadFile(%(url)r, %(target)r)"
-        % vars()
+        '(new-object System.Net.WebClient).DownloadFile("%(url)s", "%(target)s")'
+        % locals()
     )
     cmd = [
         'powershell',
@@ -248,7 +271,7 @@ download_file_powershell.viable = has_powershell
 
 
 def download_file_curl(url, target):
-    cmd = ['curl', url, '--silent', '--output', target]
+    cmd = ['curl', url, '--location', '--silent', '--output', target]
     _clean_check(cmd, target)
 
 
@@ -347,7 +370,7 @@ def _parse_args():
     parser = optparse.OptionParser()
     parser.add_option(
         '--user', dest='user_install', action='store_true', default=False,
-        help='install in user site package (requires Python 2.6 or later)')
+        help='install in user site package')
     parser.add_option(
         '--download-base', dest='download_base', metavar="URL",
         default=DEFAULT_URL,
@@ -362,9 +385,9 @@ def _parse_args():
         default=DEFAULT_VERSION,
     )
     parser.add_option(
-    	'--to-dir',
-    	help="Directory to save (and re-use) package",
-    	default=DEFAULT_SAVE_DIR,
+        '--to-dir',
+        help="Directory to save (and re-use) package",
+        default=DEFAULT_SAVE_DIR,
     )
     options, args = parser.parse_args()
     # positional arguments are ignored
@@ -372,13 +395,13 @@ def _parse_args():
 
 
 def _download_args(options):
-	"""Return args for download_setuptools function from cmdline args."""
-	return dict(
-		version=options.version,
-		download_base=options.download_base,
-		downloader_factory=options.downloader_factory,
-		to_dir=options.to_dir,
-	)
+    """Return args for download_setuptools function from cmdline args."""
+    return dict(
+        version=options.version,
+        download_base=options.download_base,
+        downloader_factory=options.downloader_factory,
+        to_dir=options.to_dir,
+    )
 
 
 def main():
