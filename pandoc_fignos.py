@@ -52,7 +52,7 @@ from pandocxnos import attach_attrs_factory, detach_attrs_factory
 from pandocxnos import insert_secnos_factory, delete_secnos_factory
 from pandocxnos import insert_rawblocks_factory
 
-__version__ = '1.4.2'
+__version__ = '1.5.0'
 
 if sys.version_info > (3,):
     from urllib.request import unquote  # pylint: disable=no-name-in-module
@@ -138,6 +138,7 @@ def _process_figure(value, fmt):
     fig = {'is_unnumbered': False,
            'is_unreferenceable': False,
            'is_tagged': False,
+           'env': None,
            'attrs': attrs}
 
     # Bail out if the label does not conform
@@ -153,8 +154,14 @@ def _process_figure(value, fmt):
         fig['is_unreferenceable'] = True
         unreferenceable.append(attrs[0])
 
-    # For html and docx, hard-code in the section numbers as tags
+    # Get the kvs
     kvs = PandocAttributes(attrs, 'pandoc').kvs
+
+    # Store the environment
+    if 'env' in kvs:
+        fig['env'] = kvs['env']
+
+    # For html and docx, hard-code in the section numbers as tags
     if numbersections and fmt in ['html', 'html5', 'docx'] and \
       'tag' not in kvs:
         if kvs['secno'] != cursec:
@@ -243,13 +250,24 @@ def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
                 # handled by pandoc's TeX writer for these versions.
                 if LABEL_PATTERN.match(attrs[0]):
                     attrs[0] = ''
-            if fig['is_tagged']:  # Code in the tags
+            if fig['is_tagged'] or fig['env']:  # Code in the tags
                 tex = '\n'.join([r'\let\oldthefigure=\thefigure',
                                  r'\renewcommand\thefigure{%s}'%\
-                                 references[key]])
+                                 references[key]]) if fig['is_tagged'] else ''
+                if fig['env']:
+                    tex += '\n'.join(['\n',
+                                      r'\let\oldfigure\figure',
+                                      r'\let\figure\%s'%fig['env'],
+                                      r'\let\oldendfigure\endfigure',
+                                      r'\let\endfigure\end' + fig['env']])
                 pre = RawBlock('tex', tex)
                 tex = '\n'.join([r'\let\thefigure=\oldthefigure',
-                                 r'\addtocounter{figure}{-1}'])
+                                 r'\addtocounter{figure}{-1}']) \
+                                 if fig['is_tagged'] else ''
+                if fig['env']:
+                    tex += '\n'.join(['\n',
+                                      r'\let\figure\oldfigure',
+                                      r'\let\endfigure\oldendfigure'])
                 post = RawBlock('tex', tex)
                 return [pre, Para(value), post]
         elif fig['is_unreferenceable']:
