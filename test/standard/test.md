@@ -1,4 +1,5 @@
 ---
+title: Pandoc-fignos Test
 figure-name: FIG
 fignos-plus-name: FIG.
 fignos-star-name: FIGURE
