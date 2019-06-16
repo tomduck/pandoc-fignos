@@ -487,6 +487,9 @@ def main():
     else:
         doc = doc[:1] + altered
 
+    # Update the metadata
+    pandocxnos.update(fmt, meta)
+
     # Dump the results
     json.dump(doc, STDOUT)
 
