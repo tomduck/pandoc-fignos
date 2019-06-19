@@ -211,6 +211,8 @@ def _adjust_caption(fmt, fig, value):
             value[0]['c'][1] += \
               [RawInline('tex', r'\protect\label{%s}'%attrs[0])]
     else:  # Hard-code in the caption name and number/tag
+        if fig['is_unreferenceable']:
+            return
         if isinstance(references[attrs[0]], int):  # Numbered reference
             if fmt in ['html', 'html5', 'epub', 'epub2', 'epub3']:
                 value[0]['c'][1] = [RawInline('html', r'<span>'),
@@ -450,6 +452,7 @@ def process(meta):
         assert len(plusname) == 2
         for name in plusname:
             assert isinstance(name, STRTYPES)
+        starname = [name.title() for name in plusname]
 
     if 'fignos-star-name' in meta:
         tmp = get_meta(meta, 'fignos-star-name')
