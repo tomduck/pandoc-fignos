@@ -1,21 +1,12 @@
 
-**New in 1.4.2:** `pandoc-fignos --version` now gives the version.
-
-**New in 1.4.1:** Fixed support for docx equation numbering by section.
-
-**New in 1.4.0:** Support for references in bracketed spans.
-
-[more...](#whats-new)
-
-
-pandoc-fignos 1.4.2
+pandoc-fignos 2.0.0
 ===================
 
 *pandoc-fignos* is a [pandoc] filter for numbering figures and figure references when converting markdown documents to other formats.
 
 Demonstration: Processing [demo3.md] with `pandoc --filter pandoc-fignos` gives numbered figures and references in [pdf][pdf3], [tex][tex3], [html][html3], [epub][epub3], [docx][docx3] and other formats (including beamer slideshows).
 
-This version of pandoc-fignos was tested using pandoc 1.15.2 - 2.7.2<sup>[1](#footnote1)</sup>.  It works under linux, Mac OS X and Windows.  I am pleased to receive bug reports and feature requests on the project's [Issues tracker].  If you find pandoc-fignos useful, then please kindly give it a star [on GitHub].
+This version of pandoc-fignos was tested using pandoc 1.15.2 - 2.7.3<sup>[1](#footnote1)</sup>.  It works under linux, Mac OS X and Windows.  I am pleased to receive bug reports and feature requests on the project's [Issues tracker].  If you find pandoc-fignos useful, then please kindly give it a star [on GitHub].
 
 See also: [pandoc-eqnos], [pandoc-tablenos]
 
@@ -36,6 +27,19 @@ Contents
  5. [Installation](#installation)
  6. [Getting Help](#getting-help)
  7. [What's New](#whats-new)
+
+
+Philosophy
+----------
+
+The following objectives guide development of this filter:
+
+  - this should be easy!
+  - pdf/latex, html, and epub output formats should be equally
+    supported using native capabilities
+  - the native capabilities of docx and other output formats should
+    be supported given help from the user community
+  -
 
 
 Usage
@@ -152,9 +156,6 @@ Pandoc-fignos may be customized by setting variables in the [metadata block] or 
     This feature is only presently enabled for html, LaTeX/pdf, and
     docx.
 
-  * `xnos-cleveref-fake` - Sets cleveref faking on/off (LaTeX/pdf
-    only).  See [Technical Details](#technical-details), below.
-
 
 [metadata block]: http://pandoc.org/README.html#extension-yaml_metadata_block
 
@@ -215,15 +216,8 @@ TeX/pdf:
   * `\figurename` is set for the caption name;
   * Tags are supported by temporarily redefining `\thefigure`
     around a figure; and
-  * The clever referencing macros `\cref` and `\Cref` are used
-    if they are available (i.e. included in your LaTeX template via
-    `\usepackage{cleveref}`), otherwise they are faked.  Set the
-    meta variable `xnos-cleveref-fake` to `False` to disable cleveref
-    faking.
-  * The clever reference names are set using `\crefformat` and
-    `\Crefformat`.  For this reason the cleveref package's
-    `capitalise` parameter has no effect.  Use the
-    `fignos-capitalise` meta variable instead.
+  * The `cleveref` macros `\cref` and `\Cref` are used for 
+    clever referencing
 
 Other:
 

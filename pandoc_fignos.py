@@ -2,6 +2,10 @@
 
 """pandoc-fignos: a pandoc filter that inserts figure nos. and refs."""
 
+
+__version__ = '1.5.0'
+
+
 # Copyright 2015-2019 Thomas J. Duck.
 # All rights reserved.
 #
@@ -29,6 +33,10 @@
 #
 #   2. Replace each reference with a figure number.  For LaTeX,
 #      replace with \ref{...} instead.
+#
+# This is followed by injecting header code as needed for certain output
+# formats.
+
 
 # pylint: disable=invalid-name
 
@@ -38,6 +46,8 @@ import functools
 import argparse
 import json
 import uuid
+import copy
+import textwrap
 
 from pandocfilters import walk
 from pandocfilters import Image, Math, Str, Space, Para, RawBlock, RawInline
@@ -50,9 +60,6 @@ from pandocxnos import elt, check_bool, get_meta, extract_attrs
 from pandocxnos import repair_refs, process_refs_factory, replace_refs_factory
 from pandocxnos import attach_attrs_factory, detach_attrs_factory
 from pandocxnos import insert_secnos_factory, delete_secnos_factory
-from pandocxnos import insert_rawblocks_factory
-
-__version__ = '1.5.0'
 
 if sys.version_info > (3,):
     from urllib.request import unquote  # pylint: disable=no-name-in-module
@@ -71,24 +78,27 @@ args = parser.parse_args()
 # Pattern for matching labels
 LABEL_PATTERN = re.compile(r'(fig:[\w/-]*)')
 
-Nreferences = 0        # Global references counter
-references = {}        # Global references tracker
-unreferenceable = []   # List of labels that are unreferenceable
-
 # Meta variables; may be reset elsewhere
-captionname = 'Figure'            # Used with \figurename
-plusname = ['fig.', 'figs.']      # Used with \cref
-starname = ['Figure', 'Figures']  # Used with \Cref
+captionname = 'Figure'  # The caption name
+cleveref = False        # Flags that clever references should be used
+capitalise = False      # Flags that plusname should be capitalised
+plusname = ['fig.', 'figs.']      # Sets names for mid-sentence references
+starname = ['Figure', 'Figures']  # Sets names for references at sentence start
+numbersections = False  # Flags that sections should be numbered by section
 
-use_cleveref_default = False      # Default setting for clever referencing
-capitalize = False                # Default setting for capitalizing plusname
+# Processing state variables
+cursec = None          # Current section
+Nreferences = 0        # Number of references in current section (or document)
+references = {}        # Tracks referenceable figures and their numbers/tags
+unreferenceable = []   # List of figures that are unreferenceable
 
-# Flag for unnumbered figures
-has_unnumbered_figures = False
-
-# Variables for tracking section numbers
-numbersections = False
-cursec = None
+# Processing flags
+captionname_changed = False     # Flags the the caption name changed
+plusname_changed = False        # Flags that the plus name changed
+starname_changed = False        # Flags that the star name changed
+has_unnumbered_figures = False  # Flags unnumbered figures were found
+has_tagged_figures = False      # Flags a tagged figure was found
+replaced_figure_env = False     # Flags that the figure environment is replaced
 
 PANDOCVERSION = None
 
@@ -97,8 +107,8 @@ PANDOCVERSION = None
 
 def _extract_attrs(x, n):
     """Extracts attributes for an image.  n is the index where the
-    attributes begin.  Extracted elements are deleted from the element
-    list x.  Attrs are returned in pandoc format.
+    attributes begin in the element list x.  Extracted elements are deleted
+    from the list.  Attrs are returned in pandoc format.
     """
     try:
         return extract_attrs(x, n)
@@ -122,14 +132,49 @@ def _extract_attrs(x, n):
         raise
 
 
-# pylint: disable=too-many-branches
+def _adjust_caption(fmt, fig, attrs, value, caption):
+    """Adjust the caption depending on the output format."""
+    if fmt in ['latex', 'beamer']:  # Append a \label if this is referenceable
+        if not fig['is_unreferenceable']:
+            value[0]['c'][1] += \
+              [RawInline('tex', r'\protect\label{%s}'%attrs[0])]
+    else:  # Hard-code in the caption name and number/tag
+        if isinstance(references[attrs[0]], int):  # Numbered reference
+            if fmt in ['html', 'html5', 'epub', 'epub2', 'epub3']:
+                value[0]['c'][1] = [RawInline('html', r'<span>'),
+                                    Str(captionname), Space(),
+                                    Str('%d:'%references[attrs[0]]),
+                                    RawInline('html', r'</span>')]
+            else:
+                value[0]['c'][1] = [Str(captionname),
+                                    Space(),
+                                    Str('%d:'%references[attrs[0]])]
+            value[0]['c'][1] += [Space()] + list(caption)
+        else:  # Tagged reference
+            assert isinstance(references[attrs[0]], STRTYPES)
+            text = references[attrs[0]]
+            if text.startswith('$') and text.endswith('$'):  # Math
+                math = text.replace(' ', r'\ ')[1:-1]
+                els = [Math({"t":"InlineMath", "c":[]}, math), Str(':')]
+            else:  # Text
+                els = [Str(text+':')]
+                if fmt in ['html', 'html5', 'epub', 'epub2', 'epub3']:
+                    value[0]['c'][1] = \
+                      [RawInline('html', r'<span>'),
+                       Str(captionname),
+                       Space()] + els + [RawInline('html', r'</span>')]
+                else:
+                    value[0]['c'][1] = [Str(captionname), Space()] + els
+            value[0]['c'][1] += [Space()] + list(caption)
+
+
 def _process_figure(value, fmt):
-    """Processes the figure.  Returns a dict containing figure properties."""
+    """Processes a figure.  Returns a dict containing figure properties."""
 
     # pylint: disable=global-statement
-    global Nreferences             # Global references counter
-    global has_unnumbered_figures  # Flags unnumbered figures were found
-    global cursec                  # Current section
+    global cursec        # Current section being processed
+    global Nreferences   # Number of refs in current section (or document)
+    global has_unnumbered_figures  # Flags that unnumbered figures were found
 
     # Parse the image
     attrs, caption = value[0]['c'][:2]
@@ -161,221 +206,247 @@ def _process_figure(value, fmt):
     if 'env' in kvs:
         fig['env'] = kvs['env']
 
-    # For html and docx, hard-code in the section numbers as tags
-    if numbersections and fmt in ['html', 'html5', 'docx'] and \
-      'tag' not in kvs:
-        if kvs['secno'] != cursec:
-            cursec = kvs['secno']
-            Nreferences = 1
-        kvs['tag'] = cursec + '.' + str(Nreferences)
-        Nreferences += 1
+    # Pandoc's --number-sections supports section numbering latex/pdf, html,
+    # epub, and docx
+    if numbersections:
+        # Latex/pdf supports equation numbers by section natively.  For the
+        # other formats we must hard-code in equation numbers by section as
+        # tags.
+        if fmt in ['html', 'html5', 'epub', 'epub2', 'epub3', 'docx'] and \
+          'tag' not in kvs:
+            if kvs['secno'] != cursec:  # The section number changed
+                cursec = kvs['secno']   # Update the global section tracker
+                Nreferences = 1         # Resets the global reference counter
+            kvs['tag'] = cursec + '.' + str(Nreferences)
+            Nreferences += 1
 
     # Save to the global references tracker
     fig['is_tagged'] = 'tag' in kvs
-    if fig['is_tagged']:
+    if fig['is_tagged']:  # ... then save the tag
         # Remove any surrounding quotes
         if kvs['tag'][0] == '"' and kvs['tag'][-1] == '"':
             kvs['tag'] = kvs['tag'].strip('"')
         elif kvs['tag'][0] == "'" and kvs['tag'][-1] == "'":
             kvs['tag'] = kvs['tag'].strip("'")
         references[attrs[0]] = kvs['tag']
-    else:
-        Nreferences += 1
+    else:  # ... then save the figure number
+        Nreferences += 1  # Increment the global reference counter
         references[attrs[0]] = Nreferences
 
-    # Adjust caption depending on the output format
-    if fmt in ['latex', 'beamer']:  # Append a \label if this is referenceable
-        if not fig['is_unreferenceable']:
-            value[0]['c'][1] += [RawInline('tex', r'\label{%s}'%attrs[0])]
-    else:  # Hard-code in the caption name and number/tag
-        if isinstance(references[attrs[0]], int):  # Numbered reference
-            value[0]['c'][1] = [RawInline('html', r'<span>'),
-                                Str(captionname), Space(),
-                                Str('%d:'%references[attrs[0]]),
-                                RawInline('html', r'</span>')] \
-                if fmt in ['html', 'html5'] else \
-                [Str(captionname), Space(), Str('%d:'%references[attrs[0]])]
-            value[0]['c'][1] += [Space()] + list(caption)
-        else:  # Tagged reference
-            assert isinstance(references[attrs[0]], STRTYPES)
-            text = references[attrs[0]]
-            if text.startswith('$') and text.endswith('$'):  # Math
-                math = text.replace(' ', r'\ ')[1:-1]
-                els = [Math({"t":"InlineMath", "c":[]}, math), Str(':')]
-            else:  # Text
-                els = [Str(text+':')]
-            value[0]['c'][1] = \
-                [RawInline('html', r'<span>'), Str(captionname), Space()] + \
-                els + [RawInline('html', r'</span>')] \
-                if fmt in ['html', 'html5'] else \
-                [Str(captionname), Space()] + els
-            value[0]['c'][1] += [Space()] + list(caption)
+    # Adjust the caption depending on the output format
+    _adjust_caption(fmt, fig, attrs, value, caption)
 
     return fig
 
-# pylint: disable=too-many-branches, too-many-return-statements
+
+def _context_dependent_output(fmt, fig, value, unnumbered_figure_ret_tex):
+    """Assembles and returns context-dependent output."""
+
+    # pylint: disable=global-statement
+    global has_tagged_figures       # Flags a tagged figure was found
+    global replaced_figure_env      # Flags that the figure env is replaced
+
+    # Context-dependent output
+    ret = None
+    attrs = fig['attrs']
+    if fig['is_unnumbered']:
+        # Unnumbered is also unreferenceable
+        if fmt in ['latex', 'beamer']:
+            if fig['env']:
+                # Replace the figure environment
+                replaced_figure_env = True
+                ret = [RawBlock('tex', r'\begin{fignos:figure-env}[%s]' % \
+                                fig['env']),
+                       Para(value),
+                       RawBlock('tex', r'\end{fignos:figure-env}')]
+            ret = unnumbered_figure_ret_tex
+    elif fmt in ['latex', 'beamer']:
+        key = attrs[0]
+        if PANDOCVERSION >= '1.17':  # Is this still needed???
+            # Remove id from the image attributes.  It is incorrectly
+            # handled by pandoc's TeX writer for these versions.
+            if LABEL_PATTERN.match(attrs[0]):
+                attrs[0] = ''
+        if fig['is_tagged']:
+            # Switch to the tagged-figure env
+            has_tagged_figures = True
+            ret = [RawBlock('tex', r'\begin{fignos:tagged-figure}[%s]' % \
+                            references[key]),
+                   Para(value),
+                   RawBlock('tex', r'\end{fignos:tagged-figure}')]
+        if fig['env']:
+            # Replace the figure environment.  Note that tagging figures
+            # and switching environments are mutually exclusive.
+            replaced_figure_env = True
+            ret = [RawBlock('tex', r'\begin{fignos:figure-env}[%s]' % \
+                            fig['env']),
+                   Para(value),
+                   RawBlock('tex', r'\end{fignos:figure-env}')]
+    elif fig['is_unreferenceable']:
+        attrs[0] = ''  # The label isn't needed any further
+    elif PANDOCVERSION < '1.16' \
+      and fmt in ('html', 'html5', 'epub', 'epub2', 'epub3') \
+      and LABEL_PATTERN.match(attrs[0]):
+        # Insert anchor for PANDOCVERSION < 1.16; for later versions
+        # the id is installed by pandoc.
+        anchor = RawBlock('html', '<a name="%s"></a>'%attrs[0])
+        ret = [anchor, Para(value)]
+    elif fmt == 'docx':
+        # As per http://officeopenxml.com/WPhyperlink.php
+        bookmarkstart = \
+          RawBlock('openxml',
+                   '<w:bookmarkStart w:id="0" w:name="%s"/>'
+                   %attrs[0])
+        bookmarkend = \
+          RawBlock('openxml', '<w:bookmarkEnd w:id="0"/>')
+        ret = [bookmarkstart, Para(value), bookmarkend]
+
+    return ret
+
+
 def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
     """Processes the figures."""
 
-    global has_unnumbered_figures  # pylint: disable=global-statement
+    # pylint: disable=global-statement
+    global has_unnumbered_figures   # Flags that unnumbered figures were found
 
     # Process figures wrapped in Para elements
     if key == 'Para' and len(value) == 1 and \
       value[0]['t'] == 'Image' and value[0]['c'][-1][1].startswith('fig:'):
 
+        # Return element list for unnumbered figures for latex/pdf.  Disables
+        # the figure caption prefix (i.e., "Fig. 1:").
+        unnumbered_figure_ret_tex = \
+          [RawBlock('tex', r'\begin{fignos:no-prefix-figure-caption}'),
+           Para(value),
+           RawBlock('tex', r'\end{fignos:no-prefix-figure-caption}')]
+
         # Inspect the image
-        if len(value[0]['c']) == 2:  # Unattributed, bail out
+        if len(value[0]['c']) == 2:  # Unattributed figure, bail out
+            # Unnumbered is also unreferenceable
             has_unnumbered_figures = True
-            if fmt == 'latex':
-                return [RawBlock('tex', r'\begin{no-prefix-figure-caption}'),
-                        Para(value),
-                        RawBlock('tex', r'\end{no-prefix-figure-caption}')]
+            if fmt in ['latex', 'beamer']:
+                return unnumbered_figure_ret_tex
             return None
 
-        # Process the figure
+        # Process the figure and return context-dependent output
         fig = _process_figure(value, fmt)
-
-        # Context-dependent output
-        attrs = fig['attrs']
-        if fig['is_unnumbered']:  # Unnumbered is also unreferenceable
-            if fmt == 'latex':
-                return [
-                    RawBlock('tex', r'\begin{no-prefix-figure-caption}'),
-                    Para(value),
-                    RawBlock('tex', r'\end{no-prefix-figure-caption}')]
-        elif fmt in ['latex', 'beamer']:
-            key = attrs[0]
-            if PANDOCVERSION >= '1.17':
-                # Remove id from the image attributes.  It is incorrectly
-                # handled by pandoc's TeX writer for these versions.
-                if LABEL_PATTERN.match(attrs[0]):
-                    attrs[0] = ''
-            if fig['is_tagged'] or fig['env']:  # Code in the tags
-                tex = '\n'.join([r'\let\oldthefigure=\thefigure',
-                                 r'\renewcommand\thefigure{%s}'%\
-                                 references[key]]) if fig['is_tagged'] else ''
-                if fig['env']:
-                    tex += '\n'.join(['\n',
-                                      r'\let\oldfigure\figure',
-                                      r'\let\figure\%s'%fig['env'],
-                                      r'\let\oldendfigure\endfigure',
-                                      r'\let\endfigure\end' + fig['env']])
-                pre = RawBlock('tex', tex)
-                tex = '\n'.join([r'\let\thefigure=\oldthefigure',
-                                 r'\addtocounter{figure}{-1}']) \
-                                 if fig['is_tagged'] else ''
-                if fig['env']:
-                    tex += '\n'.join(['\n',
-                                      r'\let\figure\oldfigure',
-                                      r'\let\endfigure\oldendfigure'])
-                post = RawBlock('tex', tex)
-                return [pre, Para(value), post]
-        elif fig['is_unreferenceable']:
-            attrs[0] = ''  # The label isn't needed any further
-        elif PANDOCVERSION < '1.16' and fmt in ('html', 'html5') \
-          and LABEL_PATTERN.match(attrs[0]):
-            # Insert anchor
-            anchor = RawBlock('html', '<a name="%s"></a>'%attrs[0])
-            return [anchor, Para(value)]
-        elif fmt == 'docx':
-            # As per http://officeopenxml.com/WPhyperlink.php
-            bookmarkstart = \
-              RawBlock('openxml',
-                       '<w:bookmarkStart w:id="0" w:name="%s"/>'
-                       %attrs[0])
-            bookmarkend = \
-              RawBlock('openxml', '<w:bookmarkEnd w:id="0"/>')
-            return [bookmarkstart, Para(value), bookmarkend]
+        return _context_dependent_output(fmt, fig, value,
+                                         unnumbered_figure_ret_tex)
 
     return None
 
 
-# Main program ---------------------------------------------------------------
+# TeX blocks -----------------------------------------------------------------
 
-# Define \@makenoprefixcaption to make a caption without a prefix.  This
-# should replace \@makecaption as needed.  See the standard \@makecaption TeX
-# at https://stackoverflow.com/questions/2039690.  The macro gets installed
-# using an environment.  The \thefigure counter must be set to something unique
-# so that duplicate names are avoided.  This must be done for the hyperref
-# counter \theHfigure as well; see Sect. 3.9 of
-# http://ctan.mirror.rafal.ca/macros/latex/contrib/hyperref/doc/manual.html.
-
-TEX0 = r"""
-% pandoc-xnos: macro to create a caption without a prefix
-\makeatletter
-\long\def\@makenoprefixcaption#1#2{
-  \vskip\abovecaptionskip
-  \sbox\@tempboxa{#2}
-  \ifdim \wd\@tempboxa >\hsize
-    #2\par
-  \else
-    \global \@minipagefalse
-    \hb@xt@\hsize{\hfil\box\@tempboxa\hfil}
-  \fi
-  \vskip\belowcaptionskip}
-\makeatother
-""".strip()
-
-TEX1 = r"""
-% pandoc-fignos: save original macros
-\makeatletter
-\let\@oldmakecaption=\@makecaption
-\let\oldthefigure=\thefigure
-\let\oldtheHfigure=\theHfigure
-\makeatother
-""".strip()
-
-TEX2 = r"""
-% pandoc-fignos: environment disables figure caption prefixes
+# Define an environment that disables figure caption prefixes.  Counters
+# must be saved and later restored.  The \thefigure and \theHfigure counter
+# must be set to something unique so that duplicate internal names are avoided
+# (see Sect. 3.2 of
+# http://ctan.mirror.rafal.ca/macros/latex/contrib/hyperref/doc/manual.html).
+NO_PREFIX_CAPTION_ENV_TEX = r"""
+%% pandoc-fignos: environment to disable figure caption prefixes
 \makeatletter
 \newcounter{figno}
-\newenvironment{no-prefix-figure-caption}{
-  \let\@makecaption=\@makenoprefixcaption
-  \renewcommand\thefigure{x.\thefigno}
-  \renewcommand\theHfigure{x.\thefigno}
-  \stepcounter{figno}
+\newenvironment{fignos:no-prefix-figure-caption}{
+  % Save and replace the old environment
+  \caption@ifcompatibility{}{
+    \let\oldthefigure=\thefigure
+    \let\oldtheHfigure=\theHfigure
+    \renewcommand{\thefigure}{yyz\thefigno}
+    \renewcommand{\theHfigure}{yyz\thefigno}
+    \stepcounter{figno}
+    \captionsetup{labelformat=empty}
+    \ignorespaces
+  }
 }{
-  \let\thefigure=\oldthefigure
-  \let\theHfigure=\oldtheHfigure
-  \let\@makecaption=\@oldmakecaption
-  \addtocounter{figure}{-1}
+  % Restore the old environment
+  \caption@ifcompatibility{}{
+    \captionsetup{labelformat=default}
+    \let\thefigure=\oldthefigure
+    \let\theHfigure=\oldtheHfigure
+    \addtocounter{figure}{-1}
+    \ignorespacesafterend 
+  }
 }
 \makeatother
-""".strip()
+"""
 
-# TeX to set the caption name
-TEX3 = r"""
-%% pandoc-fignos: caption name
+# Define an environment for tagged figures
+TAGGED_FIGURE_ENV_TEX = r"""
+%% pandoc-fignos: environment for tagged figures
+\newenvironment{fignos:tagged-figure}[1][]{
+  % Save and replace the old environment
+  \let\oldthefigure=\thefigure
+  \let\oldtheHfigure=\theHfigure
+  \renewcommand{\thefigure}{#1}
+  \renewcommand{\theHfigure}{#1}
+  \ignorespaces
+}{
+  % Restore the old environment
+  \let\thefigure=\oldthefigure
+  \let\theHfigure=\oldtheHfigure
+  \addtocounter{figure}{-1}
+  \ignorespacesafterend 
+}
+"""
+
+# Define an environment to replace the figure environment
+FIGURE_ENV_TEX = r"""
+%% pandoc-fignos: environment to replace the figure environment
+\newenvironment{fignos:figure-env}[1][]{
+  % Save and replace the old environment
+  \let\oldfigure\figure
+  \let\figure\#1
+  \let\oldendfigure\endfigure
+  \let\endfigure\end#1
+  \ignorespaces
+}{
+  % Restore the old environment
+  \let\figure\oldfigure
+  \let\endfigure\oldendfigure
+  \ignorespacesafterend 
+}
+"""
+
+# Reset the caption name; i.e. change "Figure" at the beginning of a caption
+# to something else.
+CAPTION_NAME_TEX = r"""
+%% pandoc-fignos: change caption name
 \renewcommand{\figurename}{%s}
-""".strip()
+"""
 
 
+# Main program ---------------------------------------------------------------
+
+# pylint: disable=too-many-branches
 def process(meta):
     """Saves metadata fields in global variables and returns a few
     computed fields."""
 
     # pylint: disable=global-statement
-    global capitalize
-    global captionname
-    global use_cleveref_default
-    global plusname
-    global starname
-    global numbersections
+    global captionname     # The caption name
+    global cleveref        # Flags that clever references should be used
+    global capitalise      # Flags that plusname should be capitalised
+    global plusname        # Sets names for mid-sentence references
+    global starname        # Sets names for references at sentence start
+    global numbersections  # Flags that sections should be numbered by section
+    global captionname_changed  # Flags the the caption name changed
+    global plusname_changed     # Flags that the plus name changed
+    global starname_changed     # Flags that the star name changed
 
     # Read in the metadata fields and do some checking
 
-    for name in ['fignos-caption-name', 'figure-name']:
-        # 'figure-name' is deprecated
-        if name in meta:
-            captionname = get_meta(meta, name)
-            assert isinstance(captionname, STRTYPES)
-            break
+    if 'fignos-caption-name' in meta:
+        old_captionname = captionname
+        captionname = get_meta(meta, 'fignos-caption-name')
+        captionname_changed = captionname != old_captionname
+        assert isinstance(captionname, STRTYPES)
 
-    for name in ['fignos-cleveref', 'xnos-cleveref', 'cleveref']:
+    for name in ['fignos-cleveref', 'xnos-cleveref']:
         # 'xnos-cleveref' enables cleveref in all 3 of fignos/eqnos/tablenos
-        # 'cleveref' is deprecated
         if name in meta:
-            use_cleveref_default = check_bool(get_meta(meta, name))
+            cleveref = check_bool(get_meta(meta, name))
             break
 
     for name in ['fignos-capitalize', 'fignos-capitalise',
@@ -384,25 +455,33 @@ def process(meta):
         # 'xnos-capitalise' enables capitalise in all 3 of fignos/eqnos/tablenos
         # 'xnos-capitalize' is an alternative spelling
         if name in meta:
-            capitalize = check_bool(get_meta(meta, name))
+            capitalise = check_bool(get_meta(meta, name))
             break
 
     if 'fignos-plus-name' in meta:
         tmp = get_meta(meta, 'fignos-plus-name')
+        old_plusname = copy.deepcopy(plusname)
         if isinstance(tmp, list):
+            # The singular and plural forms were given in a list
             plusname = tmp
         else:
+            # Only the singular form was given
             plusname[0] = tmp
+        plusname_changed = plusname != old_plusname
         assert len(plusname) == 2
         for name in plusname:
             assert isinstance(name, STRTYPES)
 
     if 'fignos-star-name' in meta:
         tmp = get_meta(meta, 'fignos-star-name')
+        old_starname = copy.deepcopy(starname)
         if isinstance(tmp, list):
+            # Only the singular form was given
             starname = tmp
         else:
+            # The singular and plural forms were given in a list
             starname[0] = tmp
+        starname_changed = starname != old_starname
         assert len(starname) == 2
         for name in starname:
             assert isinstance(name, STRTYPES)
@@ -423,7 +502,6 @@ def main():
     doc = json.loads(STDIN.read())
 
     # Initialize pandocxnos
-    # pylint: disable=too-many-function-args
     PANDOCVERSION = pandocxnos.init(args.pandocversion, doc)
 
     # Element primitives
@@ -453,8 +531,9 @@ def main():
     # Second pass
     process_refs = process_refs_factory(references.keys())
     replace_refs = replace_refs_factory(references,
-                                        use_cleveref_default, False,
-                                        plusname if not capitalize else
+                                        cleveref, False,
+                                        plusname if not capitalise \
+                                        or plusname_changed else
                                         [name.title() for name in plusname],
                                         starname, 'figure')
     attach_attrs_span = attach_attrs_factory(Span, replace=True)
@@ -463,32 +542,54 @@ def main():
                                 attach_attrs_span],
                                altered)
 
-    # Insert supporting TeX
-    if fmt == 'latex':
+    if fmt in ['latex', 'beamer']:
 
-        rawblocks = []
+        # Update the header-includes metadata.  Pandoc's
+        # --include-in-header option will override anything we do here.  This
+        # is a known issue and is owing to a design decision in pandoc.
+        # See https://github.com/jgm/pandoc/issues/3139.
+
+        if pandocxnos.cleveref_required():
+            pandocxnos.add_package_to_header_includes(
+                meta, 'cleveref', 'capitalise' if capitalise else None)
 
         if has_unnumbered_figures:
-            rawblocks += [RawBlock('tex', TEX0),
-                          RawBlock('tex', TEX1),
-                          RawBlock('tex', TEX2)]
+            pandocxnos.add_package_to_header_includes(meta, 'caption')
+
+        if plusname_changed:
+            tex = textwrap.dedent("""
+                %%%% pandoc-fignos: change cref names
+                \\crefname{figure}{%s}{%s}
+            """ % (plusname[0], plusname[1]))
+            pandocxnos.add_tex_to_header_includes(meta, tex)
+
+        if starname_changed:
+            tex = textwrap.dedent("""
+                %%%% pandoc-fignos: change Cref names
+                \\Crefname{figure}{%s}{%s}
+            """ % (starname[0], starname[1]))
+            pandocxnos.add_tex_to_header_includes(meta, tex)
+
+        if has_unnumbered_figures:
+            pandocxnos.add_tex_to_header_includes(
+                meta, NO_PREFIX_CAPTION_ENV_TEX)
+
+        if has_tagged_figures:
+            pandocxnos.add_tex_to_header_includes(
+                meta, TAGGED_FIGURE_ENV_TEX)
+
+        if replaced_figure_env:
+            pandocxnos.add_tex_to_header_includes(meta, FIGURE_ENV_TEX)
 
         if captionname != 'Figure':
-            rawblocks += [RawBlock('tex', TEX3 % captionname)]
-
-        insert_rawblocks = insert_rawblocks_factory(rawblocks)
-
-        altered = functools.reduce(lambda x, action: walk(x, action, fmt, meta),
-                                   [insert_rawblocks], altered)
+            pandocxnos.add_tex_to_header_includes(
+                meta, CAPTION_NAME_TEX % captionname)
 
     # Update the doc
     if PANDOCVERSION >= '1.18':
         doc['blocks'] = altered
     else:
         doc = doc[:1] + altered
-
-    # Update the metadata
-    pandocxnos.update(fmt, meta)
 
     # Dump the results
     json.dump(doc, STDOUT)
