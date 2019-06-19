@@ -2,13 +2,9 @@
 Developer Notes
 ===============
 
-Contributions to this project are welcome.  There are a number of outstanding
-Issues that need to be addressed.  Before you begin, please give me a heads-up
-so that we don't work at cross-purposes.
+Contributions to this project are welcome.
 
-Substantial contributions of code will be acknowledged in the AUTHORS file.
-
-
+    
 Branches
 --------
 
@@ -20,15 +16,18 @@ release is prepared.
 Install Alternatives
 --------------------
 
+To install a pre-release version from pypi, you will need to use the
+--pre flag.  See https://stackoverflow.com/q/35131861.
+
 To install the most recent sources from github using pip:
 
-    # pip install git+https://github.com/tomduck/pandoc-fignos.git
+    $ pip install git+https://github.com/tomduck/pandoc-fignos.git --user
 
 (to upgrade use the --upgrade flag).
 
 To upgrade from the `nextrelease` branch, use
 
-    # pip install --upgrade git+https://github.com/tomduck/pandoc-fignos.git@nextrelease
+    $ pip install --upgrade git+https://github.com/tomduck/pandoc-fignos.git@nextrelease --user
 
 
 Testing
@@ -43,10 +42,13 @@ Preparing a Release
 
 (note to self)
 
+See https://www.python.org/dev/peps/pep-0440/ for numbering conventions,
+including for pre-releases.
+    
 Tagging:
 
-    $ git tag -a 1.4.2 -m "New release."
-    $ git push origin 1.4.2
+    $ git tag -a 2.0.0b1 -m "New release."
+    $ git push origin 2.0.0b1
 
 
 Creating a source distribution:
@@ -55,6 +57,6 @@ Creating a source distribution:
 
 Uploading to pypi (update the version number):
 
-    $ twine upload dist/pandoc-fignos-1.4.2.tar.gz
+    $ twine upload dist/pandoc-fignos-2.0.0b1.tar.gz
 
 (from https://pypi.python.org/pypi/twine).

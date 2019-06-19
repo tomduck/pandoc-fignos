@@ -3,7 +3,7 @@
 """pandoc-fignos: a pandoc filter that inserts figure nos. and refs."""
 
 
-__version__ = '1.5.0'
+__version__ = '2.0.0a1'
 
 
 # Copyright 2015-2019 Thomas J. Duck.
@@ -349,24 +349,20 @@ NO_PREFIX_CAPTION_ENV_TEX = r"""
 \makeatletter
 \newcounter{figno}
 \newenvironment{fignos:no-prefix-figure-caption}{
-  % Save and replace the old environment
   \caption@ifcompatibility{}{
-    \let\oldthefigure=\thefigure
-    \let\oldtheHfigure=\theHfigure
+    \let\oldthefigure\thefigure
+    \let\oldtheHfigure\theHfigure
     \renewcommand{\thefigure}{yyz\thefigno}
     \renewcommand{\theHfigure}{yyz\thefigno}
     \stepcounter{figno}
     \captionsetup{labelformat=empty}
-    \ignorespaces
   }
 }{
-  % Restore the old environment
   \caption@ifcompatibility{}{
     \captionsetup{labelformat=default}
-    \let\thefigure=\oldthefigure
-    \let\theHfigure=\oldtheHfigure
+    \let\thefigure\oldthefigure
+    \let\theHfigure\oldtheHfigure
     \addtocounter{figure}{-1}
-    \ignorespacesafterend 
   }
 }
 \makeatother
@@ -376,43 +372,43 @@ NO_PREFIX_CAPTION_ENV_TEX = r"""
 TAGGED_FIGURE_ENV_TEX = r"""
 %% pandoc-fignos: environment for tagged figures
 \newenvironment{fignos:tagged-figure}[1][]{
-  % Save and replace the old environment
-  \let\oldthefigure=\thefigure
-  \let\oldtheHfigure=\theHfigure
+  \let\oldthefigure\thefigure
+  \let\oldtheHfigure\theHfigure
   \renewcommand{\thefigure}{#1}
   \renewcommand{\theHfigure}{#1}
-  \ignorespaces
 }{
-  % Restore the old environment
-  \let\thefigure=\oldthefigure
-  \let\theHfigure=\oldtheHfigure
+  \let\thefigure\oldthefigure
+  \let\theHfigure\oldtheHfigure
   \addtocounter{figure}{-1}
-  \ignorespacesafterend 
 }
 """
 
 # Define an environment to replace the figure environment
 FIGURE_ENV_TEX = r"""
 %% pandoc-fignos: environment to replace the figure environment
+\makeatletter
 \newenvironment{fignos:figure-env}[1][]{
-  % Save and replace the old environment
-  \let\oldfigure\figure
-  \let\figure\#1
-  \let\oldendfigure\endfigure
-  \let\endfigure\end#1
-  \ignorespaces
+  \def\@temp{#1}
+  \expandafter\ifx\csname #1\endcsname\relax
+  \else
+    \let\oldfigure\figure
+    \let\oldendfigure\endfigure
+    \renewenvironment{figure}{\begin{#1}}{\end{#1}}
+  \fi
 }{
-  % Restore the old environment
-  \let\figure\oldfigure
-  \let\endfigure\oldendfigure
-  \ignorespacesafterend 
+  \expandafter\ifx\csname \@temp\endcsname\relax
+  \else
+    \let\figure\oldfigure
+    \let\endfigure\oldendfigure
+  \fi
 }
+\makeatother
 """
 
 # Reset the caption name; i.e. change "Figure" at the beginning of a caption
 # to something else.
 CAPTION_NAME_TEX = r"""
-%% pandoc-fignos: change caption name
+%% pandoc-fignos: change the caption name
 \renewcommand{\figurename}{%s}
 """
 
@@ -551,7 +547,8 @@ def main():
 
         if pandocxnos.cleveref_required():
             pandocxnos.add_package_to_header_includes(
-                meta, 'cleveref', 'capitalise' if capitalise else None)
+                'fignos', meta, 'cleveref',
+                'capitalise' if capitalise else None)
 
         if has_unnumbered_figures:
             pandocxnos.add_package_to_header_includes(meta, 'caption')

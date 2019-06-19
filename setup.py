@@ -25,8 +25,9 @@ from setuptools import setup, dist
 from setuptools.command.install import install
 from setuptools.command.install_scripts import install_scripts
 
-LONG_DESCRIPTION = """\
-A pandoc filter for numbering figures and figure references.
+DESCRIPTION = """\
+A pandoc filter for numbering figures and figure references
+when converting markdown documents to other formats.
 """
 
 # From https://stackoverflow.com/a/39671214
@@ -107,14 +108,14 @@ setup(
     author='Thomas J. Duck',
     author_email='tomduck@tomduck.ca',
     description='Figure number filter for pandoc',
-    long_description=LONG_DESCRIPTION,
+    long_description=DESCRIPTION,
     license='GPL',
     keywords='pandoc figure numbers filter',
     url='https://github.com/tomduck/pandoc-fignos',
     download_url='https://github.com/tomduck/pandoc-fignos/tarball/' + \
                  __version__,
 
-    install_requires=['pandoc-xnos>=1.2.0,<2'],
+    install_requires=['pandoc-xnos~=2.0.0a1'],
 
     py_modules=['pandoc_fignos'],
     entry_points={'console_scripts':['pandoc-fignos = pandoc_fignos:main']},
