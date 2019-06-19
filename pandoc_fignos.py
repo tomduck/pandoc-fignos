@@ -389,6 +389,12 @@ CAPTION_NAME_TEX = r"""
 \renewcommand{\figurename}{%s}
 """
 
+# Define some text to number figures by section
+NUMBER_BY_SECTION_TEX = r"""
+%% pandoc-fignos: number figures by section
+\numberwithin{figure}{section}
+"""
+
 
 # Main program ---------------------------------------------------------------
 
@@ -459,8 +465,9 @@ def process(meta):
         for name in starname:
             assert isinstance(name, STRTYPES)
 
-    if 'xnos-number-sections' in meta:
-        numbersections = check_bool(get_meta(meta, 'xnos-number-sections'))
+    for name in ['fignos-number-sections', 'xnos-number-sections']:
+        if name in meta:
+            numbersections = check_bool(get_meta(meta, name))
 
 
 def main():
@@ -558,6 +565,10 @@ def main():
         if captionname != 'Figure':
             pandocxnos.add_tex_to_header_includes(
                 meta, CAPTION_NAME_TEX % captionname)
+
+        if numbersections:
+            pandocxnos.add_tex_to_header_includes(
+                meta, NUMBER_BY_SECTION_TEX)
 
     # Update the doc
     if PANDOCVERSION >= '1.18':
