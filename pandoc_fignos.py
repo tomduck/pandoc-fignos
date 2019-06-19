@@ -45,7 +45,6 @@ import re
 import functools
 import argparse
 import json
-import uuid
 import copy
 import textwrap
 
@@ -90,7 +89,6 @@ numbersections = False  # Flags that sections should be numbered by section
 cursec = None          # Current section
 Nreferences = 0        # Number of references in current section (or document)
 references = {}        # Tracks referenceable figures and their numbers/tags
-unreferenceable = []   # List of figures that are unreferenceable
 
 # Processing flags
 captionname_changed = False     # Flags the the caption name changed
@@ -132,10 +130,84 @@ def _extract_attrs(x, n):
         raise
 
 
-def _adjust_caption(fmt, fig, attrs, value, caption):
-    """Adjust the caption depending on the output format."""
+def _process_figure(value, fmt):
+    """Processes a figure.  Returns a dict containing figure properties."""
+
+    # pylint: disable=global-statement
+    global cursec        # Current section being processed
+    global Nreferences   # Number of refs in current section (or document)
+    global has_unnumbered_figures  # Flags that unnumbered figures were found
+
+    # Initialize the return value
+    fig = {'is_unnumbered': False,
+           'is_unreferenceable': False,
+           'is_tagged': False,
+           'env': None}
+
+    # Bail out if there are no attributes
+    if len(value[0]['c']) == 2:
+        has_unnumbered_figures = True
+        fig.update({'is_unnumbered': True, 'is_unreferenceable': True})
+        return fig
+
+    # Parse the figure
+    fig['attrs'], fig['caption'] = value[0]['c'][:2]
+    attrs = fig['attrs']
+
+    # Get the kvs
+    kvs = PandocAttributes(attrs, 'pandoc').kvs
+
+    # Store the environment
+    if 'env' in kvs:
+        fig['env'] = kvs['env']
+
+    # Bail out if the id does not conform
+    if not LABEL_PATTERN.match(attrs[0]):
+        has_unnumbered_figures = True
+        fig.update({'is_unnumbered': True, 'is_unreferenceable': True})
+        return fig
+
+    # Identify unreferenceable figures
+    if attrs[0] == 'fig:':
+        attrs[0] = ''  # The id isn't needed any further
+        fig['is_unreferenceable'] = True
+
+    # Pandoc's --number-sections supports section numbering latex/pdf, html,
+    # epub, and docx
+    if numbersections:
+        # Latex/pdf supports equation numbers by section natively.  For the
+        # other formats we must hard-code in equation numbers by section as
+        # tags.
+        if fmt in ['html', 'html5', 'epub', 'epub2', 'epub3', 'docx'] and \
+          'tag' not in kvs:
+            if kvs['secno'] != cursec:  # The section number changed
+                cursec = kvs['secno']   # Update the global section tracker
+                Nreferences = 1         # Resets the global reference counter
+            kvs['tag'] = cursec + '.' + str(Nreferences)
+            Nreferences += 1
+
+    # Save to the global references tracker
+    fig['is_tagged'] = 'tag' in kvs
+    if fig['is_tagged']:  # ... then save the tag
+        # Remove any surrounding quotes
+        if kvs['tag'][0] == '"' and kvs['tag'][-1] == '"':
+            kvs['tag'] = kvs['tag'].strip('"')
+        elif kvs['tag'][0] == "'" and kvs['tag'][-1] == "'":
+            kvs['tag'] = kvs['tag'].strip("'")
+        references[attrs[0]] = kvs['tag']
+    else:  # ... then save the figure number
+        Nreferences += 1  # Increment the global reference counter
+        references[attrs[0]] = Nreferences
+
+    return fig
+
+
+def _adjust_caption(fmt, fig, value):
+    """Adjusts the caption."""
+    attrs, caption = fig['attrs'], fig['caption']
     if fmt in ['latex', 'beamer']:  # Append a \label if this is referenceable
-        if not fig['is_unreferenceable']:
+        if PANDOCVERSION < '1.17' and not fig['is_unreferenceable']:
+            # pandoc >= 1.17 installs \label for us
             value[0]['c'][1] += \
               [RawInline('tex', r'\protect\label{%s}'%attrs[0])]
     else:  # Hard-code in the caption name and number/tag
@@ -168,129 +240,50 @@ def _adjust_caption(fmt, fig, attrs, value, caption):
             value[0]['c'][1] += [Space()] + list(caption)
 
 
-def _process_figure(value, fmt):
-    """Processes a figure.  Returns a dict containing figure properties."""
-
-    # pylint: disable=global-statement
-    global cursec        # Current section being processed
-    global Nreferences   # Number of refs in current section (or document)
-    global has_unnumbered_figures  # Flags that unnumbered figures were found
-
-    # Parse the image
-    attrs, caption = value[0]['c'][:2]
-
-    # Initialize the return value
-    fig = {'is_unnumbered': False,
-           'is_unreferenceable': False,
-           'is_tagged': False,
-           'env': None,
-           'attrs': attrs}
-
-    # Bail out if the label does not conform
-    if not LABEL_PATTERN.match(attrs[0]):
-        has_unnumbered_figures = True
-        fig['is_unnumbered'] = True
-        fig['is_unreferenceable'] = True
-        return fig
-
-    # Process unreferenceable figures
-    if attrs[0] == 'fig:': # Make up a unique description
-        attrs[0] = attrs[0] + str(uuid.uuid4())
-        fig['is_unreferenceable'] = True
-        unreferenceable.append(attrs[0])
-
-    # Get the kvs
-    kvs = PandocAttributes(attrs, 'pandoc').kvs
-
-    # Store the environment
-    if 'env' in kvs:
-        fig['env'] = kvs['env']
-
-    # Pandoc's --number-sections supports section numbering latex/pdf, html,
-    # epub, and docx
-    if numbersections:
-        # Latex/pdf supports equation numbers by section natively.  For the
-        # other formats we must hard-code in equation numbers by section as
-        # tags.
-        if fmt in ['html', 'html5', 'epub', 'epub2', 'epub3', 'docx'] and \
-          'tag' not in kvs:
-            if kvs['secno'] != cursec:  # The section number changed
-                cursec = kvs['secno']   # Update the global section tracker
-                Nreferences = 1         # Resets the global reference counter
-            kvs['tag'] = cursec + '.' + str(Nreferences)
-            Nreferences += 1
-
-    # Save to the global references tracker
-    fig['is_tagged'] = 'tag' in kvs
-    if fig['is_tagged']:  # ... then save the tag
-        # Remove any surrounding quotes
-        if kvs['tag'][0] == '"' and kvs['tag'][-1] == '"':
-            kvs['tag'] = kvs['tag'].strip('"')
-        elif kvs['tag'][0] == "'" and kvs['tag'][-1] == "'":
-            kvs['tag'] = kvs['tag'].strip("'")
-        references[attrs[0]] = kvs['tag']
-    else:  # ... then save the figure number
-        Nreferences += 1  # Increment the global reference counter
-        references[attrs[0]] = Nreferences
-
-    # Adjust the caption depending on the output format
-    _adjust_caption(fmt, fig, attrs, value, caption)
-
-    return fig
-
-
-def _context_dependent_output(fmt, fig, value, unnumbered_figure_ret_tex):
-    """Assembles and returns context-dependent output."""
+def _add_markup(fmt, fig, value):
+    """Adds markup to the output."""
 
     # pylint: disable=global-statement
     global has_tagged_figures       # Flags a tagged figure was found
     global replaced_figure_env      # Flags that the figure env is replaced
 
-    # Context-dependent output
-    ret = None
     attrs = fig['attrs']
-    if fig['is_unnumbered']:
-        # Unnumbered is also unreferenceable
-        if fmt in ['latex', 'beamer']:
-            if fig['env']:
-                # Replace the figure environment
-                replaced_figure_env = True
-                ret = [RawBlock('tex', r'\begin{fignos:figure-env}[%s]' % \
-                                fig['env']),
-                       Para(value),
-                       RawBlock('tex', r'\end{fignos:figure-env}')]
-            ret = unnumbered_figure_ret_tex
-    elif fmt in ['latex', 'beamer']:
+    ret = None
+
+    if fig['is_unnumbered'] and fmt not in ['latex', 'beamer']:
+        return None  # Nothing to do
+
+    if fmt in ['latex', 'beamer']:
         key = attrs[0]
-        if PANDOCVERSION >= '1.17':  # Is this still needed???
-            # Remove id from the image attributes.  It is incorrectly
-            # handled by pandoc's TeX writer for these versions.
-            if LABEL_PATTERN.match(attrs[0]):
-                attrs[0] = ''
-        if fig['is_tagged']:
-            # Switch to the tagged-figure env
+        if fig['is_unnumbered']:
+            # Use the no-prefix-figure-caption environment
+            ret = [RawBlock('tex', r'\begin{fignos:no-prefix-figure-caption}'),
+                   Para(value),
+                   RawBlock('tex', r'\end{fignos:no-prefix-figure-caption}')]
+        elif fig['is_tagged']:  # A figure cannot be tagged if it is unnumbered
+            # Use the tagged-figure environment
             has_tagged_figures = True
             ret = [RawBlock('tex', r'\begin{fignos:tagged-figure}[%s]' % \
                             references[key]),
                    Para(value),
                    RawBlock('tex', r'\end{fignos:tagged-figure}')]
         if fig['env']:
-            # Replace the figure environment.  Note that tagging figures
-            # and switching environments are mutually exclusive.
+            # Replace the figure environment
             replaced_figure_env = True
-            ret = [RawBlock('tex', r'\begin{fignos:figure-env}[%s]' % \
-                            fig['env']),
-                   Para(value),
-                   RawBlock('tex', r'\end{fignos:figure-env}')]
-    elif fig['is_unreferenceable']:
-        attrs[0] = ''  # The label isn't needed any further
-    elif PANDOCVERSION < '1.16' \
-      and fmt in ('html', 'html5', 'epub', 'epub2', 'epub3') \
-      and LABEL_PATTERN.match(attrs[0]):
-        # Insert anchor for PANDOCVERSION < 1.16; for later versions
-        # the id is installed by pandoc.
-        anchor = RawBlock('html', '<a name="%s"></a>'%attrs[0])
-        ret = [anchor, Para(value)]
+            pre = RawBlock('tex', r'\begin{fignos:figure-env}[%s]' % \
+                           fig['env'])
+            post = RawBlock('tex', r'\end{fignos:figure-env}')
+            if ret:
+                ret.insert(0, pre)
+                ret.append(post)
+            else:
+                ret = [pre, Para(value), post]
+    elif fmt in ('html', 'html5', 'epub', 'epub2', 'epub3'):
+        if PANDOCVERSION < '1.16' and LABEL_PATTERN.match(attrs[0]):
+            # Insert anchor for PANDOCVERSION < 1.16; for later versions
+            # the id is installed by pandoc.
+            anchor = RawBlock('html', '<a name="%s"></a>'%attrs[0])
+            ret = [anchor, Para(value)]
     elif fmt == 'docx':
         # As per http://officeopenxml.com/WPhyperlink.php
         bookmarkstart = \
@@ -300,7 +293,6 @@ def _context_dependent_output(fmt, fig, value, unnumbered_figure_ret_tex):
         bookmarkend = \
           RawBlock('openxml', '<w:bookmarkEnd w:id="0"/>')
         ret = [bookmarkstart, Para(value), bookmarkend]
-
     return ret
 
 
@@ -314,25 +306,10 @@ def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
     if key == 'Para' and len(value) == 1 and \
       value[0]['t'] == 'Image' and value[0]['c'][-1][1].startswith('fig:'):
 
-        # Return element list for unnumbered figures for latex/pdf.  Disables
-        # the figure caption prefix (i.e., "Fig. 1:").
-        unnumbered_figure_ret_tex = \
-          [RawBlock('tex', r'\begin{fignos:no-prefix-figure-caption}'),
-           Para(value),
-           RawBlock('tex', r'\end{fignos:no-prefix-figure-caption}')]
-
-        # Inspect the image
-        if len(value[0]['c']) == 2:  # Unattributed figure, bail out
-            # Unnumbered is also unreferenceable
-            has_unnumbered_figures = True
-            if fmt in ['latex', 'beamer']:
-                return unnumbered_figure_ret_tex
-            return None
-
-        # Process the figure and return context-dependent output
+        # Process the figure and add markup
         fig = _process_figure(value, fmt)
-        return _context_dependent_output(fmt, fig, value,
-                                         unnumbered_figure_ret_tex)
+        _adjust_caption(fmt, fig, value)
+        return _add_markup(fmt, fig, value)
 
     return None
 
@@ -352,8 +329,8 @@ NO_PREFIX_CAPTION_ENV_TEX = r"""
   \caption@ifcompatibility{}{
     \let\oldthefigure\thefigure
     \let\oldtheHfigure\theHfigure
-    \renewcommand{\thefigure}{yyz\thefigno}
-    \renewcommand{\theHfigure}{yyz\thefigno}
+    \renewcommand{\thefigure}{figno:\thefigno}
+    \renewcommand{\theHfigure}{figno:\thefigno}
     \stepcounter{figno}
     \captionsetup{labelformat=empty}
   }
@@ -551,7 +528,7 @@ def main():
                 'capitalise' if capitalise else None)
 
         if has_unnumbered_figures:
-            pandocxnos.add_package_to_header_includes(meta, 'caption')
+            pandocxnos.add_package_to_header_includes('fignos', meta, 'caption')
 
         if plusname_changed:
             tex = textwrap.dedent("""
