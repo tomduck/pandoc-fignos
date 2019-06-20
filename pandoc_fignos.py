@@ -47,6 +47,7 @@ import argparse
 import json
 import copy
 import textwrap
+import uuid
 
 from pandocfilters import walk
 from pandocfilters import Image, Math, Str, Space, Para, RawBlock, RawInline
@@ -86,9 +87,9 @@ starname = ['Figure', 'Figures']  # Sets names for references at sentence start
 numbersections = False  # Flags that sections should be numbered by section
 
 # Processing state variables
-cursec = None          # Current section
-Nreferences = 0        # Number of references in current section (or document)
-references = {}        # Tracks referenceable figures and their numbers/tags
+cursec = None    # Current section
+Nreferences = 0  # Number of references in current section (or document)
+references = {}  # Maps reference labels to [number/tag, figure secno]
 
 # Processing flags
 captionname_changed = False     # Flags the the caption name changed
@@ -161,7 +162,7 @@ def _process_figure(value, fmt):
     if 'env' in kvs:
         fig['env'] = kvs['env']
 
-    # Bail out if the id does not conform
+    # Bail out if the label does not conform to expectations
     if not LABEL_PATTERN.match(attrs[0]):
         has_unnumbered_figures = True
         fig.update({'is_unnumbered': True, 'is_unreferenceable': True})
@@ -169,7 +170,7 @@ def _process_figure(value, fmt):
 
     # Identify unreferenceable figures
     if attrs[0] == 'fig:':
-        attrs[0] = ''  # The id isn't needed any further
+        attrs[0] = attrs[0] + str(uuid.uuid4())
         fig['is_unreferenceable'] = True
 
     # Pandoc's --number-sections supports section numbering latex/pdf, html,
@@ -186,7 +187,7 @@ def _process_figure(value, fmt):
             kvs['tag'] = cursec + '.' + str(Nreferences)
             Nreferences += 1
 
-    # Save to the global references tracker
+    # Save reference information
     fig['is_tagged'] = 'tag' in kvs
     if fig['is_tagged']:  # ... then save the tag
         # Remove any surrounding quotes
@@ -194,11 +195,11 @@ def _process_figure(value, fmt):
             kvs['tag'] = kvs['tag'].strip('"')
         elif kvs['tag'][0] == "'" and kvs['tag'][-1] == "'":
             kvs['tag'] = kvs['tag'].strip("'")
-        references[attrs[0]] = kvs['tag']
+        references[attrs[0]] = [kvs['tag'], cursec]
     else:  # ... then save the figure number
         Nreferences += 1  # Increment the global reference counter
-        references[attrs[0]] = Nreferences
-
+        references[attrs[0]] = [Nreferences, cursec]
+        
     return fig
 
 
@@ -211,22 +212,22 @@ def _adjust_caption(fmt, fig, value):
             value[0]['c'][1] += \
               [RawInline('tex', r'\protect\label{%s}'%attrs[0])]
     else:  # Hard-code in the caption name and number/tag
-        if fig['is_unreferenceable']:
+        if fig['is_unnumbered']:
             return
-        if isinstance(references[attrs[0]], int):  # Numbered reference
+        if isinstance(references[attrs[0]][0], int):  # Numbered reference
             if fmt in ['html', 'html5', 'epub', 'epub2', 'epub3']:
                 value[0]['c'][1] = [RawInline('html', r'<span>'),
                                     Str(captionname), Space(),
-                                    Str('%d:'%references[attrs[0]]),
+                                    Str('%d:'%references[attrs[0]][0]),
                                     RawInline('html', r'</span>')]
             else:
                 value[0]['c'][1] = [Str(captionname),
                                     Space(),
-                                    Str('%d:'%references[attrs[0]])]
+                                    Str('%d:'%references[attrs[0]][0])]
             value[0]['c'][1] += [Space()] + list(caption)
         else:  # Tagged reference
-            assert isinstance(references[attrs[0]], STRTYPES)
-            text = references[attrs[0]]
+            assert isinstance(references[attrs[0]][0], STRTYPES)
+            text = references[attrs[0]][0]
             if text.startswith('$') and text.endswith('$'):  # Math
                 math = text.replace(' ', r'\ ')[1:-1]
                 els = [Math({"t":"InlineMath", "c":[]}, math), Str(':')]
@@ -266,7 +267,7 @@ def _add_markup(fmt, fig, value):
             # Use the tagged-figure environment
             has_tagged_figures = True
             ret = [RawBlock('tex', r'\begin{fignos:tagged-figure}[%s]' % \
-                            references[key]),
+                            references[key][0]),
                    Para(value),
                    RawBlock('tex', r'\end{fignos:tagged-figure}')]
         if fig['env']:
@@ -283,7 +284,7 @@ def _add_markup(fmt, fig, value):
     elif fmt in ('html', 'html5', 'epub', 'epub2', 'epub3'):
         if PANDOCVERSION < '1.16' and LABEL_PATTERN.match(attrs[0]):
             # Insert anchor for PANDOCVERSION < 1.16; for later versions
-            # the id is installed by pandoc.
+            # the label is installed as an <img> id by pandoc.
             anchor = RawBlock('html', '<a name="%s"></a>'%attrs[0])
             ret = [anchor, Para(value)]
     elif fmt == 'docx':
