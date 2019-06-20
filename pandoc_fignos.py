@@ -184,7 +184,7 @@ def _process_figure(value, fmt):
             if kvs['secno'] != cursec:  # The section number changed
                 cursec = kvs['secno']   # Update the global section tracker
                 Nreferences = 1         # Resets the global reference counter
-            kvs['tag'] = cursec + '.' + str(Nreferences)
+            kvs['tag'] = str(cursec) + '.' + str(Nreferences)
             Nreferences += 1
 
     # Save reference information
