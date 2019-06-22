@@ -55,14 +55,14 @@ from pandocfilters import Span
 
 import pandocxnos
 from pandocxnos import PandocAttributes
-from pandocxnos import STRTYPES, STDIN, STDOUT
+from pandocxnos import STRTYPES, STDIN, STDOUT, STDERR
 from pandocxnos import elt, check_bool, get_meta, extract_attrs
 from pandocxnos import repair_refs, process_refs_factory, replace_refs_factory
 from pandocxnos import attach_attrs_factory, detach_attrs_factory
 from pandocxnos import insert_secnos_factory, delete_secnos_factory
 
 if sys.version_info > (3,):
-    from urllib.request import unquote  # pylint: disable=no-name-in-module
+    from urllib.request import unquote
 else:
     from urllib import unquote  # pylint: disable=no-name-in-module
 
@@ -85,6 +85,7 @@ capitalise = False      # Flags that plusname should be capitalised
 plusname = ['fig.', 'figs.']      # Sets names for mid-sentence references
 starname = ['Figure', 'Figures']  # Sets names for references at sentence start
 numbersections = False  # Flags that sections should be numbered by section
+warninglevel = 1        # 0 - no warnings; 1 - some warnings; 2 - all warnings
 
 # Processing state variables
 cursec = None    # Current section
@@ -97,7 +98,6 @@ plusname_changed = False        # Flags that the plus name changed
 starname_changed = False        # Flags that the star name changed
 has_unnumbered_figures = False  # Flags unnumbered figures were found
 has_tagged_figures = False      # Flags a tagged figure was found
-replaced_figure_env = False     # Flags that the figure environment is replaced
 
 PANDOCVERSION = None
 
@@ -142,8 +142,7 @@ def _process_figure(value, fmt):
     # Initialize the return value
     fig = {'is_unnumbered': False,
            'is_unreferenceable': False,
-           'is_tagged': False,
-           'env': None}
+           'is_tagged': False}
 
     # Bail out if there are no attributes
     if len(value[0]['c']) == 2:
@@ -157,10 +156,6 @@ def _process_figure(value, fmt):
 
     # Get the kvs
     kvs = PandocAttributes(attrs, 'pandoc').kvs
-
-    # Store the environment
-    if 'env' in kvs:
-        fig['env'] = kvs['env']
 
     # Bail out if the label does not conform to expectations
     if not LABEL_PATTERN.match(attrs[0]):
@@ -199,7 +194,7 @@ def _process_figure(value, fmt):
     else:  # ... then save the figure number
         Nreferences += 1  # Increment the global reference counter
         references[attrs[0]] = [Nreferences, cursec]
-        
+
     return fig
 
 
@@ -247,8 +242,7 @@ def _add_markup(fmt, fig, value):
     """Adds markup to the output."""
 
     # pylint: disable=global-statement
-    global has_tagged_figures       # Flags a tagged figure was found
-    global replaced_figure_env      # Flags that the figure env is replaced
+    global has_tagged_figures  # Flags a tagged figure was found
 
     attrs = fig['attrs']
     ret = None
@@ -270,17 +264,6 @@ def _add_markup(fmt, fig, value):
                             references[key][0]),
                    Para(value),
                    RawBlock('tex', r'\end{fignos:tagged-figure}')]
-        if fig['env']:
-            # Replace the figure environment
-            replaced_figure_env = True
-            pre = RawBlock('tex', r'\begin{fignos:figure-env}[%s]' % \
-                           fig['env'])
-            post = RawBlock('tex', r'\end{fignos:figure-env}')
-            if ret:
-                ret.insert(0, pre)
-                ret.append(post)
-            else:
-                ret = [pre, Para(value), post]
     elif fmt in ('html', 'html5', 'epub', 'epub2', 'epub3'):
         if PANDOCVERSION < '1.16' and LABEL_PATTERN.match(attrs[0]):
             # Insert anchor for PANDOCVERSION < 1.16; for later versions
@@ -363,28 +346,6 @@ TAGGED_FIGURE_ENV_TEX = r"""
 }
 """
 
-# Define an environment to replace the figure environment
-FIGURE_ENV_TEX = r"""
-%% pandoc-fignos: environment to replace the figure environment
-\makeatletter
-\newenvironment{fignos:figure-env}[1][]{
-  \def\@temp{#1}
-  \expandafter\ifx\csname #1\endcsname\relax
-  \else
-    \let\oldfigure\figure
-    \let\oldendfigure\endfigure
-    \renewenvironment{figure}{\begin{#1}}{\end{#1}}
-  \fi
-}{
-  \expandafter\ifx\csname \@temp\endcsname\relax
-  \else
-    \let\figure\oldfigure
-    \let\endfigure\oldendfigure
-  \fi
-}
-\makeatother
-"""
-
 # Reset the caption name; i.e. change "Figure" at the beginning of a caption
 # to something else.
 CAPTION_NAME_TEX = r"""
@@ -401,7 +362,7 @@ NUMBER_BY_SECTION_TEX = r"""
 
 # Main program ---------------------------------------------------------------
 
-# pylint: disable=too-many-branches
+# pylint: disable=too-many-branches,too-many-statements
 def process(meta):
     """Saves metadata fields in global variables and returns a few
     computed fields."""
@@ -413,11 +374,31 @@ def process(meta):
     global plusname        # Sets names for mid-sentence references
     global starname        # Sets names for references at sentence start
     global numbersections  # Flags that sections should be numbered by section
+    global warninglevel    # 0 - no warnings; 1 - some; 2 - all
     global captionname_changed  # Flags the the caption name changed
     global plusname_changed     # Flags that the plus name changed
     global starname_changed     # Flags that the star name changed
 
     # Read in the metadata fields and do some checking
+
+    if 'fignos-warning-level' in meta:
+        warninglevel = int(get_meta(meta, 'fignos-warning-level'))
+
+    metanames = ['fignos-warning-level', 'fignos-caption-name',
+                 'fignos-cleveref', 'xnos-cleveref',
+                 'fignos-capitalize', 'fignos-capitalise',
+                 'xnos-capitalize', 'xnos-capitalise',
+                 'fignos-plus-name', 'fignos-star-name',
+                 'fignos-number-sections', 'xnos-number-sections']
+
+    if warninglevel:
+        for name in meta:
+            if (name.startswith('fignos') or name.startswith('xnos')) and \
+              name not in metanames:
+                msg = textwrap.dedent("""
+                          pandoc-fignos: unknown meta variable "%s"\n
+                      """ % name)
+                STDERR.write(msg)
 
     if 'fignos-caption-name' in meta:
         old_captionname = captionname
@@ -474,6 +455,79 @@ def process(meta):
             numbersections = check_bool(get_meta(meta, name))
 
 
+def _add_tex_to_header_includes(meta, tex):
+    """Add tex to header includes and gives warning if appropriate."""
+    tex = textwrap.dedent(tex)
+    pandocxnos.add_tex_to_header_includes(meta, tex)
+    if warninglevel == 2:
+        STDERR.write(textwrap.indent(tex, '    '))
+
+
+def _add_package_to_header_includes(prefix, meta, package, options=None):
+    """Add package to header includes and gives warning if appropriate."""
+    tex = pandocxnos.add_package_to_header_includes(prefix, meta, package,
+                                                    options)
+    if warninglevel == 2:
+        STDERR.write(textwrap.indent(tex, '    '))
+
+
+def add_tex(meta):
+    """Adds text to the meta data."""
+
+    if warninglevel == 2:
+        msg = textwrap.dedent("""\
+                  pandoc fignos: Wrote the following blocks to
+                  header-includes.  If you use pandoc's
+                  --include-in-header option then you will need to
+                  manually include these yourself.
+              """)
+        STDERR.write('\n')
+        STDERR.write(textwrap.fill(msg))
+        STDERR.write('\n')
+
+    # Update the header-includes metadata.  Pandoc's
+    # --include-in-header option will override anything we do here.  This
+    # is a known issue and is owing to a design decision in pandoc.
+    # See https://github.com/jgm/pandoc/issues/3139.
+
+    if pandocxnos.cleveref_required():
+        _add_package_to_header_includes(
+            'fignos', meta, 'cleveref',
+            'capitalise' if capitalise else None)
+
+    if has_unnumbered_figures:
+        _add_package_to_header_includes('fignos', meta, 'caption')
+
+    if plusname_changed:
+        tex = """\
+            %%%% pandoc-fignos: change cref names
+            \\crefname{figure}{%s}{%s}
+        """ % (plusname[0], plusname[1])
+        _add_tex_to_header_includes(meta, tex)
+
+    if starname_changed:
+        tex = """\
+            %%%% pandoc-fignos: change Cref names
+            \\Crefname{figure}{%s}{%s}
+        """ % (starname[0], starname[1])
+        _add_tex_to_header_includes(meta, tex)
+
+    if has_unnumbered_figures:
+        _add_tex_to_header_includes(meta, NO_PREFIX_CAPTION_ENV_TEX)
+
+    if has_tagged_figures:
+        _add_tex_to_header_includes(meta, TAGGED_FIGURE_ENV_TEX)
+
+    if captionname != 'Figure':
+        _add_tex_to_header_includes(meta, CAPTION_NAME_TEX % captionname)
+
+    if numbersections:
+        _add_tex_to_header_includes(meta, NUMBER_BY_SECTION_TEX)
+
+    if warninglevel == 2:
+        STDERR.write('\n')
+
+
 def main():
     """Filters the document AST."""
 
@@ -527,52 +581,7 @@ def main():
                                altered)
 
     if fmt in ['latex', 'beamer']:
-
-        # Update the header-includes metadata.  Pandoc's
-        # --include-in-header option will override anything we do here.  This
-        # is a known issue and is owing to a design decision in pandoc.
-        # See https://github.com/jgm/pandoc/issues/3139.
-
-        if pandocxnos.cleveref_required():
-            pandocxnos.add_package_to_header_includes(
-                'fignos', meta, 'cleveref',
-                'capitalise' if capitalise else None)
-
-        if has_unnumbered_figures:
-            pandocxnos.add_package_to_header_includes('fignos', meta, 'caption')
-
-        if plusname_changed:
-            tex = textwrap.dedent("""
-                %%%% pandoc-fignos: change cref names
-                \\crefname{figure}{%s}{%s}
-            """ % (plusname[0], plusname[1]))
-            pandocxnos.add_tex_to_header_includes(meta, tex)
-
-        if starname_changed:
-            tex = textwrap.dedent("""
-                %%%% pandoc-fignos: change Cref names
-                \\Crefname{figure}{%s}{%s}
-            """ % (starname[0], starname[1]))
-            pandocxnos.add_tex_to_header_includes(meta, tex)
-
-        if has_unnumbered_figures:
-            pandocxnos.add_tex_to_header_includes(
-                meta, NO_PREFIX_CAPTION_ENV_TEX)
-
-        if has_tagged_figures:
-            pandocxnos.add_tex_to_header_includes(
-                meta, TAGGED_FIGURE_ENV_TEX)
-
-        if replaced_figure_env:
-            pandocxnos.add_tex_to_header_includes(meta, FIGURE_ENV_TEX)
-
-        if captionname != 'Figure':
-            pandocxnos.add_tex_to_header_includes(
-                meta, CAPTION_NAME_TEX % captionname)
-
-        if numbersections:
-            pandocxnos.add_tex_to_header_includes(
-                meta, NUMBER_BY_SECTION_TEX)
+        add_tex(meta)
 
     # Update the doc
     if PANDOCVERSION >= '1.18':
