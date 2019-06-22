@@ -107,7 +107,7 @@ PANDOCVERSION = None
 def _extract_attrs(x, n):
     """Extracts attributes for an image.  n is the index where the
     attributes begin in the element list x.  Extracted elements are deleted
-    from the list.  Attrs are returned in pandoc format.
+    from the list.
     """
     try:
         return extract_attrs(x, n)
@@ -125,11 +125,9 @@ def _extract_attrs(x, n):
             s = image['c'][-1][0]
             if '%20%7B' in s:
                 path = s[:s.index('%20%7B')]
-                attrs = unquote(s[s.index('%7B'):])
+                attrstr = unquote(s[s.index('%7B'):])
                 image['c'][-1][0] = path  # Remove attr string from the path
-                pandocattrs = PandocAttributes(attrs.strip(), 'markdown')
-                return pandocattrs.to_pandoc(), pandocattrs.attr_string, \
-                    pandocattrs.parse_failed
+                return PandocAttributes(attrstr.strip(), 'markdown')
         raise
 
 
@@ -153,21 +151,18 @@ def _process_figure(value, fmt):
         return fig
 
     # Parse the figure
-    fig['attrs'], fig['caption'] = value[0]['c'][:2]
-    attrs = fig['attrs']
-
-    # Get the kvs
-    kvs = PandocAttributes(attrs, 'pandoc').kvs
+    attrs = fig['attrs'] = PandocAttributes(value[0]['c'][0], 'pandoc')
+    fig['caption'] = value[0]['c'][1]
 
     # Bail out if the label does not conform to expectations
-    if not LABEL_PATTERN.match(attrs[0]):
+    if not LABEL_PATTERN.match(attrs.id):
         has_unnumbered_figures = True
         fig.update({'is_unnumbered': True, 'is_unreferenceable': True})
         return fig
 
     # Identify unreferenceable figures
-    if attrs[0] == 'fig:':
-        attrs[0] = attrs[0] + str(uuid.uuid4())
+    if attrs.id == 'fig:':
+        attrs.id += str(uuid.uuid4())
         fig['is_unreferenceable'] = True
 
     # Pandoc's --number-sections supports section numbering latex/pdf, html,
@@ -177,25 +172,25 @@ def _process_figure(value, fmt):
         # other formats we must hard-code in equation numbers by section as
         # tags.
         if fmt in ['html', 'html5', 'epub', 'epub2', 'epub3', 'docx'] and \
-          'tag' not in kvs:
-            if kvs['secno'] != cursec:  # The section number changed
-                cursec = kvs['secno']   # Update the global section tracker
+          'tag' not in attrs:
+            if attrs['secno'] != cursec:  # The section number changed
+                cursec = attrs['secno']   # Update the global section tracker
                 Nreferences = 1         # Resets the global reference counter
-            kvs['tag'] = str(cursec) + '.' + str(Nreferences)
+            attrs['tag'] = str(cursec) + '.' + str(Nreferences)
             Nreferences += 1
 
     # Save reference information
-    fig['is_tagged'] = 'tag' in kvs
+    fig['is_tagged'] = 'tag' in attrs
     if fig['is_tagged']:  # ... then save the tag
         # Remove any surrounding quotes
-        if kvs['tag'][0] == '"' and kvs['tag'][-1] == '"':
-            kvs['tag'] = kvs['tag'].strip('"')
-        elif kvs['tag'][0] == "'" and kvs['tag'][-1] == "'":
-            kvs['tag'] = kvs['tag'].strip("'")
-        references[attrs[0]] = [kvs['tag'], cursec]
+        if attrs['tag'][0] == '"' and attrs['tag'][-1] == '"':
+            attrs['tag'] = attrs['tag'].strip('"')
+        elif attrs['tag'][0] == "'" and attrs['tag'][-1] == "'":
+            attrs['tag'] = attrs['tag'].strip("'")
+        references[attrs.id] = [attrs['tag'], cursec]
     else:  # ... then save the figure number
         Nreferences += 1  # Increment the global reference counter
-        references[attrs[0]] = [Nreferences, cursec]
+        references[attrs.id] = [Nreferences, cursec]
 
     return fig
 
@@ -207,24 +202,24 @@ def _adjust_caption(fmt, fig, value):
         if PANDOCVERSION < '1.17' and not fig['is_unreferenceable']:
             # pandoc >= 1.17 installs \label for us
             value[0]['c'][1] += \
-              [RawInline('tex', r'\protect\label{%s}'%attrs[0])]
+              [RawInline('tex', r'\protect\label{%s}'%attrs.id)]
     else:  # Hard-code in the caption name and number/tag
         if fig['is_unnumbered']:
             return
-        if isinstance(references[attrs[0]][0], int):  # Numbered reference
+        if isinstance(references[attrs.id][0], int):  # Numbered reference
             if fmt in ['html', 'html5', 'epub', 'epub2', 'epub3']:
                 value[0]['c'][1] = [RawInline('html', r'<span>'),
                                     Str(captionname), Space(),
-                                    Str('%d:'%references[attrs[0]][0]),
+                                    Str('%d:'%references[attrs.id][0]),
                                     RawInline('html', r'</span>')]
             else:
                 value[0]['c'][1] = [Str(captionname),
                                     Space(),
-                                    Str('%d:'%references[attrs[0]][0])]
+                                    Str('%d:'%references[attrs.id][0])]
             value[0]['c'][1] += [Space()] + list(caption)
         else:  # Tagged reference
-            assert isinstance(references[attrs[0]][0], STRTYPES)
-            text = references[attrs[0]][0]
+            assert isinstance(references[attrs.id][0], STRTYPES)
+            text = references[attrs.id][0]
             if text.startswith('$') and text.endswith('$'):  # Math
                 math = text.replace(' ', r'\ ')[1:-1]
                 els = [Math({"t":"InlineMath", "c":[]}, math), Str(':')]
@@ -253,7 +248,6 @@ def _add_markup(fmt, fig, value):
         return None  # Nothing to do
 
     if fmt in ['latex', 'beamer']:
-        key = attrs[0]
         if fig['is_unnumbered']:
             # Use the no-prefix-figure-caption environment
             ret = [RawBlock('tex', r'\begin{fignos:no-prefix-figure-caption}'),
@@ -263,21 +257,21 @@ def _add_markup(fmt, fig, value):
             # Use the tagged-figure environment
             has_tagged_figures = True
             ret = [RawBlock('tex', r'\begin{fignos:tagged-figure}[%s]' % \
-                            references[key][0]),
+                            references[attrs.id][0]),
                    Para(value),
                    RawBlock('tex', r'\end{fignos:tagged-figure}')]
     elif fmt in ('html', 'html5', 'epub', 'epub2', 'epub3'):
-        if PANDOCVERSION < '1.16' and LABEL_PATTERN.match(attrs[0]):
+        if PANDOCVERSION < '1.16' and LABEL_PATTERN.match(attrs.id):
             # Insert anchor for PANDOCVERSION < 1.16; for later versions
             # the label is installed as an <img> id by pandoc.
-            anchor = RawBlock('html', '<a name="%s"></a>'%attrs[0])
+            anchor = RawBlock('html', '<a name="%s"></a>'%attrs.id)
             ret = [anchor, Para(value)]
     elif fmt == 'docx':
         # As per http://officeopenxml.com/WPhyperlink.php
         bookmarkstart = \
           RawBlock('openxml',
                    '<w:bookmarkStart w:id="0" w:name="%s"/>'
-                   %attrs[0])
+                   %attrs.id)
         bookmarkend = \
           RawBlock('openxml', '<w:bookmarkEnd w:id="0"/>')
         ret = [bookmarkstart, Para(value), bookmarkend]
