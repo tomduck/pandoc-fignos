@@ -3,7 +3,7 @@
 """pandoc-fignos: a pandoc filter that inserts figure nos. and refs."""
 
 
-__version__ = '2.0.0a1'
+__version__ = '2.0.0b1'
 
 
 # Copyright 2015-2019 Thomas J. Duck.
@@ -127,7 +127,9 @@ def _extract_attrs(x, n):
                 path = s[:s.index('%20%7B')]
                 attrs = unquote(s[s.index('%7B'):])
                 image['c'][-1][0] = path  # Remove attr string from the path
-                return PandocAttributes(attrs.strip(), 'markdown').to_pandoc()
+                pandocattrs = PandocAttributes(attrs.strip(), 'markdown')
+                return pandocattrs.to_pandoc(), pandocattrs.attr_string, \
+                    pandocattrs.parse_failed
         raise
 
 
@@ -455,22 +457,6 @@ def process(meta):
             numbersections = check_bool(get_meta(meta, name))
 
 
-def _add_tex_to_header_includes(meta, tex):
-    """Add tex to header includes and gives warning if appropriate."""
-    tex = textwrap.dedent(tex)
-    pandocxnos.add_tex_to_header_includes(meta, tex)
-    if warninglevel == 2:
-        STDERR.write(textwrap.indent(tex, '    '))
-
-
-def _add_package_to_header_includes(prefix, meta, package, options=None):
-    """Add package to header includes and gives warning if appropriate."""
-    tex = pandocxnos.add_package_to_header_includes(prefix, meta, package,
-                                                    options)
-    if warninglevel == 2:
-        STDERR.write(textwrap.indent(tex, '    '))
-
-
 def add_tex(meta):
     """Adds text to the meta data."""
 
@@ -491,38 +477,50 @@ def add_tex(meta):
     # See https://github.com/jgm/pandoc/issues/3139.
 
     if pandocxnos.cleveref_required():
-        _add_package_to_header_includes(
-            'fignos', meta, 'cleveref',
-            'capitalise' if capitalise else None)
+        tex = """
+            %%%% pandoc-fignos: required package
+            \\usepackage%s{cleveref}
+        """ % ('[capitalise]' if capitalise else '')
+        pandocxnos.add_tex_to_header_includes(
+            meta, tex, warninglevel, r'\\usepackage(\[[\w\s,]*\])?\{cleveref\}')
 
     if has_unnumbered_figures:
-        _add_package_to_header_includes('fignos', meta, 'caption')
+        tex = """
+            %%%% pandoc-fignos: required package
+            \\usepackage{caption}
+        """
+        pandocxnos.add_tex_to_header_includes(
+            meta, tex, warninglevel, r'\\usepackage(\[[\w\s,]*\])?\{caption\}')
 
     if plusname_changed:
-        tex = """\
+        tex = """
             %%%% pandoc-fignos: change cref names
             \\crefname{figure}{%s}{%s}
         """ % (plusname[0], plusname[1])
-        _add_tex_to_header_includes(meta, tex)
+        pandocxnos.add_tex_to_header_includes(meta, tex, warninglevel)
 
     if starname_changed:
         tex = """\
             %%%% pandoc-fignos: change Cref names
             \\Crefname{figure}{%s}{%s}
         """ % (starname[0], starname[1])
-        _add_tex_to_header_includes(meta, tex)
+        pandocxnos.add_tex_to_header_includes(meta, tex, warninglevel)
 
     if has_unnumbered_figures:
-        _add_tex_to_header_includes(meta, NO_PREFIX_CAPTION_ENV_TEX)
+        pandocxnos.add_tex_to_header_includes(
+            meta, NO_PREFIX_CAPTION_ENV_TEX, warninglevel)
 
     if has_tagged_figures:
-        _add_tex_to_header_includes(meta, TAGGED_FIGURE_ENV_TEX)
+        pandocxnos.add_tex_to_header_includes(
+            meta, TAGGED_FIGURE_ENV_TEX, warninglevel)
 
     if captionname != 'Figure':
-        _add_tex_to_header_includes(meta, CAPTION_NAME_TEX % captionname)
+        pandocxnos.add_tex_to_header_includes(
+            meta, CAPTION_NAME_TEX % captionname, warninglevel)
 
     if numbersections:
-        _add_tex_to_header_includes(meta, NUMBER_BY_SECTION_TEX)
+        pandocxnos.add_tex_to_header_includes(
+            meta, NUMBER_BY_SECTION_TEX, warninglevel)
 
     if warninglevel == 2:
         STDERR.write('\n')
@@ -554,27 +552,30 @@ def main():
     process(meta)
 
     # First pass
-    attach_attrs_image = attach_attrs_factory(Image,
-                                              extract_attrs=_extract_attrs)
+    replace = True if PANDOCVERSION >= '1.16' else False
+    attach_attrs_image = attach_attrs_factory('pandoc-fignos', Image,
+                                              warninglevel,
+                                              extract_attrs=_extract_attrs,
+                                              replace=replace)
     detach_attrs_image = detach_attrs_factory(Image)
     insert_secnos = insert_secnos_factory(Image)
     delete_secnos = delete_secnos_factory(Image)
-    filters = [insert_secnos, process_figures, delete_secnos] \
-      if PANDOCVERSION >= '1.16' else \
-      [attach_attrs_image, insert_secnos, process_figures,
-       delete_secnos, detach_attrs_image]
+    filters = [attach_attrs_image, insert_secnos, process_figures,
+               delete_secnos, detach_attrs_image]
     altered = functools.reduce(lambda x, action: walk(x, action, fmt, meta),
                                filters, blocks)
 
     # Second pass
-    process_refs = process_refs_factory(references.keys())
+    process_refs = process_refs_factory('pandoc-fignos', references.keys(),
+                                        warninglevel)
     replace_refs = replace_refs_factory(references,
                                         cleveref, False,
                                         plusname if not capitalise \
                                         or plusname_changed else
                                         [name.title() for name in plusname],
-                                        starname, 'figure')
-    attach_attrs_span = attach_attrs_factory(Span, replace=True)
+                                        starname)
+    attach_attrs_span = attach_attrs_factory('pandoc-fignos', Span,
+                                             warninglevel, replace=True)
     altered = functools.reduce(lambda x, action: walk(x, action, fmt, meta),
                                [repair_refs, process_refs, replace_refs,
                                 attach_attrs_span],
