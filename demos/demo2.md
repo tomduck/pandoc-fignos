@@ -1,3 +1,6 @@
+---
+title: Pandoc-fignos Demo
+...
 
 Reference to +@fig:1.
 

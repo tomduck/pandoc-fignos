@@ -6,4 +6,4 @@ Reference to fig. [1](#fig:1).
 
 Figure [2](#fig:2) is given above.
 
-![Figure 3: The number three.](img/fig-3.png){width="1in"}
+![Figure 3: The number three.](img/fig-3.png){#fig: width="1in"}

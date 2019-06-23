@@ -1,7 +1,7 @@
 ---
+title: Pandoc-fignos Demo
 fignos-cleveref: True
 fignos-plus-name: Fig.
-header-includes: \usepackage{caption}
 ...
 
 Reference to @fig:1.
