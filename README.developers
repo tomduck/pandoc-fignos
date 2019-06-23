@@ -19,7 +19,7 @@ ready, it will be merged into the `nextrelease` branch.
 Install Alternatives
 --------------------
 
-1) To install a pre-release version of pandoc fignos from pypi, the --pre flag
+1) To install a pre-release version of pandoc-fignos from pypi, the --pre flag
    should be used with pip.
 
 2) To install directly from the github repository use:
@@ -46,8 +46,11 @@ Install Alternatives
 Testing
 -------
 
-Regression tests are provided in test/.  Read the README.md in that
-directory for instructions.
+Regression tests for pandoc-fignos are provided in test/standard.  Read
+the README.md in that directory for instructions.
+
+Integration tests for pandoc-fignos/eqnos/tablenos are provided in
+test/integration.
 
 
 Preparing a Release
