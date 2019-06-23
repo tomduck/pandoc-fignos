@@ -9,8 +9,8 @@
 [more...](#whats-new).
 
 
-pandoc-fignos 2.0.0b1
-=====================
+pandoc-fignos 2.0.0
+===================
 
 *pandoc-fignos* is a [pandoc] filter for numbering figures and their references when converting markdown documents to other formats.
 
