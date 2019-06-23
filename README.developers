@@ -2,15 +2,18 @@
 Developer Notes
 ===============
 
-Contributions to this project are welcome.  In particular, full docx support is awaiting input from a knowledgeable expert on how to structure the OOXML.
+Contributions to this project are welcome.  In particular, full docx support
+is awaiting input from a knowledgeable expert on how to structure the OOXML.
 
     
 Branches
 --------
 
-The next release is developed in the `nextrelease` branch.  When ready, the changes are merged into the `master` branch.
+The next release is developed in the `nextrelease` branch.  When ready, the
+changes are merged into the `master` branch.
 
-Version 2.0 is being temporarily developed in a separate `2.0` branch.  When ready, it will be merged into the `nextrelease` branch.
+Version 2.0 is being temporarily developed in a separate `2.0` branch.  When
+ready, it will be merged into the `nextrelease` branch.
 
 
 Install Alternatives

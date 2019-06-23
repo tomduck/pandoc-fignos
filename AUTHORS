@@ -1,8 +1,6 @@
 
-pandoc-fignos was written by Thomas J. Duck <tomduck@tomduck.ca>
+pandoc-fignos was written and is maintained by Thomas J. Duck
+<tomduck@tomduck.ca>.
 
-I am grateful for the contributions made by:
-
-  * Sebastian Höffner (pull request #44)
-  * The many users who have submitted many helpful bug reports and feature
-    requests.
+I am grateful for the contributions made by the many users who have submitted
+issues and pull requests via GitHub.
