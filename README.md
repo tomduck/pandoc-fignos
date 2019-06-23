@@ -140,8 +140,8 @@ Pandoc-fignos may be customized by setting variables in the [metadata block] or 
   * `fignos-cleveref` or `xnos-cleveref` - Set to `True` to assume "+"
     clever references by default;
 
-  * `fignos-capitalise` or `xnos-capitalise` - Capitalizes the names
-     of "+" clever references (e.g., change from "fig." to "Fig.");
+  * `xnos-capitalise` - Capitalizes the names of "+" clever
+    references (e.g., change from "fig." to "Fig.");
 
   * `fignos-plus-name` - Sets the name of a "+" clever reference
     (e.g., change it from "fig." to "figure"); and
@@ -159,6 +159,8 @@ Pandoc-fignos may be customized by setting variables in the [metadata block] or 
      [option](https://pandoc.org/MANUAL.html#option--number-sections)
      enabled for LaTeX/pdf, html, and epub output.  For docx,
      use [docx custom styles] instead. 
+
+Note that variables beginning with `fignos-` apply to only pandoc-fignos, whereas variables beginning with `xnos-` apply to all three of pandoc-fignos/eqnos/tablenos.
 
 Demonstration: Processing [demo3.md] with pandoc + pandoc-fignos gives numbered figures and references in [pdf][pdf3], [tex][tex3], [html][html3], [epub][epub3], [docx][docx3] and other formats.
 

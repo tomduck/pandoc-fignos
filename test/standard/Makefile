@@ -38,6 +38,7 @@ IMAGES = img/fig-1.png img/fig-2.png img/fig-3.png
 all: pdf html epub docx img
 
 pdf: out/test-2.7.pdf \
+	 out/test-2.7-py2.7.pdf \
      out/test-2.6.pdf \
      out/test-2.5.pdf \
      out/test-2.3.pdf \

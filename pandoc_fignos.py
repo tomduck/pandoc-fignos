@@ -84,7 +84,7 @@ cleveref = False        # Flags that clever references should be used
 capitalise = False      # Flags that plusname should be capitalised
 plusname = ['fig.', 'figs.']      # Sets names for mid-sentence references
 starname = ['Figure', 'Figures']  # Sets names for references at sentence start
-numbersections = False  # Flags that sections should be numbered by section
+numbersections = False  # Flags that figures should be numbered by section
 warninglevel = 1        # 0 - no warnings; 1 - some warnings; 2 - all warnings
 
 # Processing state variables
@@ -165,17 +165,19 @@ def _process_figure(value, fmt):
         attrs.id += str(uuid.uuid4())
         fig['is_unreferenceable'] = True
 
+    # Update the current section number
+    if attrs['secno'] != cursec:  # The section number changed
+        cursec = attrs['secno']   # Update the global section tracker
+        Nreferences = 1           # Resets the global reference counter
+
     # Pandoc's --number-sections supports section numbering latex/pdf, html,
     # epub, and docx
     if numbersections:
         # Latex/pdf supports equation numbers by section natively.  For the
-        # other formats we must hard-code in equation numbers by section as
+        # other formats we must hard-code in figure numbers by section as
         # tags.
         if fmt in ['html', 'html5', 'epub', 'epub2', 'epub3', 'docx'] and \
           'tag' not in attrs:
-            if attrs['secno'] != cursec:  # The section number changed
-                cursec = attrs['secno']   # Update the global section tracker
-                Nreferences = 1         # Resets the global reference counter
             attrs['tag'] = str(cursec) + '.' + str(Nreferences)
             Nreferences += 1
 
@@ -278,11 +280,8 @@ def _add_markup(fmt, fig, value):
     return ret
 
 
-def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
+def process_figures(key, value, fmt, meta):  # pylint: disable=unused-argument
     """Processes the figures."""
-
-    # pylint: disable=global-statement
-    global has_unnumbered_figures   # Flags that unnumbered figures were found
 
     # Process figures wrapped in Para elements
     if key == 'Para' and len(value) == 1 and \
@@ -350,7 +349,7 @@ CAPTION_NAME_TEX = r"""
 \renewcommand{\figurename}{%s}
 """
 
-# Define some text to number figures by section
+# Define some tex to number figures by section
 NUMBER_BY_SECTION_TEX = r"""
 %% pandoc-fignos: number figures by section
 \numberwithin{figure}{section}
@@ -378,12 +377,14 @@ def process(meta):
 
     # Read in the metadata fields and do some checking
 
-    if 'fignos-warning-level' in meta:
-        warninglevel = int(get_meta(meta, 'fignos-warning-level'))
+    for name in ['fignos-warning-level', 'xnos-warning-level']:
+        if name in meta:
+            warninglevel = int(get_meta(meta, name))
+            break
 
-    metanames = ['fignos-warning-level', 'fignos-caption-name',
+    metanames = ['fignos-warning-level', 'xnos-warning-level',
+                 'fignos-caption-name',
                  'fignos-cleveref', 'xnos-cleveref',
-                 'fignos-capitalize', 'fignos-capitalise',
                  'xnos-capitalize', 'xnos-capitalise',
                  'fignos-plus-name', 'fignos-star-name',
                  'fignos-number-sections', 'xnos-number-sections']
@@ -393,7 +394,7 @@ def process(meta):
             if (name.startswith('fignos') or name.startswith('xnos')) and \
               name not in metanames:
                 msg = textwrap.dedent("""
-                          pandoc-fignos: unknown meta variable "%s"\n
+                          pandoc-fignos: unknown meta variable "%s"
                       """ % name)
                 STDERR.write(msg)
 
@@ -409,11 +410,12 @@ def process(meta):
             cleveref = check_bool(get_meta(meta, name))
             break
 
-    for name in ['fignos-capitalize', 'fignos-capitalise',
-                 'xnos-capitalize', 'xnos-capitalise']:
-        # 'fignos-capitalise' is an alternative spelling
-        # 'xnos-capitalise' enables capitalise in all 3 of fignos/eqnos/tablenos
-        # 'xnos-capitalize' is an alternative spelling
+    for name in ['xnos-capitalise', 'xnos-capitalize']:
+        # 'xnos-capitalise' enables capitalise in all 3 of
+        # fignos/eqnos/tablenos.  Since this uses an option in the caption
+        # package, it is not possible to select between the three (use
+        # 'fignos-plus-name' instead.  'xnos-capitalize' is an alternative
+        # spelling
         if name in meta:
             capitalise = check_bool(get_meta(meta, name))
             break
@@ -421,26 +423,23 @@ def process(meta):
     if 'fignos-plus-name' in meta:
         tmp = get_meta(meta, 'fignos-plus-name')
         old_plusname = copy.deepcopy(plusname)
-        if isinstance(tmp, list):
-            # The singular and plural forms were given in a list
+        if isinstance(tmp, list):  # The singular and plural forms were given
             plusname = tmp
-        else:
-            # Only the singular form was given
+        else:  # Only the singular form was given
             plusname[0] = tmp
         plusname_changed = plusname != old_plusname
         assert len(plusname) == 2
         for name in plusname:
             assert isinstance(name, STRTYPES)
-        starname = [name.title() for name in plusname]
+        if plusname_changed:
+            starname = [name.title() for name in plusname]
 
     if 'fignos-star-name' in meta:
         tmp = get_meta(meta, 'fignos-star-name')
         old_starname = copy.deepcopy(starname)
         if isinstance(tmp, list):
-            # Only the singular form was given
             starname = tmp
         else:
-            # The singular and plural forms were given in a list
             starname[0] = tmp
         starname_changed = starname != old_starname
         assert len(starname) == 2
@@ -450,14 +449,20 @@ def process(meta):
     for name in ['fignos-number-sections', 'xnos-number-sections']:
         if name in meta:
             numbersections = check_bool(get_meta(meta, name))
+            break
 
 
 def add_tex(meta):
     """Adds text to the meta data."""
 
-    if warninglevel == 2:
+    # pylint: disable=too-many-boolean-expressions
+    warnings = warninglevel == 2 and \
+      (pandocxnos.cleveref_required() or has_unnumbered_figures or
+       plusname_changed or starname_changed or has_tagged_figures or
+       captionname != 'Figure' or numbersections)
+    if warnings:
         msg = textwrap.dedent("""\
-                  pandoc fignos: Wrote the following blocks to
+                  pandoc-fignos: Wrote the following blocks to
                   header-includes.  If you use pandoc's
                   --include-in-header option then you will need to
                   manually include these yourself.
@@ -517,7 +522,7 @@ def add_tex(meta):
         pandocxnos.add_tex_to_header_includes(
             meta, NUMBER_BY_SECTION_TEX, warninglevel)
 
-    if warninglevel == 2:
+    if warnings:
         STDERR.write('\n')
 
 
@@ -555,10 +560,10 @@ def main():
     detach_attrs_image = detach_attrs_factory(Image)
     insert_secnos = insert_secnos_factory(Image)
     delete_secnos = delete_secnos_factory(Image)
-    filters = [attach_attrs_image, insert_secnos, process_figures,
-               delete_secnos, detach_attrs_image]
     altered = functools.reduce(lambda x, action: walk(x, action, fmt, meta),
-                               filters, blocks)
+                               [attach_attrs_image, insert_secnos,
+                                process_figures, delete_secnos,
+                                detach_attrs_image], blocks)
 
     # Second pass
     process_refs = process_refs_factory('pandoc-fignos', references.keys(),
