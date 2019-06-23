@@ -1,4 +1,5 @@
 
-This directory contains regression tests.  Running `make` produces out/demo-*.pdf files that you may inspect visually.  Note that the Makefile expects specific numbered pandoc executables (e.g., pandoc-1.17.0.2) are available from the shell.  You will likely have to adapt the Makefile to use what is available on your system.
+Regression Tests
+================
 
-Note that the spacing in the output pdf files varies because of pandoc.  Everything else should visually remain the same.
+This directory contains regression tests.  Running `make` produces out/demo-* files that may be inspected and compared.  Note that the Makefile expects specific numbered pandoc executables (e.g., pandoc-2.7.3) to be available.  You will need to adapt the Makefile to use what is available on your system.

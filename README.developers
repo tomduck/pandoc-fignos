@@ -2,61 +2,72 @@
 Developer Notes
 ===============
 
-Contributions to this project are welcome.
+Contributions to this project are welcome.  In particular, full docx support is awaiting input from a knowledgeable expert on how to structure the OOXML.
 
     
 Branches
 --------
 
-Development is mostly done in the `nextrelease` branch.  When complete
-(and tested), the changes are merged into the `master` branch and a new
-release is prepared.
+The next release is developed in the `nextrelease` branch.  When ready, the changes are merged into the `master` branch.
 
-    
+Version 2.0 is being temporarily developed in a separate `2.0` branch.  When ready, it will be merged into the `nextrelease` branch.
+
+
 Install Alternatives
 --------------------
 
-To install a pre-release version from pypi, you will need to use the
---pre flag.  See https://stackoverflow.com/q/35131861.
+1) To install a pre-release version of pandoc fignos from pypi, the --pre flag
+   should be used with pip.
 
-To install the most recent sources from github using pip:
+2) To install directly from the github repository use:
 
-    $ pip install git+https://github.com/tomduck/pandoc-fignos.git --user
+       $ pip install git+https://github.com/tomduck/pandoc-fignos.git --user
 
-(to upgrade use the --upgrade flag).
+   (to upgrade use the --upgrade flag).
 
-To upgrade from the `nextrelease` branch, use
+3) To install from the `nextrelease` branch on github, use
 
-    $ pip install --upgrade git+https://github.com/tomduck/pandoc-fignos.git@nextrelease --user
+       $ pip install \
+         git+https://github.com/tomduck/pandoc-fignos.git@nextrelease --user
+
+   (to upgrade use the --upgrade flag).
+
+4) To install from source, `cd` into the source directory and use
+
+       pip install -e . --user
+
+   Note that any changes made to the source will be automatically reflected
+   when the filter is run (which is useful for development).
 
 
 Testing
 -------
 
-A suite of regression tests are provided in test/.  Read the README.md in that
+Regression tests are provided in test/.  Read the README.md in that
 directory for instructions.
 
 
 Preparing a Release
 -------------------
 
-(note to self)
-
 See https://www.python.org/dev/peps/pep-0440/ for numbering conventions,
 including for pre-releases.
     
-Tagging:
+Tagging  (update the version number):
 
     $ git tag -a 2.0.0b1 -m "New release."
     $ git push origin 2.0.0b1
 
 
-Creating a source distribution:
+Creating source and distributions:
 
-    $ python3 setup.py sdist
+    $ python3 setup.py sdist bdist_wheel
 
+(see https://packaging.python.org/tutorials/packaging-projects/).
+    
 Uploading to pypi (update the version number):
 
-    $ twine upload dist/pandoc-fignos-2.0.0b1.tar.gz
+    $ twine upload dist/pandoc-fignos-2.0.0b1.tar.gz \
+                   dist/pandoc-fignos-2.0.0b1-py3-none-any.whl
 
-(from https://pypi.python.org/pypi/twine).
+(see https://pypi.python.org/pypi/twine).

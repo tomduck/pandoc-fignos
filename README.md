@@ -1,12 +1,24 @@
 
-pandoc-fignos 2.0.0
-===================
 
-*pandoc-fignos* is a [pandoc] filter for numbering figures and figure references when converting markdown documents to other formats.
+**Notice:** A beta release for pandoc-fignos 2.0.0 is now available.  It can be installed using
 
-Demonstration: Processing [demo3.md] with `pandoc --filter pandoc-fignos` gives numbered figures and references in [pdf][pdf3], [tex][tex3], [html][html3], [epub][epub3], [docx][docx3] and other formats (including beamer slideshows).
+    pip install pandoc-fignos --upgrade --pre --user
 
-This version of pandoc-fignos was tested using pandoc 1.15.2 - 2.7.3<sup>[1](#footnote1)</sup>.  It works under linux, Mac OS X and Windows.  I am pleased to receive bug reports and feature requests on the project's [Issues tracker].  If you find pandoc-fignos useful, then please kindly give it a star [on GitHub].
+**New in 2.0.0:** This is a major release which is easier to use at the cost of minor incompatibilities with previous versions.
+
+[more...](#whats-new).
+
+
+pandoc-fignos 2.0.0b1
+=====================
+
+*pandoc-fignos* is a [pandoc] filter for numbering figures and their references when converting markdown documents to other formats.
+
+Demonstration: Processing [demo3.md] with `pandoc --filter pandoc-fignos ...` gives numbered figures and references in [pdf][pdf3], [tex][tex3], [html][html3], [epub][epub3], [docx][docx3] and other formats.
+
+This version of pandoc-fignos was tested using pandoc 1.15.2 - 2.7.3<sup>[1](#footnote1)</sup> and may be used with linux, macOS, and Windows. Bug reports and feature requests may be posted on the project's [Issues tracker].  If you find pandoc-fignos useful, then please kindly give it a star [on GitHub].
+
+The goal of pandoc-fignos is to make cross-referencing easy, and to equally support pdf/latex, html, and epub output formats (more can be added with time).  Pandoc-fignos is fully configurable, and provides helpful messages when errors are detected.
 
 See also: [pandoc-eqnos], [pandoc-tablenos]
 
@@ -26,42 +38,30 @@ Contents
  4. [Technical Details](#technical-details)
  5. [Installation](#installation)
  6. [Getting Help](#getting-help)
- 7. [What's New](#whats-new)
-
-
-Philosophy
-----------
-
-The following objectives guide development of this filter:
-
-  - this should be easy!
-  - pdf/latex, html, and epub output formats should be equally
-    supported using native capabilities
-  - the native capabilities of docx and other output formats should
-    be supported given help from the user community
-  -
+ 7. [Development](#development)
+ 8. [What's New](#whats-new)
 
 
 Usage
 -----
 
-Use the following option with pandoc:
+Once installed, pandoc-fignos is enabled by using the
 
     --filter pandoc-fignos
 
-Note that any use of `--filter pandoc-citeproc` or `--bibliography=FILE` should come *after* the pandoc-fignos filter call.
+option with pandoc.  Any use of `--filter pandoc-citeproc` or `--bibliography=FILE` should come *after* the pandoc-fignos filter option.
 
 
 Markdown Syntax
 ---------------
 
-The markdown syntax extension used by pandoc-fignos was developed in [pandoc Issue #813] -- see [this post] by [@scaramouche1].
+The cross-referencing syntax used by pandoc-fignos was developed in [pandoc Issue #813] -- see [this post] by [@scaramouche1].  This syntax may only be used in markdown documents.
 
 To mark a figure for numbering, add an identifier to its attributes:
 
     ![Caption.](image.png){#fig:id}
 
-Alternatively, use [reference link] attributes.  The prefix `#fig:` is required. `id` should be replaced with a unique string composed of letters, numbers, dashes and underscores.  If `id` is omitted then the figure will be numbered but unreferenceable.
+The prefix `#fig:` is required. `id` should be replaced with a unique string composed of letters, numbers, dashes and underscores.  If `id` is omitted then the figure will be numbered but unreferenceable.  Alternatively, [reference link] attributes may be used.
 
 To reference the figure, use
 
@@ -73,7 +73,7 @@ or
 
 Curly braces around a reference are stripped from the output.
 
-Demonstration: Processing [demo.md] with `pandoc --filter pandoc-fignos` gives numbered figures and references in [pdf], [tex], [html], [epub], [docx] and other formats.
+Demonstration: Processing [demo.md] with pandoc + pandoc-fignos gives numbered figures and references in [pdf], [tex], [html], [epub], [docx] and other formats.
 
 [pandoc Issue #813]: https://github.com/jgm/pandoc/issues/813
 [this post]: https://github.com/jgm/pandoc/issues/813#issuecomment-70423503
@@ -93,22 +93,22 @@ Writing markdown like
 
     See fig. @fig:id.
 
-seems a bit redundant.  Pandoc-fignos supports "clever referencing" via single-character modifiers in front of a reference.  You can write
+seems a bit redundant.  Pandoc-fignos supports "clever references" via single-character modifiers in front of a reference.  Users may write
 
      See +@fig:id.
 
-to have the reference name (i.e., "fig.") automatically generated.  The above form is used mid-sentence.  At the beginning of a sentence, use
+to have the reference name (i.e., "fig.") automatically generated.  The above form is used mid-sentence; at the beginning of a sentence, use
 
      *@fig:id
 
-instead.  If clever referencing is enabled by default (see [Customization](#customization), below), then you can disable it for a given reference using<sup>[2](#footnote2)</sup>
+instead.  If clever references are enabled by default (see [Customization](#customization), below), then users may disable it for a given reference using<sup>[2](#footnote2)</sup>
 
     !@fig:id
 
 
-Demonstration: Processing [demo2.md] with `pandoc --filter pandoc-fignos` gives numbered figures and references in [pdf][pdf2], [tex][tex2], [html][html2], [epub][epub2], [docx][docx2] and other formats.
+Demonstration: Processing [demo2.md] with pandoc + pandoc-fignos gives numbered figures and references in [pdf][pdf2], [tex][tex2], [html][html2], [epub][epub2], [docx][docx2] and other formats.
 
-Note: If you use `*fig:id` and emphasis (e.g., `*italics*`) in the same sentence, then you must backslash escape the `*` in the clever reference; e.g., `\*fig:id`.
+Note: When using `*fig:id` and emphasis (e.g., `*italics*`) in the same sentence, the `*` in the clever reference must be backslash-escaped; i.e., `\*fig:id`.
 
 [demo2.md]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/demo2.md
 [pdf2]: https://raw.githack.com/tomduck/pandoc-fignos/master/demos/out/demo2.pdf
@@ -120,7 +120,7 @@ Note: If you use `*fig:id` and emphasis (e.g., `*italics*`) in the same sentence
 
 #### Tagged Figures ####
 
-You may optionally override the figure number by placing a tag in a figure's attributes block as follows:
+The figure number may be overridden by placing a tag in the figure's attributes block:
 
     ![Caption.](image.png){#fig:id tag="B.1"}
 
@@ -132,35 +132,38 @@ Customization
 
 Pandoc-fignos may be customized by setting variables in the [metadata block] or on the command line (using `-M KEY=VAL`).  The following variables are supported:
 
-  * `fignos-capitalise` or `xnos-capitalise` - Capitalizes the names
-     of "+" references (e.g., change from "fig." to "Fig.");
-
-  * `fignos-caption-name` - Sets the name at the beginning of a
-    caption (e.g., change it from "Figure to "Fig." or "图");
+  * `fignos-warning-level` or `xnos-warning-level` - Set to `0` for
+    no warnings, `1` for critical warnings (default), or `2` for
+    critical warnings and informational messages.  Warning level 2
+    should be used when troubleshooting.
 
   * `fignos-cleveref` or `xnos-cleveref` - Set to `True` to assume "+"
     clever references by default;
 
-  * `fignos-plus-name` - Sets the name of a "+" reference
+  * `fignos-capitalise` or `xnos-capitalise` - Capitalizes the names
+     of "+" clever references (e.g., change from "fig." to "Fig.");
+
+  * `fignos-plus-name` - Sets the name of a "+" clever reference
     (e.g., change it from "fig." to "figure"); and
 
-  * `fignos-star-name` - Sets the name of a "*" reference
+  * `fignos-star-name` - Sets the name of a "*" clever reference
     (e.g., change it from "Figure" to "Fig.").
 
-  * `xnos-number-sections` - Set to `True` so that figures are
-    numbered per section (i.e. Fig. 1.1, 1.2, etc in Section 1, and
-    Fig 2.1, 2.2, etc in Section 2).  See
-    [Figure Numbering by Section](#figure-numbering-by-section),
-    below.
+  * `fignos-caption-name` - Sets the name at the beginning of a
+    caption (e.g., change it from "Figure to "Fig." or "图");
 
-    This feature is only presently enabled for html, LaTeX/pdf, and
-    docx.
+  * `fignos-number-sections` or `xnos-number-sections` - Set to
+    `True` to number figures by section (e.g., Fig. 1.1, 1.2, etc in
+     Section 1, and Fig 2.1, 2.2, etc in Section 2).  This feature
+     should be used together with pandoc's `--number-sections`
+     [option](https://pandoc.org/MANUAL.html#option--number-sections)
+     enabled for LaTeX/pdf, html, and epub output.  For docx,
+     use [docx custom styles] instead. 
 
+Demonstration: Processing [demo3.md] with pandoc + pandoc-fignos gives numbered figures and references in [pdf][pdf3], [tex][tex3], [html][html3], [epub][epub3], [docx][docx3] and other formats.
 
 [metadata block]: http://pandoc.org/README.html#extension-yaml_metadata_block
-
-Demonstration: Processing [demo3.md] with `pandoc --filter pandoc-fignos` gives numbered figures and references in [pdf][pdf3], [tex][tex3], [html][html3], [epub][epub3], [docx][docx3] and other formats.
-
+[custom styles]: https://pandoc.org/MANUAL.html#custom-styles
 [demo3.md]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/demo3.md
 [pdf3]: https://raw.githack.com/tomduck/pandoc-fignos/master/demos/out/demo3.pdf
 [tex3]: https://raw.githack.com/tomduck/pandoc-fignos/master/demos/out/demo3.tex
@@ -169,159 +172,92 @@ Demonstration: Processing [demo3.md] with `pandoc --filter pandoc-fignos` gives 
 [docx3]: https://raw.githack.com/tomduck/pandoc-fignos/master/demos/out/demo3.docx
 
 
-#### Figure Numbering by Section ####
-
-Pandoc's `--number-sections` option enables section numbering for LaTeX/pdf and html output.  For docx, use [custom styles](https://pandoc.org/MANUAL.html#custom-styles) instead.  Figure numbering by section (e.g., "Fig. 2.1") can then be obtained as follows:
-
- 1) **html and docx:** Add `xnos-number-sections: True` to your YAML
-    metadata or use the `-M xnos-number-sections=True` option with
-    pandoc.  This variable is ignored for other output formats.
-
- 2) **LaTeX/pdf:** Add
-    `header-includes: \numberwithin{figure}{section}` to your YAML
-    metadata.  If you need multiple header includes, then add
-    something like this:
-
-    ~~~
-    header-includes:
-      - \numberwithin{figure}{section}
-      - \numberwithin{equation}{section}
-      - \numberwithin{table}{section}
-    ~~~
-
-    Alternatively, write your header includes into FILE,
-    and use the `--include-in-header=FILE` option with pandoc.
-
-    If you set either `--top-level-division=part` or
-    `--top-level-division=chapter` then these header includes can be
-    dropped.
-
-    LaTeX header-includes are ignored for html output.
-
-
-#### Latex/PDF Specializations ####
-
-To make internal links target the top of a figure (rather than its caption), add `\usepackage{caption}` to the `header-includes` field of your document's YAML metadata.  To make the figure caption label bold, add `\usepackage[labelfont=bf]{caption}` instead.  See the [LaTeX caption package] documentation for additional features.
-
-[LaTeX caption package]: https://www.ctan.org/pkg/caption
-
-
 Technical Details
 -----------------
 
-TeX/pdf:
+#### TeX/pdf Output ####
 
+During processing, pandoc-fignos inserts packages and supporting TeX into the `header-includes` metadata field.  To see what is inserted, set the `fignos-warninglevel` meta variable to `2`.  Note that any use of pandoc's `--include-in-header` option [overrides](https://github.com/jgm/pandoc/issues/3139) all `header-includes`.  In such cases users will need to separately include the codes pandoc-fignos needs.  Setting `fignos-warning-level` to `2` will provide helpful information in this regard.
+
+Other details:
+
+  * TeX is only inserted into the `header-includes` if it is
+    actually needed (in particular, packages are not installed
+    if they are found elsewhere in the `header-includes`);
+  * The `cleveref` and `caption` packages are used for clever
+    references and caption control, respectively; 
   * The `\label` and `\ref` macros are used for figure labels and
-    references (links are automatically generated);
-  * `\figurename` is set for the caption name;
-  * Tags are supported by temporarily redefining `\thefigure`
-    around a figure; and
-  * The `cleveref` macros `\cref` and `\Cref` are used for 
-    clever referencing
+    references, respectively; `\Cref` and `\cref` are used for
+    clever references;
+  * Clever reference names are set with `\Crefname` and `\crefname`;
+  * The caption name is set with`\figurename`;
+  * Tags are supported by way of a custom environment that
+    temporarily redefines `\thefigure`; and
+  * Caption prefixes (e.g., "Figure 1:") are disabled for
+    unnumbered figures by way of a custom environment that uses
+    `\captionsetup`.
 
-Other:
 
-  * Links to figures use html's and docx's native capabilities; and
+#### Other Output Formats ####
+
+  * Linking uses native capabilities wherever possible;
 
   * The numbers, caption name, and (clever) references are hard-coded
-    into the output.
+    into the output;
+
+  * The output is structured such that references and figure 
+    captions may be styled (e.g., using
+    [css](https://pandoc.org/MANUAL.html#option--css) or
+    [docx custom styles]).
 
 
 Installation
 ------------
 
-Pandoc-fignos requires [python], a programming language that comes pre-installed on linux and Mac OS X, and which is easily installed on Windows.  Either python 2.7 or 3.x will do.
+Pandoc-fignos requires [python], a programming language that comes pre-installed on macOS and most linux distributions.  It is easily installed on Windows -- see [here](https://realpython.com/installing-python/).  Either python 2.7 or 3.x will do.
 
 [python]: https://www.python.org/
 
+Pandoc-fignos may be installed using the shell command
 
-#### Standard installation ####
-
-Install pandoc-fignos (as root) using the shell command
-
-    pip install pandoc-fignos
+    pip install pandoc-fignos --user
 
 To upgrade to the most recent release, use
 
-    pip install --upgrade pandoc-fignos
+    pip install --upgrade pandoc-fignos --user
 
-Pip is a program that downloads and installs modules from the Python Package Index, [PyPI].  It should come installed with your python distribution.
+Pip is a program that downloads and installs modules from the Python Package Index, [PyPI].  It is normally installed with a python distribution.
 
-Note that on some systems for `python3` you may need to use `pip3` instead.
+Alternative installation procedures are given in [README.developers].
 
 [PyPI]: https://pypi.python.org/pypi
+[README.developers]: README.developers
 
 
-#### Troubleshooting ####
+#### Installation Troubleshooting ####
 
-If you are prompted to upgrade `pip`, then do so.  Installation errors may occur with older versions.  The command you need to execute (as root) is
+When prompted to upgrade `pip`, follow the instructions given to do so.  Installation errors may occur with older versions.
 
-    python -m pip install --upgrade pip
+Installations from source may also require upgrading `setuptools` using:
 
-One user reported that they had to manually upgrade the `six` and `setuptools` modules:
+    pip install --upgrade setuptools
 
-    pip install --upgrade six
-    pip install pandoc-fignos
+I usually perform the above two commands as root (or under sudo).  Everything else can be done as a regular user.
 
-This should not normally be necessary.
-
-You may test the installation as a regular user using the shell command
+When installing pandoc-fignos, watch for any errors or warning messages.  In particular, pip may warn that pandoc-fignos was installed into a directory that "is not on PATH".  This will need to be fixed before proceeding.  Access to pandoc-fignos may be tested using the shell command
 
     which pandoc-fignos
 
-This will tell you where pandoc-fignos is installed.  If it is not found, then please submit a report to our [Issues tracker].
 
-To determine which version of pandoc-fignos you have installed, use
+To determine which version of pandoc-fignos is installed, use
 
     pip show pandoc-fignos
 
-As of pandoc-fignos 1.4.2 you can also use
+As of pandoc-fignos 1.4.2 the shell command
 
-    pandoc-eqnos --version
+    pandoc-fignos --version
 
-Please be sure you have the latest version installed before reporting a bug on our [Issues tracker].
-
-
-#### Installing on linux ####
-
-If you are running linux, then pip may be packaged separately from python.  On Debian-based systems (including Ubuntu), you can install pip as root using
-
-    apt-get update
-    apt-get install python-pip
-
-During the install you may be asked to run
-
-    easy_install -U setuptools
-
-owing to the ancient version of setuptools that Debian provides.  The command should be executed as root.  You may now follow the [standard installation] procedure given above.
-
-[standard installation]: #standard-installation
-
-
-#### Installing on Mac OS X ####
-
-To install as root on Mac OS X, you will need to use the `sudo` command.  For example:
-
-    sudo pip install pandoc-fignos
-
-Troubleshooting should be done as a regular user (i.e., without using `sudo`).
-
-
-#### Installing on Windows ####
-
-It is easy to install python on Windows.  First, [download] the latest release.  Run the installer and complete the following steps:
-
- 1. Install Python pane: Check "Add Python 3.5 to path" then
-    click "Customize installation".
-
- 2. Optional Features pane: Click "Next".
-
- 3. Advanced Options pane: Optionally check "Install for all
-    users" and customize the install location, then click "Install".
-
-Once python is installed, start the "Command Prompt" program.  Depending on where you installed python, you may need to elevate your privileges by right-clicking the "Command Prompt" program and selecting "Run as administrator".  You may now follow the [standard installation] procedure given above.  Be sure to close the Command Prompt program when you have finished.
-
-[download]: https://www.python.org/downloads/windows/
+also works.  Please be sure to have the latest version of pandoc-fignos installed before reporting a bug.
 
 
 Getting Help
@@ -330,19 +266,34 @@ Getting Help
 If you have any difficulties with pandoc-fignos, or would like to see a new feature, then please submit a report to our [Issues tracker].
 
 
+Development
+-----------
+
+The philosophy of this project is make cross-referencing in markdown easy, and to equally support pdf/latex, html, and epub output formats.  Full docx support is awaiting input from a knowledgeable expert on how to structure the OOXML.
+
+Pandoc-fignos will continue to support pandoc 1.15-onward and python 2 & 3 for the foreseeable future.  The reasons for this are that a) some users cannot upgrade pandoc and/or python; and b) supporting all versions tends to make pandoc-fignos more robust.
+
+Developer notes are maintained in [README.developers].
+
+
 What's New
 ----------
 
-**New in 1.4.1:** Fixed support for docx equation numbering by section.
+**New in 2.0.0:**  This version represents a major revision of pandoc-fignos.  While the interface is similar to that of the 1.x series, some users may encounter minor compatibility issues.
 
-**New in 1.4.0:** Support for references in bracketed spans.
+Warning messages are a new feature of pandoc-fignos.  The meta variable `fignos-warning-level` may be set to `0`, `1`, or `2` depending on the degree of warnings desired.  Warning level `1` (the default) will alert users to bad references, malformed attributes, and unknown meta variables.  Warning level `2` adds informational messages that should be helpful with debugging.  Level `0` turns all messages off.
 
-**New in 1.3.2:** Support for docx equation numbering by section.
+TeX codes produced by pandoc-fignos are massively improved.  The hacks used before were causing some users problems.  The new approach provides more flexibility and better compatibility with the LaTeX system.
 
-**New in 1.3.0:** Boolean metadata values must now be one of `true`, `True` `TRUE`, `false`, `False`, or `FALSE`.  This is following a [change of behaviour](https://pandoc.org/releases.html#pandoc-2.2.2-16-july-2018) with pandoc 2.2.2.
+Supporting TeX is now written to the `header-includes` meta data.  Users no longer need to include LaTeX commands in the `header-includes` to get basic pandoc-fignos functions to work.  Use `fignos-warning-level: 2` to see what pandoc-fignos adds to the `header-includes`.
 
-**New in 1.2.0:** Added `fignos-capitalise` meta variable to capitalise clever references (e.g., change "fig." to "Fig.").
+A word of warning: Pandoc-fignos's additions to the `header-includes` are overridden when pandoc's `--include-in-header` option is used.  This is owing to a [design choice](https://github.com/jgm/pandoc/issues/3139) in pandoc.  Users may choose to deliberately override pandoc-fignos's `header-includes` by providing their own TeX through `--include-in-header`.  If a user needs to include other bits of TeX in this way, then they will need to do the same for the TeX that pandoc-fignos needs.
 
+Epub support is now much improved.  In particular, reference links across chapters now work.
+
+ID tags for figures in html and epub are now provided in the manner pandoc chooses.  These tags are currently on the `<img>` element.  Similarly, in TeX the `\label` tags are installed where pandoc chooses, which is currently outside the `\caption` field.
+
+The basic filter and library codes have been refactored and improved with a view toward maintainability.  While extensive tests have been performed, some problems may have slipped through unnoticed.  Bug reports should be submitted to our [Issues tracker].
 
 ----
 
@@ -353,3 +304,5 @@ What's New
 <a name="footnote2">2</a>: The disabling modifier "!" is used instead of "-" because [pandoc unnecessarily drops minus signs] in front of references.
 
 [pandoc unnecessarily drops minus signs]: https://github.com/jgm/pandoc/issues/2901
+
+[package distributed by python.org]: https://www.python.org/downloads/mac-osx/
