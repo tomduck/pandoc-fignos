@@ -26,7 +26,7 @@ from setuptools.command.install import install
 from setuptools.command.install_scripts import install_scripts
 
 DESCRIPTION = """\
-A pandoc filter for numbering figures and figure references
+A pandoc filter for numbering figures and their references
 when converting markdown documents to other formats.
 """
 
