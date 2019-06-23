@@ -191,8 +191,8 @@ def _process_figure(value, fmt):
             attrs['tag'] = attrs['tag'].strip("'")
         references[attrs.id] = [attrs['tag'], cursec]
     else:  # ... then save the figure number
-        Nreferences += 1  # Increment the global reference counter
         references[attrs.id] = [Nreferences, cursec]
+        Nreferences += 1  # Increment the global reference counter
 
     return fig
 
