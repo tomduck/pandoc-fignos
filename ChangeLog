@@ -1,6 +1,7 @@
 pandoc-fignos 2.0.0 (unreleased)
 
     * A warnings system has been added.
+    * Meta variable names have been updated.
     * TeX codes have been completely overhauled.
     * Epub support is improved.
     * The location for ID tags for figures in html and epub are
