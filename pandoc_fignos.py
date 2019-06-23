@@ -225,13 +225,13 @@ def _adjust_caption(fmt, fig, value):
                 els = [Math({"t":"InlineMath", "c":[]}, math), Str(':')]
             else:  # Text
                 els = [Str(text+':')]
-                if fmt in ['html', 'html5', 'epub', 'epub2', 'epub3']:
-                    value[0]['c'][1] = \
-                      [RawInline('html', r'<span>'),
-                       Str(captionname),
-                       Space()] + els + [RawInline('html', r'</span>')]
-                else:
-                    value[0]['c'][1] = [Str(captionname), Space()] + els
+            if fmt in ['html', 'html5', 'epub', 'epub2', 'epub3']:
+                value[0]['c'][1] = \
+                  [RawInline('html', r'<span>'),
+                   Str(captionname),
+                   Space()] + els + [RawInline('html', r'</span>')]
+            else:
+                value[0]['c'][1] = [Str(captionname), Space()] + els
             value[0]['c'][1] += [Space()] + list(caption)
 
 
@@ -241,19 +241,19 @@ def _add_markup(fmt, fig, value):
     # pylint: disable=global-statement
     global has_tagged_figures  # Flags a tagged figure was found
 
+    if fig['is_unnumbered']:
+        if fmt in ['latex', 'beamer']:
+            # Use the no-prefix-figure-caption environment
+            return [RawBlock('tex', r'\begin{fignos:no-prefix-figure-caption}'),
+                    Para(value),
+                    RawBlock('tex', r'\end{fignos:no-prefix-figure-caption}')]
+        return None  # Nothing to do
+
     attrs = fig['attrs']
     ret = None
 
-    if fig['is_unnumbered'] and fmt not in ['latex', 'beamer']:
-        return None  # Nothing to do
-
     if fmt in ['latex', 'beamer']:
-        if fig['is_unnumbered']:
-            # Use the no-prefix-figure-caption environment
-            ret = [RawBlock('tex', r'\begin{fignos:no-prefix-figure-caption}'),
-                   Para(value),
-                   RawBlock('tex', r'\end{fignos:no-prefix-figure-caption}')]
-        elif fig['is_tagged']:  # A figure cannot be tagged if it is unnumbered
+        if fig['is_tagged']:  # A figure cannot be tagged if it is unnumbered
             # Use the tagged-figure environment
             has_tagged_figures = True
             ret = [RawBlock('tex', r'\begin{fignos:tagged-figure}[%s]' % \
@@ -290,7 +290,8 @@ def process_figures(key, value, fmt, meta): # pylint: disable=unused-argument
 
         # Process the figure and add markup
         fig = _process_figure(value, fmt)
-        _adjust_caption(fmt, fig, value)
+        if 'attrs' in fig:
+            _adjust_caption(fmt, fig, value)
         return _add_markup(fmt, fig, value)
 
     return None
@@ -546,7 +547,7 @@ def main():
     process(meta)
 
     # First pass
-    replace = True if PANDOCVERSION >= '1.16' else False
+    replace = PANDOCVERSION >= '1.16'
     attach_attrs_image = attach_attrs_factory('pandoc-fignos', Image,
                                               warninglevel,
                                               extract_attrs=_extract_attrs,

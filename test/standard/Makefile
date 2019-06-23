@@ -35,7 +35,7 @@ HTMLFLAGS = --standalone --variable urlcolor=blue
 IMAGES = img/fig-1.png img/fig-2.png img/fig-3.png
 
 
-all: pdf html docx img
+all: pdf html epub docx img
 
 pdf: out/test-2.7.pdf \
      out/test-2.6.pdf \
@@ -52,6 +52,8 @@ pdf: out/test-2.7.pdf \
 
 html: out/test-2.7.html
 
+epub: out/test-2.7.epub
+
 docx: out/test-2.7.docx
 
 
@@ -60,6 +62,10 @@ out/test-%.html: test.md $(IMAGES)
 	$(PANDOC-$*) $< --filter pandoc-fignos $(HTMLFLAGS) -o $@
 	@if [ ! -d out/img ]; then mkdir -p out/img; fi
 	cp img/fig-?.png out/img
+
+out/test-%.epub: test.md $(IMAGES)
+	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
+	$(PANDOC-$*) $< --filter pandoc-fignos $(HTMLFLAGS) -o $@
 
 out/test-%-py2.7.pdf: test.md $(IMAGES)
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
