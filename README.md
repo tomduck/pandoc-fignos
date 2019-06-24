@@ -283,6 +283,8 @@ What's New
 
 Warning messages are a new feature of pandoc-fignos.  The meta variable `fignos-warning-level` may be set to `0`, `1`, or `2` depending on the degree of warnings desired.  Warning level `1` (the default) will alert users to bad references, malformed attributes, and unknown meta variables.  Warning level `2` adds informational messages that should be helpful with debugging.  Level `0` turns all messages off.
 
+Meta variable names have been updated.  Deprecated names have been removed, and new variables have been added.
+
 TeX codes produced by pandoc-fignos are massively improved.  The hacks used before were causing some users problems.  The new approach provides more flexibility and better compatibility with the LaTeX system.
 
 Supporting TeX is now written to the `header-includes` meta data.  Users no longer need to include LaTeX commands in the `header-includes` to get basic pandoc-fignos functions to work.  Use `fignos-warning-level: 2` to see what pandoc-fignos adds to the `header-includes`.
