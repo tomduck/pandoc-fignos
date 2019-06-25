@@ -1,5 +1,5 @@
 
-extensions = .pdf .html .epub .tex .docx .json .md
+extensions = .pdf .html .epub .tex .docx
 
 dest = $(addprefix out/demo,$(extensions)) \
        $(addprefix out/demo2,$(extensions)) \
@@ -19,7 +19,7 @@ out/%.pdf: %.md
 
 out/%.html: %.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
-	pandoc $< --standalone --filter pandoc-fignos -o $@
+	pandoc $< --standalone --filter pandoc-fignos --include-in-header=headers/header.html -o $@
 	cp -R img out
 
 out/%.epub: %.md
