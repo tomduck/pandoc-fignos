@@ -263,11 +263,13 @@ def _add_markup(fmt, fig, value):
                    Para(value),
                    RawBlock('tex', r'\end{fignos:tagged-figure}')]
     elif fmt in ('html', 'html5', 'epub', 'epub2', 'epub3'):
-        if PANDOCVERSION < '1.16' and LABEL_PATTERN.match(attrs.id):
-            # Insert anchor for PANDOCVERSION < 1.16; for later versions
-            # the label is installed as an <img> id by pandoc.
-            anchor = RawBlock('html', '<a name="%s"></a>'%attrs.id)
-            ret = [anchor, Para(value)]
+        if LABEL_PATTERN.match(attrs.id):
+            pre = RawBlock('html', '<div id="%s" class="fignos">'%attrs.id)
+            post = RawBlock('html', '</div>')
+            ret = [pre, Para(value), post]
+            # Eliminate the id from the Image
+            attrs.id = ''
+            value[0]['c'][0] = attrs.list
     elif fmt == 'docx':
         # As per http://officeopenxml.com/WPhyperlink.php
         bookmarkstart = \
@@ -385,7 +387,7 @@ def process(meta):
     metanames = ['fignos-warning-level', 'xnos-warning-level',
                  'fignos-caption-name',
                  'fignos-cleveref', 'xnos-cleveref',
-                 'xnos-capitalize', 'xnos-capitalise',
+                 'xnos-capitalise', 'xnos-capitalize',
                  'fignos-plus-name', 'fignos-star-name',
                  'fignos-number-sections', 'xnos-number-sections']
 
@@ -456,7 +458,7 @@ def add_tex(meta):
     """Adds text to the meta data."""
 
     # pylint: disable=too-many-boolean-expressions
-    warnings = warninglevel == 2 and \
+    warnings = warninglevel == 2 and references and \
       (pandocxnos.cleveref_required() or has_unnumbered_figures or
        plusname_changed or starname_changed or has_tagged_figures or
        captionname != 'Figure' or numbersections)
@@ -476,7 +478,7 @@ def add_tex(meta):
     # is a known issue and is owing to a design decision in pandoc.
     # See https://github.com/jgm/pandoc/issues/3139.
 
-    if pandocxnos.cleveref_required():
+    if pandocxnos.cleveref_required() and references:
         tex = """
             %%%% pandoc-fignos: required package
             \\usepackage%s{cleveref}
@@ -484,7 +486,7 @@ def add_tex(meta):
         pandocxnos.add_tex_to_header_includes(
             meta, tex, warninglevel, r'\\usepackage(\[[\w\s,]*\])?\{cleveref\}')
 
-    if has_unnumbered_figures:
+    if has_unnumbered_figures and references:
         tex = """
             %%%% pandoc-fignos: required package
             \\usepackage{caption}
@@ -492,21 +494,21 @@ def add_tex(meta):
         pandocxnos.add_tex_to_header_includes(
             meta, tex, warninglevel, r'\\usepackage(\[[\w\s,]*\])?\{caption\}')
 
-    if plusname_changed:
+    if plusname_changed and references:
         tex = """
             %%%% pandoc-fignos: change cref names
             \\crefname{figure}{%s}{%s}
         """ % (plusname[0], plusname[1])
         pandocxnos.add_tex_to_header_includes(meta, tex, warninglevel)
 
-    if starname_changed:
+    if starname_changed and references:
         tex = """\
             %%%% pandoc-fignos: change Cref names
             \\Crefname{figure}{%s}{%s}
         """ % (starname[0], starname[1])
         pandocxnos.add_tex_to_header_includes(meta, tex, warninglevel)
 
-    if has_unnumbered_figures:
+    if has_unnumbered_figures and references:
         pandocxnos.add_tex_to_header_includes(
             meta, NO_PREFIX_CAPTION_ENV_TEX, warninglevel)
 
@@ -514,11 +516,11 @@ def add_tex(meta):
         pandocxnos.add_tex_to_header_includes(
             meta, TAGGED_FIGURE_ENV_TEX, warninglevel)
 
-    if captionname != 'Figure':
+    if captionname != 'Figure' and references:
         pandocxnos.add_tex_to_header_includes(
             meta, CAPTION_NAME_TEX % captionname, warninglevel)
 
-    if numbersections:
+    if numbersections and references:
         pandocxnos.add_tex_to_header_includes(
             meta, NUMBER_BY_SECTION_TEX, warninglevel)
 
