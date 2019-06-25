@@ -516,7 +516,7 @@ def add_tex(meta):
         pandocxnos.add_tex_to_header_includes(
             meta, TAGGED_FIGURE_ENV_TEX, warninglevel)
 
-    if captionname != 'Figure' and references:
+    if captionname_changed and references:
         pandocxnos.add_tex_to_header_includes(
             meta, CAPTION_NAME_TEX % captionname, warninglevel)
 
