@@ -1,11 +1,7 @@
 ---
-cleveref: True
-xnos-number-sections: True
 title: Test Document
-header-includes:
-  - \numberwithin{figure}{section}
-  - \numberwithin{equation}{section}
-  - \numberwithin{table}{section}
+xnos-cleveref: True
+xnos-number-sections: True
 ...
 
 Title 1
@@ -69,7 +65,7 @@ $$ y = f(x) $${#eq:4}
 
 ![Caption.](fig.png){#fig:4.2 width=5%}
 
-$$ y = f(x) $${#eq:4.1 tag "A.3"}
+$$ y = f(x) $${#eq:4.1}
 
 $$ y = f(x) $${#eq:4.2}
 
