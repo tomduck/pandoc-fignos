@@ -18,7 +18,7 @@ Demonstration: Processing [demo3.md] with `pandoc --filter pandoc-fignos ...` gi
 
 This version of pandoc-fignos was tested using pandoc 1.15.2 - 2.7.3, <sup>[1](#footnote1)</sup> and may be used with linux, macOS, and Windows. Bug reports and feature requests may be posted on the project's [Issues tracker].  If you find pandoc-fignos useful, then please kindly give it a star [on GitHub].
 
-The goal of pandoc-fignos is to make cross-referencing easy, and to equally support pdf/latex, html, and epub output formats (more can be added with time).  Pandoc-fignos is fully configurable, and provides helpful messages when errors are detected.
+The goals of pandoc-fignos are to make cross-referencing easy, and to equally support pdf/latex, html, and epub output formats (more can be added with time).  The output of pandoc-fignos may be customized, and helpful messages are provided when errors are detected.
 
 See also: [pandoc-eqnos], [pandoc-tablenos]
 
@@ -45,7 +45,7 @@ Contents
 Usage
 -----
 
-Once installed, pandoc-fignos is enabled by using the
+Pandoc-fignos is activated by using the
 
     --filter pandoc-fignos
 
@@ -164,7 +164,7 @@ Note that variables beginning with `fignos-` apply to only pandoc-fignos, wherea
 Demonstration: Processing [demo3.md] with pandoc + pandoc-fignos gives numbered figures and references in [pdf][pdf3], [tex][tex3], [html][html3], [epub][epub3], [docx][docx3] and other formats.
 
 [metadata block]: http://pandoc.org/README.html#extension-yaml_metadata_block
-[custom styles]: https://pandoc.org/MANUAL.html#custom-styles
+[docx custom styles]: https://pandoc.org/MANUAL.html#custom-styles
 [demo3.md]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/demo3.md
 [pdf3]: https://raw.githack.com/tomduck/pandoc-fignos/master/demos/out/demo3.pdf
 [tex3]: https://raw.githack.com/tomduck/pandoc-fignos/master/demos/out/demo3.tex
@@ -234,7 +234,7 @@ Alternative installation procedures are given in [README.developers].
 [README.developers]: README.developers
 
 
-#### Installation Troubleshooting ####
+#### Troubleshooting ####
 
 When prompted to upgrade `pip`, follow the instructions given to do so.  Installation errors may occur with older versions.
 
@@ -247,7 +247,6 @@ I usually perform the above two commands as root (or under sudo).  Everything el
 When installing pandoc-fignos, watch for any errors or warning messages.  In particular, pip may warn that pandoc-fignos was installed into a directory that "is not on PATH".  This will need to be fixed before proceeding.  Access to pandoc-fignos may be tested using the shell command
 
     which pandoc-fignos
-
 
 To determine which version of pandoc-fignos is installed, use
 
@@ -301,9 +300,9 @@ Finally, the `\label` tags are now installed where pandoc chooses, which is curr
 
 #### Html/ Epub ####
 
-The figure is now enclosed in a `<div>` which contains the `id` and class `fignos`.  These changes have been made to facilitate styling.  The `id` was formerly contained in an anchor tag.
+The figure is now enclosed in a `<div>` which contains the `id` and class `fignos`.  This change was made to facilitate styling.  The `id` was formerly contained in an anchor tag.
 
-Epub support is much improved.  In particular, reference links across chapters now work.
+Epub support is generally improved.
 
 
 ----
