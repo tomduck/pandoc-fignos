@@ -285,17 +285,25 @@ Warning messages are a new feature of pandoc-fignos.  The meta variable `fignos-
 
 Meta variable names have been updated.  Deprecated names have been removed, and new variables have been added.
 
+The basic filter and library codes have been refactored and improved with a view toward maintainability.  While extensive tests have been performed, some problems may have slipped through unnoticed.  Bug reports should be submitted to our [Issues tracker].
+
+
+#### TeX/PDF ###
+
 TeX codes produced by pandoc-fignos are massively improved.  The hacks used before were causing some users problems.  The new approach provides more flexibility and better compatibility with the LaTeX system.
 
 Supporting TeX is now written to the `header-includes` meta data.  Users no longer need to include LaTeX commands in the `header-includes` to get basic pandoc-fignos functions to work.  Use `fignos-warning-level: 2` to see what pandoc-fignos adds to the `header-includes`.
 
 A word of warning: Pandoc-fignos's additions to the `header-includes` are overridden when pandoc's `--include-in-header` option is used.  This is owing to a [design choice](https://github.com/jgm/pandoc/issues/3139) in pandoc.  Users may choose to deliberately override pandoc-fignos's `header-includes` by providing their own TeX through `--include-in-header`.  If a user needs to include other bits of TeX in this way, then they will need to do the same for the TeX that pandoc-fignos needs.
 
-Epub support is now much improved.  In particular, reference links across chapters now work.
+Finally, the `\label` tags are now installed where pandoc chooses, which is currently outside the `\caption` field.  Pandoc-fignos previously forced the `\label` to go inside `\caption`.
 
-ID tags for figures in html and epub are now provided in the manner pandoc chooses.  These tags are currently on the `<img>` element.  Similarly, in TeX the `\label` tags are installed where pandoc chooses, which is currently outside the `\caption` field.
 
-The basic filter and library codes have been refactored and improved with a view toward maintainability.  While extensive tests have been performed, some problems may have slipped through unnoticed.  Bug reports should be submitted to our [Issues tracker].
+#### Html/ Epub ####
+
+The figure is now enclosed in a `<div>` which contains the `id` and class `fignos`.  These changes have been made to facilitate styling.  The `id` was formerly contained in an anchor tag.
+
+Epub support is much improved.  In particular, reference links across chapters now work.
 
 
 ----
