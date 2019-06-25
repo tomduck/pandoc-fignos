@@ -2,14 +2,13 @@ pandoc-fignos 2.0.0 (unreleased)
 
     * A warnings system has been added.
     * Meta variable names have been updated.
-    * TeX codes have been completely overhauled.
-    * Epub support is improved.
-    * The location for ID tags for figures in html and epub are
-      left up to pandoc.
-    * The location for `\label` in TeX is left up to pandoc.
     * The basic filter and library codes have been refactored and
       improved with a view toward maintainability.
     * The documentation has been updated.
+    * TeX codes have been completely overhauled.
+    * TeX `\label` location is left up to pandoc.
+    * Html/epub figures are now enclosed in a `<div>`.
+    * Epub support is generally improved.
 
 
 pandoc-fignos 1.4.2 (2019-05-16)
