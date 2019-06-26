@@ -17,7 +17,9 @@ Figures @fig:1, {@fig:2}a and {@fig:2}b, and {@fig:3}:
 
 *@fig:1, {+@fig:2}a and fig. !@fig:3.
 
-[Figures {@fig:1}-{@fig:3}, and figs. {@fig:1}-{@fig:2}-{@fig:3}.]{style="color:red"}
+[Figure @fig:1] in square brackets.
+
+[Figures {@fig:1}-{@fig:3}, and figs. {@fig:1}-{@fig:2}-{@fig:3} in a red-coloured span.]{style="color:red"}
 
 References in lists:
 
