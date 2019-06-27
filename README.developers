@@ -19,23 +19,28 @@ ready, it will be merged into the `nextrelease` branch.
 Install Alternatives
 --------------------
 
-1) To install a pre-release version of pandoc-fignos from pypi, the --pre flag
-   should be used with pip.
+Installing from source may require upgrading `setuptools` by executing
 
-2) To install directly from the github repository use:
+    pip install --upgrade setuptools
+
+as root (or under sudo).
+
+There are a few different options for installing from source:
+    
+1) To install from the github `master` branch use:
 
        $ pip install git+https://github.com/tomduck/pandoc-fignos.git --user
 
    (to upgrade use the --upgrade flag).
 
-3) To install from the `nextrelease` branch on github, use
+2) To install from the `nextrelease` branch on github, use
 
        $ pip install \
          git+https://github.com/tomduck/pandoc-fignos.git@nextrelease --user
 
    (to upgrade use the --upgrade flag).
 
-4) To install from source, `cd` into the source directory and use
+3) To install from a local source distribution, `cd` into its root and use
 
        pip install -e . --user
 

@@ -18,7 +18,7 @@ Demonstration: Processing [demo3.md] with `pandoc --filter pandoc-fignos ...` gi
 
 This version of pandoc-fignos was tested using pandoc 1.15.2 - 2.7.3, <sup>[1](#footnote1)</sup> and may be used with linux, macOS, and Windows. Bug reports and feature requests may be posted on the project's [Issues tracker].  If you find pandoc-fignos useful, then please kindly give it a star [on GitHub].
 
-Pandoc-fignos is easy to install and use, and it equally supports pdf/latex, html, and epub output formats.  Its output may be customized, and helpful messages are provided when errors are detected.
+Pandoc-fignos is easy to install and use, and equally supports pdf/latex, html, and epub output formats.  Its output may be customized, and helpful messages are provided when errors are detected.
 
 See also: [pandoc-eqnos], [pandoc-tablenos]
 
@@ -221,13 +221,17 @@ Pandoc-fignos may be installed using the shell command
 
     pip install pandoc-fignos --user
 
+Pip is a program that downloads and installs modules from the Python Package Index, [PyPI].  It normally comes installed with a python distribution.
+
 To upgrade to the most recent release, use
 
-    pip install --upgrade pandoc-fignos --user
+    pip install pandoc-fignos --user --upgrade 
 
-Pip is a program that downloads and installs modules from the Python Package Index, [PyPI].  It is normally installed with a python distribution.
+To upgrade to a pre-release version, use
 
-Alternative installation procedures are given in [README.developers].
+    pip install pandoc-fignos --user --upgrade --pre
+
+Instructions for installing from source are given in [README.developers].
 
 [python]: https://www.python.org/
 [PyPI]: https://pypi.python.org/pypi
@@ -236,13 +240,7 @@ Alternative installation procedures are given in [README.developers].
 
 #### Troubleshooting ####
 
-When prompted to upgrade `pip`, follow the instructions given to do so.  Installation errors may occur with older versions.
-
-Installations from source may also require upgrading `setuptools` using:
-
-    pip install --upgrade setuptools
-
-I usually perform the above two commands as root (or under sudo).  Everything else can be done as a regular user.
+When prompted to upgrade `pip`, follow the instructions given to do so.  This will probably need to be done as root, or under sudo.  The installation of pandoc-fignos can be completed as a regular user.
 
 When installing pandoc-fignos, watch for any errors or warning messages.  In particular, pip may warn that pandoc-fignos was installed into a directory that "is not on PATH".  This will need to be fixed before proceeding.  Access to pandoc-fignos may be tested using the shell command
 
