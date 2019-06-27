@@ -18,7 +18,7 @@ Demonstration: Processing [demo3.md] with `pandoc --filter pandoc-fignos ...` gi
 
 This version of pandoc-fignos was tested using pandoc 1.15.2 - 2.7.3, <sup>[1](#footnote1)</sup> and may be used with linux, macOS, and Windows. Bug reports and feature requests may be posted on the project's [Issues tracker].  If you find pandoc-fignos useful, then please kindly give it a star [on GitHub].
 
-The goals of pandoc-fignos are to make cross-referencing easy, and to equally support pdf/latex, html, and epub output formats (more can be added with time).  The output of pandoc-fignos may be customized, and helpful messages are provided when errors are detected.
+Pandoc-fignos is easy to install and use, and it equally supports pdf/latex, html, and epub output formats.  Its output may be customized, and helpful messages are provided when errors are detected.
 
 See also: [pandoc-eqnos], [pandoc-tablenos]
 
