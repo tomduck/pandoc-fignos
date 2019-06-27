@@ -1,11 +1,10 @@
 
-**New in 1.4.2:** `pandoc-fignos --version` now gives the version.
 
-**New in 1.4.1:** Fixed support for docx equation numbering by section.
+**Notice:** A beta release for pandoc-fignos 2.0.0 is now available.  It can be installed using
 
-**New in 1.4.0:** Support for references in bracketed spans.
+    pip install pandoc-fignos --upgrade --pre --user
 
-[more...](#whats-new)
+Please read the beta's [documentation](https://github.com/tomduck/pandoc-fignos/tree/2.0) and in particular about [What's New](https://github.com/tomduck/pandoc-fignos/tree/2.0#whats-new) first.
 
 
 pandoc-fignos 1.4.2
