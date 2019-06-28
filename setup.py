@@ -115,7 +115,7 @@ setup(
     download_url='https://github.com/tomduck/pandoc-fignos/tarball/' + \
                  __version__,
 
-    install_requires=['pandoc-xnos~=2.0.0b1'],
+    install_requires=['pandoc-xnos~=2.0.0b2'],
 
     py_modules=['pandoc_fignos'],
     entry_points={'console_scripts':['pandoc-fignos = pandoc_fignos:main']},

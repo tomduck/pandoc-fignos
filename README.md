@@ -167,7 +167,12 @@ Pandoc-fignos may be customized by setting variables in the [metadata block] or 
     (e.g., change it from "Figure" to "Fig.").
 
   * `fignos-caption-name` - Sets the name at the beginning of a
-    caption (e.g., change it from "Figure to "Fig." or "图"); and
+    caption (e.g., change it from "Figure to "Fig." or "图");
+
+  * `fignos-caption-separator` or `xnos-caption-separator` - Sets 
+    the caption separator (e.g., the colon in "Figure 1:") to
+    something else.  It must be one of none, colon,
+    period, space, quad, and newline; and
 
   * `fignos-number-sections` or `xnos-number-sections` - Set to
     `True` to number figures by section (e.g., Fig. 1.1, 1.2, etc in

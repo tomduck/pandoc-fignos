@@ -3,7 +3,7 @@
 """pandoc-fignos: a pandoc filter that inserts figure nos. and refs."""
 
 
-__version__ = '2.0.0b1'
+__version__ = '2.0.0b2'
 
 
 # Copyright 2015-2019 Thomas J. Duck.
@@ -80,6 +80,7 @@ LABEL_PATTERN = re.compile(r'(fig:[\w/-]*)')
 
 # Meta variables; may be reset elsewhere
 captionname = 'Figure'  # The caption name
+separator = 'colon'     # The caption separator
 cleveref = False        # Flags that clever references should be used
 capitalise = False      # Flags that plusname should be capitalised
 plusname = ['fig.', 'figs.']      # Sets names for mid-sentence references
@@ -94,6 +95,7 @@ references = {}  # Maps reference labels to [number/tag, figure secno]
 
 # Processing flags
 captionname_changed = False     # Flags the the caption name changed
+separator_changed = False       # Flags the the caption name changed
 plusname_changed = False        # Flags that the plus name changed
 starname_changed = False        # Flags that the star name changed
 has_unnumbered_figures = False  # Flags unnumbered figures were found
@@ -208,25 +210,28 @@ def _adjust_caption(fmt, fig, value):
     else:  # Hard-code in the caption name and number/tag
         if fig['is_unnumbered']:
             return
+        sep = {'none':'', 'colon':':', 'period':'.', 'space':' ',
+               'quad':u'\u2000', 'newline':'\n'}[separator]
+
         if isinstance(references[attrs.id][0], int):  # Numbered reference
             if fmt in ['html', 'html5', 'epub', 'epub2', 'epub3']:
                 value[0]['c'][1] = [RawInline('html', r'<span>'),
                                     Str(captionname), Space(),
-                                    Str('%d:'%references[attrs.id][0]),
+                                    Str('%d%s'%(references[attrs.id][0], sep)),
                                     RawInline('html', r'</span>')]
             else:
                 value[0]['c'][1] = [Str(captionname),
                                     Space(),
-                                    Str('%d:'%references[attrs.id][0])]
+                                    Str('%d%s'%(references[attrs.id][0], sep))]
             value[0]['c'][1] += [Space()] + list(caption)
         else:  # Tagged reference
             assert isinstance(references[attrs.id][0], STRTYPES)
             text = references[attrs.id][0]
             if text.startswith('$') and text.endswith('$'):  # Math
                 math = text.replace(' ', r'\ ')[1:-1]
-                els = [Math({"t":"InlineMath", "c":[]}, math), Str(':')]
+                els = [Math({"t":"InlineMath", "c":[]}, math), Str(sep)]
             else:  # Text
-                els = [Str(text+':')]
+                els = [Str(text+sep)]
             if fmt in ['html', 'html5', 'epub', 'epub2', 'epub3']:
                 value[0]['c'][1] = \
                   [RawInline('html', r'<span>'),
@@ -351,6 +356,13 @@ CAPTION_NAME_TEX = r"""
 \renewcommand{\figurename}{%s}
 """
 
+# Reset the label separator; i.e. change the colon after "Figure 1:" to
+# something else.
+CAPTION_SEPARATOR_TEX = r"""
+%% pandoc-fignos: change the caption separator
+\captionsetup[figure]{labelsep=%s}
+"""
+
 # Define some tex to number figures by section
 NUMBER_BY_SECTION_TEX = r"""
 %% pandoc-fignos: number figures by section
@@ -367,13 +379,15 @@ def process(meta):
 
     # pylint: disable=global-statement
     global captionname     # The caption name
+    global separator       # The caption separator
     global cleveref        # Flags that clever references should be used
     global capitalise      # Flags that plusname should be capitalised
     global plusname        # Sets names for mid-sentence references
     global starname        # Sets names for references at sentence start
     global numbersections  # Flags that sections should be numbered by section
     global warninglevel    # 0 - no warnings; 1 - some; 2 - all
-    global captionname_changed  # Flags the the caption name changed
+    global captionname_changed  # Flags the caption name changed
+    global separator_changed    # Flags the caption separator changed
     global plusname_changed     # Flags that the plus name changed
     global starname_changed     # Flags that the star name changed
 
@@ -386,6 +400,7 @@ def process(meta):
 
     metanames = ['fignos-warning-level', 'xnos-warning-level',
                  'fignos-caption-name',
+                 'fignos-caption-separator', 'xnos-caption-separator',
                  'fignos-cleveref', 'xnos-cleveref',
                  'xnos-capitalise', 'xnos-capitalize',
                  'fignos-plus-name', 'fignos-star-name',
@@ -405,6 +420,21 @@ def process(meta):
         captionname = get_meta(meta, 'fignos-caption-name')
         captionname_changed = captionname != old_captionname
         assert isinstance(captionname, STRTYPES)
+
+    for name in ['fignos-caption-separator', 'xnos-caption-separator']:
+        if name in meta:
+            old_separator = separator
+            separator = get_meta(meta, name)
+            if separator not in \
+              ['none', 'colon', 'period', 'space', 'quad', 'newline']:
+                msg = textwrap.dedent("""
+                          pandoc-fignos: caption separator must be one of
+                          none, colon, period, space, quad, or newline.
+                      """ % name)
+                STDERR.write(msg)
+                continue
+            separator_changed = separator != old_separator
+            break
 
     for name in ['fignos-cleveref', 'xnos-cleveref']:
         # 'xnos-cleveref' enables cleveref in all 3 of fignos/eqnos/tablenos
@@ -519,6 +549,10 @@ def add_tex(meta):
     if captionname_changed and references:
         pandocxnos.add_tex_to_header_includes(
             meta, CAPTION_NAME_TEX % captionname, warninglevel)
+
+    if separator_changed and references:
+        pandocxnos.add_tex_to_header_includes(
+            meta, CAPTION_SEPARATOR_TEX % separator, warninglevel)
 
     if numbersections and references:
         pandocxnos.add_tex_to_header_includes(
