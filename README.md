@@ -157,14 +157,15 @@ Pandoc-fignos may be customized by setting variables in the [metadata block] or 
   * `fignos-cleveref` or `xnos-cleveref` - Set to `True` to assume "+"
     clever references by default;
 
-  * `xnos-capitalise` - Capitalizes the names of "+" clever
+  * `xnos-capitalise` - Capitalises the names of "+" clever
     references (e.g., change from "fig." to "Fig.");
 
   * `fignos-plus-name` - Sets the name of a "+" clever reference
-    (e.g., change it from "fig." to "figure"); and
+    (e.g., change it from "fig." to "figure").  Settings here take
+    precedence over `xnos-capitalise`;
 
   * `fignos-star-name` - Sets the name of a "*" clever reference
-    (e.g., change it from "Figure" to "Fig.").
+    (e.g., change it from "Figure" to "Fig.");
 
   * `fignos-caption-name` - Sets the name at the beginning of a
     caption (e.g., change it from "Figure to "Fig." or "图");
