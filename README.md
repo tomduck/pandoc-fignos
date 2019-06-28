@@ -235,7 +235,7 @@ An example figure looks like
 </div>
 ~~~
 
-The figure and its number are wrapped in a div with an `id` for linking and with class `fignos` to allow for css styling.
+The figure and its number are wrapped in a `<div></div>` with an `id` for linking and with class `fignos` to allow for css styling.
 
 
 ### Docx Output ###
