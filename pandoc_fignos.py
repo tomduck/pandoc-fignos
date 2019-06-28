@@ -516,7 +516,7 @@ def add_tex(meta):
         pandocxnos.add_tex_to_header_includes(
             meta, tex, warninglevel, r'\\usepackage(\[[\w\s,]*\])?\{cleveref\}')
 
-    if (has_unnumbered_figures or separator_changed) and references:
+    if has_unnumbered_figures or (separator_changed and references):
         tex = """
             %%%% pandoc-fignos: required package
             \\usepackage{caption}
@@ -538,11 +538,11 @@ def add_tex(meta):
         """ % (starname[0], starname[1])
         pandocxnos.add_tex_to_header_includes(meta, tex, warninglevel)
 
-    if has_unnumbered_figures and references:
+    if has_unnumbered_figures:
         pandocxnos.add_tex_to_header_includes(
             meta, NO_PREFIX_CAPTION_ENV_TEX, warninglevel)
 
-    if has_tagged_figures:
+    if has_tagged_figures and references:
         pandocxnos.add_tex_to_header_includes(
             meta, TAGGED_FIGURE_ENV_TEX, warninglevel)
 
