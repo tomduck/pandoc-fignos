@@ -3,7 +3,7 @@
 """pandoc-fignos: a pandoc filter that inserts figure nos. and refs."""
 
 
-__version__ = '2.0.0b2'
+__version__ = '2.0.0b3'
 
 
 # Copyright 2015-2019 Thomas J. Duck.
@@ -516,7 +516,7 @@ def add_tex(meta):
         pandocxnos.add_tex_to_header_includes(
             meta, tex, warninglevel, r'\\usepackage(\[[\w\s,]*\])?\{cleveref\}')
 
-    if has_unnumbered_figures and references:
+    if (has_unnumbered_figures or separator_changed) and references:
         tex = """
             %%%% pandoc-fignos: required package
             \\usepackage{caption}
