@@ -178,18 +178,33 @@ Technical Details
 
 #### TeX/pdf Output ####
 
-During processing, pandoc-fignos inserts packages and supporting TeX into the `header-includes` metadata field.  To see what is inserted, set the `fignos-warninglevel` meta variable to `2`.  Note that any use of pandoc's `--include-in-header` option [overrides](https://github.com/jgm/pandoc/issues/3139) all `header-includes`.  In such cases users will need to separately include the codes pandoc-fignos needs.
+During processing, pandoc-fignos inserts packages and supporting TeX into the `header-includes` metadata field.  To see what is inserted, set the `fignos-warninglevel` meta variable to `2`.  Note that any use of pandoc's `--include-in-header` option [overrides](https://github.com/jgm/pandoc/issues/3139) all `header-includes`.
+
+An example reference in TeX looks like
+
+~~~latex
+See \cref{fig:1}.
+~~~
+
+An example figure looks like
+
+~~~latex
+\begin{figure}
+  \hypertarget{fig:1}{%
+    \centering
+    \includegraphics[width=1in,height=\textheight]{img/fig-1.png}
+    \caption{The number one.}\label{fig:1}
+  }
+\end{figure}
+~~~
 
 Other details:
 
-  * TeX is only inserted into the `header-includes` if it is
-    actually needed (in particular, packages are not installed
-    if they are found elsewhere in the `header-includes`);
   * The `cleveref` and `caption` packages are used for clever
     references and caption control, respectively; 
   * The `\label` and `\ref` macros are used for figure labels and
-    references, respectively; `\Cref` and `\cref` are used for
-    clever references;
+    references, respectively (`\Cref` and `\cref` are used for
+    clever reference)s;
   * Clever reference names are set with `\Crefname` and `\crefname`;
   * The caption name is set with`\figurename`;
   * Tags are supported by way of a custom environment that
@@ -199,17 +214,33 @@ Other details:
     `\captionsetup`.
 
 
-#### Other Output Formats ####
+#### Html/Epub Output ####
 
-  * Linking uses native capabilities wherever possible;
+An example reference in html looks like
 
-  * The numbers, caption name, and (clever) references are hard-coded
-    into the output;
+~~~html
+See fig. <a href="#fig:1">1</a>.
+~~~
 
-  * The output is structured such that references and figure 
-    captions may be styled (e.g., using
-    [css](https://pandoc.org/MANUAL.html#option--css) or
-    [docx custom styles]).
+An example figure looks like
+
+~~~html
+<div id="fig:1" class="fignos">
+  <figure>
+    <img src="img/fig-1.png" style="width:1in" alt="" />
+    <figcaption>
+      <span>Figure 1:</span> The number one.
+    </figcaption>
+  </figure>
+</div>
+~~~
+
+The figure and its number are wrapped in a div with an `id` for linking and with class `fignos` to allow for css styling.
+
+
+#### Docx Output ####
+
+Docx OOXML output is under development and subject to change.  Native capabilities will be used wherever possible.
 
 
 Installation
