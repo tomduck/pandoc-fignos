@@ -94,8 +94,8 @@ Nreferences = 0  # Number of references in current section (or document)
 references = {}  # Maps reference labels to [number/tag, figure secno]
 
 # Processing flags
-captionname_changed = False     # Flags the the caption name changed
-separator_changed = False       # Flags the the caption name changed
+captionname_changed = False     # Flags the caption name changed
+separator_changed = False       # Flags the caption separator changed
 plusname_changed = False        # Flags that the plus name changed
 starname_changed = False        # Flags that the star name changed
 has_unnumbered_figures = False  # Flags unnumbered figures were found
