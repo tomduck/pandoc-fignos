@@ -171,8 +171,8 @@ Pandoc-fignos may be customized by setting variables in the [metadata block] or 
 
   * `fignos-caption-separator` or `xnos-caption-separator` - Sets 
     the caption separator (e.g., the colon in "Figure 1:") to
-    something else.  It must be one of none, colon,
-    period, space, quad, and newline; and
+    something else.  It must be one of `none`, `colon`,
+    `period`, `space`, `quad`, or `newline`; and
 
   * `fignos-number-sections` or `xnos-number-sections` - Set to
     `True` to number figures by section (e.g., Fig. 1.1, 1.2, etc in
