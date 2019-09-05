@@ -491,7 +491,7 @@ def add_tex(meta):
     warnings = warninglevel == 2 and references and \
       (pandocxnos.cleveref_required() or has_unnumbered_figures or
        plusname_changed or starname_changed or has_tagged_figures or
-       captionname != 'Figure' or numbersections)
+       captionname_changed or numbersections)
     if warnings:
         msg = textwrap.dedent("""\
                   pandoc-fignos: Wrote the following blocks to
@@ -513,50 +513,52 @@ def add_tex(meta):
             %%%% pandoc-fignos: required package
             \\usepackage%s{cleveref}
         """ % ('[capitalise]' if capitalise else '')
-        pandocxnos.add_tex_to_header_includes(
-            meta, tex, warninglevel, r'\\usepackage(\[[\w\s,]*\])?\{cleveref\}')
+        pandocxnos.add_to_header_includes(
+            meta, 'tex', tex, warninglevel,
+            r'\\usepackage(\[[\w\s,]*\])?\{cleveref\}')
 
     if has_unnumbered_figures or (separator_changed and references):
         tex = """
             %%%% pandoc-fignos: required package
             \\usepackage{caption}
         """
-        pandocxnos.add_tex_to_header_includes(
-            meta, tex, warninglevel, r'\\usepackage(\[[\w\s,]*\])?\{caption\}')
+        pandocxnos.add_to_header_includes(
+            meta, 'tex', tex, warninglevel,
+            r'\\usepackage(\[[\w\s,]*\])?\{caption\}')
 
     if plusname_changed and references:
         tex = """
             %%%% pandoc-fignos: change cref names
             \\crefname{figure}{%s}{%s}
         """ % (plusname[0], plusname[1])
-        pandocxnos.add_tex_to_header_includes(meta, tex, warninglevel)
+        pandocxnos.add_to_header_includes(meta, 'tex', tex, warninglevel)
 
     if starname_changed and references:
         tex = """\
             %%%% pandoc-fignos: change Cref names
             \\Crefname{figure}{%s}{%s}
         """ % (starname[0], starname[1])
-        pandocxnos.add_tex_to_header_includes(meta, tex, warninglevel)
+        pandocxnos.add_to_header_includes(meta, 'tex', tex, warninglevel)
 
     if has_unnumbered_figures:
-        pandocxnos.add_tex_to_header_includes(
-            meta, NO_PREFIX_CAPTION_ENV_TEX, warninglevel)
+        pandocxnos.add_to_header_includes(
+            meta, 'tex', NO_PREFIX_CAPTION_ENV_TEX, warninglevel)
 
     if has_tagged_figures and references:
-        pandocxnos.add_tex_to_header_includes(
-            meta, TAGGED_FIGURE_ENV_TEX, warninglevel)
+        pandocxnos.add_to_header_includes(
+            meta, 'tex', TAGGED_FIGURE_ENV_TEX, warninglevel)
 
     if captionname_changed and references:
-        pandocxnos.add_tex_to_header_includes(
-            meta, CAPTION_NAME_TEX % captionname, warninglevel)
+        pandocxnos.add_to_header_includes(
+            meta, 'tex', CAPTION_NAME_TEX % captionname, warninglevel)
 
     if separator_changed and references:
-        pandocxnos.add_tex_to_header_includes(
-            meta, CAPTION_SEPARATOR_TEX % separator, warninglevel)
+        pandocxnos.add_to_header_includes(
+            meta, 'tex', CAPTION_SEPARATOR_TEX % separator, warninglevel)
 
     if numbersections and references:
-        pandocxnos.add_tex_to_header_includes(
-            meta, NUMBER_BY_SECTION_TEX, warninglevel)
+        pandocxnos.add_to_header_includes(
+            meta, 'tex', NUMBER_BY_SECTION_TEX, warninglevel)
 
     if warnings:
         STDERR.write('\n')
