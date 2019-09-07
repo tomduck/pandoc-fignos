@@ -9,6 +9,7 @@ pandoc-fignos 2.0.0 (unreleased)
     * TeX `\label` location is left up to pandoc.
     * Html/epub figures are now enclosed in a `<div>`.
     * Epub support is generally improved.
+    * Links on specific references can now be disabled.
 
 
 pandoc-fignos 1.4.2 (2019-05-16)

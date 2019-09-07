@@ -89,7 +89,7 @@ or
 
     {@fig:id}
 
-Curly braces around a reference are stripped from the output.
+Curly braces protect a reference and are stripped from the output.
 
 Demonstration: Processing [demo.md] with pandoc + pandoc-fignos gives numbered figures and references in [pdf], [tex], [html], [epub], [docx] and other formats.
 
@@ -142,6 +142,13 @@ The figure number may be overridden by placing a tag in the figure's attributes 
     ![Caption.](image.png){#fig:id tag="B.1"}
 
 The tag may be arbitrary text, or an inline equation such as `$\text{B.1}'$`.  Mixtures of the two are not currently supported.
+
+
+### Disabling Links ###
+
+To disable a link on a reference, set `nolink=True` in the reference's attributes:
+
+    @fig:id{nolink=True}
 
 
 Customization
