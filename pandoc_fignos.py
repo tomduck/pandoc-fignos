@@ -604,8 +604,8 @@ def main():
                                 detach_attrs_image], blocks)
 
     # Second pass
-    process_refs = process_refs_factory('pandoc-fignos', references.keys(),
-                                        warninglevel)
+    process_refs = process_refs_factory('pandoc-fignos', LABEL_PATTERN,
+                                        references.keys(), warninglevel)
     replace_refs = replace_refs_factory(references,
                                         cleveref, False,
                                         plusname if not capitalise \
