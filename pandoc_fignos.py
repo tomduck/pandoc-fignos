@@ -86,7 +86,7 @@ capitalise = False      # Flags that plusname should be capitalised
 plusname = ['fig.', 'figs.']      # Sets names for mid-sentence references
 starname = ['Figure', 'Figures']  # Sets names for references at sentence start
 numbersections = False  # Flags that figures should be numbered by section
-warninglevel = 1        # 0 - no warnings; 1 - some warnings; 2 - all warnings
+warninglevel = 2        # 0 - no warnings; 1 - some warnings; 2 - all warnings
 
 # Processing state variables
 cursec = None    # Current section
