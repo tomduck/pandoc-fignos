@@ -304,7 +304,7 @@ What's New
 
 **New in 2.0.0:**  This version represents a major revision of pandoc-fignos.  While the interface is similar to that of the 1.x series, some users may encounter minor compatibility issues.
 
-Warning messages are a new feature of pandoc-fignos.  The meta variable `fignos-warning-level` may be set to `0`, `1`, or `2` depending on the degree of warnings desired.  Warning level `1` (the default) will alert users to bad references, malformed attributes, and unknown meta variables.  Warning level `2` adds informational messages that should be helpful with debugging.  Level `0` turns all messages off.
+Warning messages are a new feature of pandoc-fignos.  The meta variable `fignos-warning-level` may be set to `0`, `1`, or `2` depending on the degree of warnings desired.  Warning level `1` will alert users to bad references, malformed attributes, and unknown meta variables.  Warning level `2` (the default) adds informational messages that should be helpful with debugging.  Level `0` turns all messages off.
 
 Meta variable names have been updated.  Deprecated names have been removed, and new variables have been added.
 
