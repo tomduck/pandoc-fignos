@@ -72,7 +72,7 @@ out/test-%.epub: test.md $(IMAGES)
 
 out/test-%-py2.7.pdf: test.md $(IMAGES)
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
-	$(PANDOC-$*) $< -t json $(PDFFLAGS) | $(PYTHON-2.7) ../../pandoc_fignos.py latex --pandocversion=$(v$*) | $(PANDOC-$*) -f json $(PDFFLAGS) -o $@
+	$(PANDOC-$*) $< -t json $(PDFFLAGS) -M xnos-warning-level=0 | $(PYTHON-2.7) ../../pandoc_fignos.py latex --pandocversion=$(v$*) | $(PANDOC-$*) -f json $(PDFFLAGS) -o $@
 
 out/test-%.pdf: test.md $(IMAGES)
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
