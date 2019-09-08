@@ -244,7 +244,7 @@ Other details:
     references and caption control, respectively; 
   * The `\label` and `\ref` macros are used for figure labels and
     references, respectively (`\Cref` and `\cref` are used for
-    clever reference)s;
+    clever references);
   * Clever reference names are set with `\Crefname` and `\crefname`;
   * The caption name is set with`\figurename`;
   * Tags are supported by way of a custom environment that
