@@ -3,7 +3,7 @@
 """pandoc-fignos: a pandoc filter that inserts figure nos. and refs."""
 
 
-__version__ = '2.0.0b3'
+__version__ = '2.0.0b4'
 
 
 # Copyright 2015-2019 Thomas J. Duck.
