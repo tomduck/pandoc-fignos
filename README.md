@@ -184,11 +184,20 @@ Pandoc-fignos may be customized by setting variables in the [metadata block] or 
 
   * `fignos-number-sections` or `xnos-number-sections` - Set to
     `True` to number figures by section (e.g., Fig. 1.1, 1.2, etc in
-     Section 1, and Fig 2.1, 2.2, etc in Section 2).  This feature
-     should be used together with pandoc's `--number-sections`
-     [option](https://pandoc.org/MANUAL.html#option--number-sections)
-     enabled for LaTeX/pdf, html, and epub output.  For docx,
-     use [docx custom styles] instead.
+    Section 1, and Fig 2.1, 2.2, etc in Section 2).  For LaTeX/pdf,
+    html, and epub output, this feature should be used together with
+    pandoc's `--number-sections`
+    [option](https://pandoc.org/MANUAL.html#option--number-sections)
+    enabled.  For docx, use [docx custom styles] instead.
+
+  * `xnos-number-offset` - Set to an integer to offset the section
+    numbers when numbering figures by section.  For html and epub
+    output, this feature should be used together with pandoc's
+    `--number-offset`
+    [option](https://pandoc.org/MANUAL.html#option--number-sections)
+    set to the same integer value.  For LaTeX/PDF, this option
+    offsets the actual section numbers as required.
+
 
 Note that variables beginning with `fignos-` apply to only pandoc-fignos, whereas variables beginning with `xnos-` apply to all three of pandoc-fignos/eqnos/tablenos.
 

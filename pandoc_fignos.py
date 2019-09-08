@@ -86,6 +86,7 @@ capitalise = False      # Flags that plusname should be capitalised
 plusname = ['fig.', 'figs.']      # Sets names for mid-sentence references
 starname = ['Figure', 'Figures']  # Sets names for references at sentence start
 numbersections = False  # Flags that figures should be numbered by section
+secoffset = 0           # Section number offset
 warninglevel = 2        # 0 - no warnings; 1 - some warnings; 2 - all warnings
 
 # Processing state variables
@@ -180,7 +181,7 @@ def _process_figure(value, fmt):
         # tags.
         if fmt in ['html', 'html5', 'epub', 'epub2', 'epub3', 'docx'] and \
           'tag' not in attrs:
-            attrs['tag'] = str(cursec) + '.' + str(Nreferences)
+            attrs['tag'] = str(cursec+secoffset) + '.' + str(Nreferences)
             Nreferences += 1
 
     # Save reference information
@@ -363,10 +364,16 @@ CAPTION_SEPARATOR_TEX = r"""
 \captionsetup[figure]{labelsep=%s}
 """
 
-# Define some tex to number figures by section
+# Number figures by section
 NUMBER_BY_SECTION_TEX = r"""
 %% pandoc-fignos: number figures by section
 \numberwithin{figure}{section}
+"""
+
+# Section number offset
+SECOFFSET_TEX = r"""
+%% pandoc-fignos: section number offset
+\setcounter{section}{%s}
 """
 
 
@@ -385,6 +392,7 @@ def process(meta):
     global plusname        # Sets names for mid-sentence references
     global starname        # Sets names for references at sentence start
     global numbersections  # Flags that sections should be numbered by section
+    global secoffset       # Section number offset
     global warninglevel    # 0 - no warnings; 1 - some; 2 - all
     global captionname_changed  # Flags the caption name changed
     global separator_changed    # Flags the caption separator changed
@@ -404,7 +412,8 @@ def process(meta):
                  'fignos-cleveref', 'xnos-cleveref',
                  'xnos-capitalise', 'xnos-capitalize',
                  'fignos-plus-name', 'fignos-star-name',
-                 'fignos-number-sections', 'xnos-number-sections']
+                 'fignos-number-sections', 'xnos-number-sections',
+                 'xnos-number-offset']
 
     if warninglevel:
         for name in meta:
@@ -483,6 +492,8 @@ def process(meta):
             numbersections = check_bool(get_meta(meta, name))
             break
 
+    if 'xnos-number-offset' in meta:
+        secoffset = int(get_meta(meta, name))
 
 def add_tex(meta):
     """Adds text to the meta data."""
@@ -491,7 +502,7 @@ def add_tex(meta):
     warnings = warninglevel == 2 and references and \
       (pandocxnos.cleveref_required() or has_unnumbered_figures or
        plusname_changed or starname_changed or has_tagged_figures or
-       captionname_changed or numbersections)
+       captionname_changed or numbersections or secoffset)
     if warnings:
         msg = textwrap.dedent("""\
                   pandoc-fignos: Wrote the following blocks to
@@ -559,6 +570,11 @@ def add_tex(meta):
     if numbersections and references:
         pandocxnos.add_to_header_includes(
             meta, 'tex', NUMBER_BY_SECTION_TEX, warninglevel)
+
+    if secoffset and references:
+        pandocxnos.add_to_header_includes(
+            meta, 'tex', SECOFFSET_TEX % secoffset, warninglevel,
+            r'\\setcounter\{section\}')
 
     if warnings:
         STDERR.write('\n')

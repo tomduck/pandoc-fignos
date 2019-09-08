@@ -2,14 +2,13 @@ pandoc-fignos 2.0.0 (unreleased)
 
     * A warnings system has been added.
     * Meta variable names have been updated.
-    * The basic filter and library codes have been refactored and
-      improved with a view toward maintainability.
-    * The documentation has been updated.
     * TeX codes have been completely overhauled.
     * TeX `\label` location is left up to pandoc.
     * Html/epub figures are now enclosed in a `<div>`.
     * Epub support is generally improved.
-    * Links on specific references can now be disabled.
+    * Support for section number offsets in table numbers (Issue #47).
+    * Support for disabling links on selected references (Issue #54).
+    * Support for custom caption separators (Issue #67).
 
 
 pandoc-fignos 1.4.2 (2019-05-16)
