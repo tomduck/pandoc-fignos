@@ -157,7 +157,7 @@ Customization
 Pandoc-fignos may be customized by setting variables in the [metadata block] or on the command line (using `-M KEY=VAL`).  The following variables are supported:
 
   * `fignos-warning-level` or `xnos-warning-level` - Set to `0` for
-    no warnings, `1` for critical warnings (default), or `2` for
+    no warnings, `1` for critical warnings, or `2` (default) for
     critical warnings and informational messages.  Warning level 2
     should be used when troubleshooting.
 
