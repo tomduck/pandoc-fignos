@@ -70,7 +70,7 @@ Tagging  (update the version number):
     $ git push origin 2.0.0b4
 
 
-Creating source and distributions:
+Creating source and binary distributions:
 
     $ python3 setup.py sdist bdist_wheel
 
