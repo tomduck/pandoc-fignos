@@ -493,7 +493,7 @@ def process(meta):
             break
 
     if 'xnos-number-offset' in meta:
-        secoffset = int(get_meta(meta, name))
+        secoffset = int(get_meta(meta, 'xnos-number-offset'))
 
 def add_tex(meta):
     """Adds text to the meta data."""
