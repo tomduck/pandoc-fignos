@@ -193,6 +193,9 @@ Pandoc-fignos may be customized by setting variables in the [metadata block] or 
     [option](https://pandoc.org/MANUAL.html#option--number-sections)
     enabled.  For docx, use [docx custom styles] instead.
 
+    This option should not be set for numbering by chapter in
+    LaTeX/pdf book document classes.
+
   * `xnos-number-offset` - Set to an integer to offset the section
     numbers when numbering figures by section.  For html and epub
     output, this feature should be used together with pandoc's
