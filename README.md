@@ -18,9 +18,7 @@ Demonstration: Processing [demo3.md] with pandoc + pandoc-fignos gives numbered 
 
 This version of pandoc-fignos was tested using pandoc 1.15.2 - 2.7.3,<sup>[1](#footnote1)</sup> and may be used with linux, macOS, and Windows. Bug reports and feature requests may be posted on the project's [Issues tracker].  If you find pandoc-fignos useful, then please kindly give it a star [on GitHub].
 
-Pandoc-fignos is easy to install and use, and equally supports pdf/latex, html, and epub output formats.  Its output may be customized, and helpful messages are provided when errors are detected.
-
-See also: [pandoc-eqnos], [pandoc-tablenos] \
+See also: [pandoc-eqnos], [pandoc-tablenos], [pandoc-secnos] \
 Other filters: [pandoc-comments], [pandoc-latex-extensions]
 
 [pandoc]: http://pandoc.org/
@@ -28,6 +26,7 @@ Other filters: [pandoc-comments], [pandoc-latex-extensions]
 [on GitHub]:  https://github.com/tomduck/pandoc-fignos
 [pandoc-eqnos]: https://github.com/tomduck/pandoc-eqnos
 [pandoc-tablenos]: https://github.com/tomduck/pandoc-tablenos
+[pandoc-secnos]: https://github.com/tomduck/pandoc-secnos
 [pandoc-comments]: https://github.com/tomduck/pandoc-comments
 [pandoc-latex-extensions]: https://github.com/tomduck/pandoc-latex-extensions
 
@@ -70,7 +69,13 @@ Pandoc-fignos is activated by using the
 
     --filter pandoc-fignos
 
-option with pandoc.  Any use of `--filter pandoc-citeproc` or `--bibliography=FILE` should come *after* the pandoc-fignos filter option.
+option with pandoc.  Alternatively, use
+
+    --filter pandoc-xnos
+
+to activate all of the `pandoc-fignos`, `pandoc-eqnos`, `pandoc-tablenos`, and `pandoc-secnos` filters (if installed).
+
+Any use of `--filter pandoc-citeproc` or `--bibliography=FILE` should come *after* the `pandoc-fignos` or `pandoc-xnos` filter calls.
 
 
 Markdown Syntax
