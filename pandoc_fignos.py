@@ -66,15 +66,6 @@ if sys.version_info > (3,):
 else:
     from urllib import unquote  # pylint: disable=no-name-in-module
 
-
-# Read the command-line arguments
-parser = argparse.ArgumentParser(description='Pandoc figure numbers filter.')
-parser.add_argument('--version', action='version',
-                    version='%(prog)s {version}'.format(version=__version__))
-parser.add_argument('fmt')
-parser.add_argument('--pandocversion', help='The pandoc version.')
-args = parser.parse_args()
-
 # Pattern for matching labels
 LABEL_PATTERN = re.compile(r'(fig:[\w/-]*)')
 
@@ -579,17 +570,27 @@ def add_tex(meta):
     if warnings:
         STDERR.write('\n')
 
-
-def main():
+# pylint: disable=too-many-locals, unused-argument
+def main(stdin=STDIN, stdout=STDOUT, stderr=STDERR):
     """Filters the document AST."""
 
     # pylint: disable=global-statement
     global PANDOCVERSION
     global Image
 
+    # Read the command-line arguments
+    parser = argparse.ArgumentParser(\
+      description='Pandoc figure numbers filter.')
+    parser.add_argument(\
+      '--version', action='version',
+      version='%(prog)s {version}'.format(version=__version__))
+    parser.add_argument('fmt')
+    parser.add_argument('--pandocversion', help='The pandoc version.')
+    args = parser.parse_args()
+
     # Get the output format and document
     fmt = args.fmt
-    doc = json.loads(STDIN.read())
+    doc = json.loads(stdin.read())
 
     # Initialize pandocxnos
     PANDOCVERSION = pandocxnos.init(args.pandocversion, doc)
@@ -645,10 +646,10 @@ def main():
         doc = doc[:1] + altered
 
     # Dump the results
-    json.dump(doc, STDOUT)
+    json.dump(doc, stdout)
 
     # Flush stdout
-    STDOUT.flush()
+    stdout.flush()
 
 if __name__ == '__main__':
     main()
