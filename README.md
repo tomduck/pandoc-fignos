@@ -4,9 +4,9 @@
 
     pip install pandoc-fignos --upgrade --pre --user
 
-**New in 2.0.0:** This is a major release which is easier to use at the cost of minor incompatibilities with previous versions.
+**New in 2.0.0:** This is a major release which is easier to use at the cost of minor incompatibilities with previous versions. [more...](#whats-new).
 
-[more...](#whats-new).
+Also: A [pandoc-secnos] filter has been added to the pandoc-xnos filter suite.
 
 
 pandoc-fignos 2.0.0
