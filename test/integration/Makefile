@@ -1,7 +1,7 @@
 
 PANDOC = pandoc
 
-FLAGS = --standalone --top-level-division=section --number-sections --filter pandoc-fignos --filter pandoc-eqnos --filter pandoc-tablenos
+FLAGS = --standalone --top-level-division=section --number-sections --filter pandoc-xnos
 
 all: out/demo.pdf out/demo.html out/demo.docx out/demo.json out/demo.tex
 

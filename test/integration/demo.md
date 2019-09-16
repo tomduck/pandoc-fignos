@@ -1,7 +1,7 @@
 ---
 title: Test Document
 xnos-cleveref: True
-xnos-number-sections: True
+xnos-number-by-section: True
 ...
 
 Title 1
@@ -22,6 +22,8 @@ X Y
 T F
 
 Table: Foo. {#tbl:1}
+
+Reference to @sec:title-2.
 
 
 Subtitle 1 {-}
