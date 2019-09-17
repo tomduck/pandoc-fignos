@@ -100,11 +100,11 @@ Demonstration: Processing [demo.md] with pandoc + pandoc-fignos gives numbered f
 [@scaramouche1]: https://github.com/scaramouche1
 [reference link]: http://pandoc.org/MANUAL.html#reference-links
 [demo.md]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/demo.md
-[pdf]: https://raw.githack.com/tomduck/pandoc-fignos/master/demos/out/demo.pdf
-[tex]: https://raw.githack.com/tomduck/pandoc-fignos/master/demos/out/demo.tex
-[html]: https://raw.githack.com/tomduck/pandoc-fignos/master/demos/out/demo.html
-[epub]: https://raw.githack.com/tomduck/pandoc-fignos/master/demos/out/demo.epub
-[docx]: https://raw.githack.com/tomduck/pandoc-fignos/master/demos/out/demo.docx
+[pdf]: https://raw.githack.com/tomduck/pandoc-fignos/untracked/demos/out/demo.pdf
+[tex]: https://raw.githack.com/tomduck/pandoc-fignos/untracked/demos/out/demo.tex
+[html]: https://raw.githack.com/tomduck/pandoc-fignos/untracked/demos/out/demo.html
+[epub]: https://raw.githack.com/tomduck/pandoc-fignos/untracked/demos/out/demo.epub
+[docx]: https://raw.githack.com/tomduck/pandoc-fignos/untracked/demos/out/demo.docx
 
 
 ### Clever References ###
@@ -130,11 +130,11 @@ Demonstration: Processing [demo2.md] with pandoc + pandoc-fignos gives numbered 
 Note: When using `*fig:id` and emphasis (e.g., `*italics*`) in the same sentence, the `*` in the clever reference must be backslash-escaped; i.e., `\*fig:id`.
 
 [demo2.md]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/demo2.md
-[pdf2]: https://raw.githack.com/tomduck/pandoc-fignos/master/demos/out/demo2.pdf
-[tex2]: https://raw.githack.com/tomduck/pandoc-fignos/master/demos/out/demo2.tex
-[html2]: https://raw.githack.com/tomduck/pandoc-fignos/master/demos/out/demo2.html
-[epub2]: https://raw.githack.com/tomduck/pandoc-fignos/master/demos/out/demo2.epub
-[docx2]: https://raw.githack.com/tomduck/pandoc-fignos/master/demos/out/demo2.docx
+[pdf2]: https://raw.githack.com/tomduck/pandoc-fignos/untracked/demos/out/demo2.pdf
+[tex2]: https://raw.githack.com/tomduck/pandoc-fignos/untracked/demos/out/demo2.tex
+[html2]: https://raw.githack.com/tomduck/pandoc-fignos/untracked/demos/out/demo2.html
+[epub2]: https://raw.githack.com/tomduck/pandoc-fignos/untracked/demos/out/demo2.epub
+[docx2]: https://raw.githack.com/tomduck/pandoc-fignos/untracked/demos/out/demo2.docx
 
 
 ### Tagged Figures ###
@@ -211,11 +211,11 @@ Demonstration: Processing [demo3.md] with pandoc + pandoc-fignos gives numbered 
 [metadata block]: http://pandoc.org/README.html#extension-yaml_metadata_block
 [docx custom styles]: https://pandoc.org/MANUAL.html#custom-styles
 [demo3.md]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/demo3.md
-[pdf3]: https://raw.githack.com/tomduck/pandoc-fignos/master/demos/out/demo3.pdf
-[tex3]: https://raw.githack.com/tomduck/pandoc-fignos/master/demos/out/demo3.tex
-[html3]: https://raw.githack.com/tomduck/pandoc-fignos/master/demos/out/demo3.html
-[epub3]: https://raw.githack.com/tomduck/pandoc-fignos/master/demos/out/demo3.epub
-[docx3]: https://raw.githack.com/tomduck/pandoc-fignos/master/demos/out/demo3.docx
+[pdf3]: https://raw.githack.com/tomduck/pandoc-fignos/untracked/demos/out/demo3.pdf
+[tex3]: https://raw.githack.com/tomduck/pandoc-fignos/untracked/demos/out/demo3.tex
+[html3]: https://raw.githack.com/tomduck/pandoc-fignos/untracked/demos/out/demo3.html
+[epub3]: https://raw.githack.com/tomduck/pandoc-fignos/untracked/demos/out/demo3.epub
+[docx3]: https://raw.githack.com/tomduck/pandoc-fignos/untracked/demos/out/demo3.docx
 
 
 Technical Details
