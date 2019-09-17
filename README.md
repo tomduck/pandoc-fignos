@@ -1,18 +1,11 @@
 
-
-**Notice:** This beta release may be installed using
-
-    pip install pandoc-fignos --upgrade --pre --user
-
 **New in 2.0.0:** This is a major release which is easier to use at the cost of minor incompatibilities with previous versions. [more...](#whats-new).
-
-Also: A [pandoc-secnos] filter has been added to the pandoc-xnos filter suite.
 
 
 pandoc-fignos 2.0.0
 ===================
 
-*pandoc-fignos* is a [pandoc] filter for numbering figures and their references (i.e., cross-referencing) when converting markdown documents to other formats.
+*pandoc-fignos* is a [pandoc] filter for numbering figures and their references (i.e., cross-referencing) when converting markdown documents to other formats.  It is part of the [pandoc-xnos] filter suite].
 
 Demonstration: Processing [demo3.md] with pandoc + pandoc-fignos gives numbered figures and references in [pdf][pdf3], [tex][tex3], [html][html3], [epub][epub3], [docx][docx3] and other formats.
 
@@ -22,6 +15,7 @@ See also: [pandoc-eqnos], [pandoc-tablenos], [pandoc-secnos] \
 Other filters: [pandoc-comments], [pandoc-latex-extensions]
 
 [pandoc]: http://pandoc.org/
+[pandoc-xnos]: https://github.com/tomduck/pandoc-xnos
 [Issues tracker]: https://github.com/tomduck/pandoc-fignos/issues
 [on GitHub]:  https://github.com/tomduck/pandoc-fignos
 [pandoc-eqnos]: https://github.com/tomduck/pandoc-eqnos
@@ -55,11 +49,11 @@ Pandoc-fignos may be installed and upgraded using the shell command
 
 Pip is a program that downloads and installs software from the Python Package Index, [PyPI].  It normally comes installed with a python distribution.<sup>[2](#footnote2)</sup>
 
-Instructions for installing from source are given in [README.developers].
+Instructions for installing from source are given in [DEVELOPERS.md].
 
 [python]: https://www.python.org/
 [PyPI]: https://pypi.python.org/pypi
-[README.developers]: README.developers
+[DEVELOPERS.md]: DEVELOPERS.md
 
 
 Usage
@@ -307,7 +301,7 @@ Full docx support is awaiting input from a knowledgeable expert on how to struct
 
 Pandoc-fignos will continue to support pandoc 1.15-onward and python 2 & 3 for the foreseeable future.  The reasons for this are that a) some users cannot upgrade pandoc and/or python; and b) supporting all versions tends to make pandoc-fignos more robust.
 
-Developer notes are maintained in [README.developers].
+Developer notes are maintained in [DEVELOPERS.md].
 
 
 What's New
