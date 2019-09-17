@@ -47,10 +47,7 @@ There are a few different options for installing from source:
 Testing
 -------
 
-Regression tests for pandoc-fignos are provided in test/standard.  Read the README.md in that directory for instructions.
-
-Integration tests for pandoc-fignos/eqnos/tablenos are provided in
-test/integration.
+Regression tests for pandoc-fignos are provided in `test/`.  Read the README.md in that directory for instructions.
 
 
 Preparing a Release
