@@ -72,9 +72,9 @@ Starting from the root of the `master` branch, update demos in the `demos` branc
     cd demos
     make -B
     git checkout demos
-    mv out/* ..
-    git commit --ammend
-    git --force push
+    cp -rf out/* ..
+    git commit --amend -am "Updated demos."
+    git push --force
 
 This procedure ensures that there will only be a single revision of each file (see https://stackoverflow.com/a/22827188).
 
