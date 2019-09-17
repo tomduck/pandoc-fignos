@@ -9,7 +9,7 @@ The next release is developed in the `nextrelease` branch.  When ready, the chan
 
 A copy of the 1.x release series is maintained in the 1.x branch.
 
-Demo outputs are stored in the `untracked` branch.
+Demo outputs are stored in the `demos` branch.
 
 
 Install Alternatives
@@ -67,12 +67,12 @@ Merge the `nextrelease` branch into `master` using
 
 ### Updating Demos ###
 
-Starting from the root of the `master` branch, update demos in the `untracked` branch using
+Starting from the root of the `master` branch, update demos in the `demos` branch using
 
     cd demos
     make -B
-    git checkout untracked
-    git add out
+    git checkout demos
+    mv out/* ..
     git commit --ammend
     git --force push
 
