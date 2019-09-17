@@ -5,7 +5,7 @@
 pandoc-fignos 2.0.0
 ===================
 
-*pandoc-fignos* is a [pandoc] filter for numbering figures and their references (i.e., cross-referencing) when converting markdown documents to other formats.  It is part of the [pandoc-xnos] filter suite].
+*pandoc-fignos* is a [pandoc] filter for numbering figures and their references (i.e., cross-referencing) when converting markdown documents to other formats.  It is part of the [pandoc-xnos] filter suite.
 
 Demonstration: Processing [demo3.md] with pandoc + pandoc-fignos gives numbered figures and references in [pdf][pdf3], [tex][tex3], [html][html3], [epub][epub3], [docx][docx3] and other formats.
 
