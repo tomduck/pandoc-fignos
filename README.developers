@@ -1,10 +1,6 @@
 
 Developer Notes
 ===============
-
-Contributions to this project are welcome.  In particular, full docx support
-is awaiting input from a knowledgeable expert on how to structure the OOXML.
-
     
 Branches
 --------
@@ -12,8 +8,9 @@ Branches
 The next release is developed in the `nextrelease` branch.  When ready, the
 changes are merged into the `master` branch.
 
-Version 2.0 is being temporarily developed in a separate `2.0` branch.  When
-ready, it will be merged into the `nextrelease` branch.
+A copy of the 1.x release series is maintained in the 1.x branch.
+
+Demo outputs are stored in the `untracked` branch.
 
 
 Install Alternatives
@@ -29,13 +26,13 @@ There are a few different options for installing from source:
     
 1) To install from the github `master` branch use:
 
-       $ pip install git+https://github.com/tomduck/pandoc-fignos.git --user
+       pip install git+https://github.com/tomduck/pandoc-fignos.git --user
 
-   (to upgrade use the --upgrade flag).
+   (to upgrade append the `--upgrade` flag).
 
 2) To install from the `nextrelease` branch on github, use
 
-       $ pip install \
+       pip install \
          git+https://github.com/tomduck/pandoc-fignos.git@nextrelease --user
 
    (to upgrade use the --upgrade flag).
@@ -61,24 +58,55 @@ test/integration.
 Preparing a Release
 -------------------
 
+### Merging ####
+
+Merge the `nextrelease` branch into `master` using
+
+    git checkout master
+    git merge nextrelease
+    git push
+
+
+### Updating Demos ###
+
+Starting from the root of the `master` branch, update demos in the `untracked`
+branch using
+
+    cd demos
+    make -B
+    git checkout untracked
+    git add out
+    git commit --ammend
+    git --force push
+
+This procedure ensures that there will only be a single revision of each file
+(see https://stackoverflow.com/a/22827188).
+
+
+### Tagging ###
+
 See https://www.python.org/dev/peps/pep-0440/ for numbering conventions,
 including for pre-releases.
-    
+
+Check that you are in the `master` branch.
+
 Tagging  (update the version number):
 
-    $ git tag -a 2.0.0b4 -m "New release."
-    $ git push origin 2.0.0b4
+    git tag -a 2.0.0 -m "New release."
+    git push origin 2.0.0
 
 
-Creating source and binary distributions:
+### Distributing ###
+
+Create source and binary distributions using
 
     $ python3 setup.py sdist bdist_wheel
 
 (see https://packaging.python.org/tutorials/packaging-projects/).
     
-Uploading to pypi (update the version number):
+Upload to pypi (update the version number) using
 
-    $ twine upload dist/pandoc-fignos-2.0.0b4.tar.gz \
-                   dist/pandoc_fignos-2.0.0b4-py3-none-any.whl
+    twine upload dist/pandoc-fignos-2.0.0.tar.gz \
+                 dist/pandoc_fignos-2.0.0-py3-none-any.whl
 
 (see https://pypi.python.org/pypi/twine).
