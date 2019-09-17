@@ -5,7 +5,7 @@
 pandoc-fignos 2.0.0
 ===================
 
-*pandoc-fignos* is a [pandoc] filter for numbering figures and their references (i.e., cross-referencing) when converting markdown documents to other formats.  It is part of the [pandoc-xnos] filter suite.
+*pandoc-fignos* is a [pandoc] filter for numbering figures and their references when converting from markdown to other formats.  It is part of the [pandoc-xnos] filter suite.  LaTeX/pdf, html, and epub output have native support.  Native support for docx output is a work in progress.
 
 Demonstration: Processing [demo3.md] with pandoc + pandoc-fignos gives numbered figures and references in [pdf][pdf3], [tex][tex3], [html][html3], [epub][epub3], [docx][docx3] and other formats.
 
@@ -43,11 +43,11 @@ Installation
 
 Pandoc-fignos requires [python], a programming language that comes pre-installed on macOS and linux.  It is easily installed on Windows -- see [here](https://realpython.com/installing-python/).  Either python 2.7 or 3.x will do.
 
-Pandoc-fignos may be installed and upgraded using the shell command
+Pandoc-fignos may be installed using the shell command
 
-    pip install pandoc-fignos --user --upgrade
+    pip install pandoc-fignos --user
 
-Pip is a program that downloads and installs software from the Python Package Index, [PyPI].  It normally comes installed with a python distribution.<sup>[2](#footnote2)</sup>
+and upgraded by appending `--upgrade` to the above command.  Pip is a program that downloads and installs software from the Python Package Index, [PyPI].  It normally comes installed with a python distribution.<sup>[2](#footnote2)</sup>
 
 Instructions for installing from source are given in [DEVELOPERS.md].
 
@@ -67,7 +67,7 @@ option with pandoc.  Alternatively, use
 
     --filter pandoc-xnos
 
-to activate all of the `pandoc-fignos`, `pandoc-eqnos`, `pandoc-tablenos`, and `pandoc-secnos` filters (if installed).
+to activate all of the [pandoc-xnos] filters (if installed).
 
 Any use of `--filter pandoc-citeproc` or `--bibliography=FILE` should come *after* the `pandoc-fignos` or `pandoc-xnos` filter calls.
 
