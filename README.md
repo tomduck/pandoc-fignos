@@ -67,7 +67,7 @@ option with pandoc.  Alternatively, use
 
     --filter pandoc-xnos
 
-to activate all of the [pandoc-xnos] filters (if installed).
+to activate all of the filters in the [pandoc-xnos] suite (if installed).
 
 Any use of `--filter pandoc-citeproc` or `--bibliography=FILE` should come *after* the `pandoc-fignos` or `pandoc-xnos` filter calls.
 
