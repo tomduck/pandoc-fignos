@@ -1,5 +1,5 @@
 build
 dist
 *.egg-info
-test/out/*
 demos/out/*
+test/out/*
