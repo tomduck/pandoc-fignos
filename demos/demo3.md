@@ -1,5 +1,8 @@
 ---
 title: Pandoc-fignos Demo
+geometry:
+  - top=1in
+  - bottom=1in
 fignos-cleveref: True
 fignos-plus-name: Fig.
 ...
