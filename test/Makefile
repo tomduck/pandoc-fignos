@@ -1,7 +1,7 @@
 
 # Note: pandoc-2.4 broke citation parsing, and so is not supported.
 
-v2.7 = 2.7
+v2.7 = 2.7.3
 v2.6 = 2.6
 v2.5 = 2.5
 v2.3 = 2.3.1
@@ -28,7 +28,6 @@ PANDOC-1.16 = pandoc-$(v1.16)
 PANDOC-1.15 = pandoc-$(v1.15)
 
 PYTHON-2.7 = python2.7
-PYTHON-3.6 = python3.6
 
 PDFFLAGS = --variable geometry:margin=1in --standalone --variable urlcolor=blue
 HTMLFLAGS = --standalone --variable urlcolor=blue
@@ -36,12 +35,10 @@ HTMLFLAGS = --standalone --variable urlcolor=blue
 IMAGES = img/fig-1.png img/fig-2.png img/fig-3.png
 
 
-all: pdf html docx img
+all: pdf html epub docx tex img
 
 pdf: out/test-2.7.pdf \
-     out/test-2.7-py2.7.pdf \
-     out/test-2.7-py3.6.pdf \
-     out/test-2.7-cleveref.pdf \
+	 out/test-2.7-py2.7.pdf \
      out/test-2.6.pdf \
      out/test-2.5.pdf \
      out/test-2.3.pdf \
@@ -49,16 +46,18 @@ pdf: out/test-2.7.pdf \
      out/test-2.1.pdf \
      out/test-2.0.pdf \
      out/test-1.19.pdf \
-     out/test-1.19-cleveref.pdf \
      out/test-1.18.pdf \
-     out/test-1.18-cleveref.pdf \
      out/test-1.17.pdf \
      out/test-1.16.pdf \
      out/test-1.15.pdf
 
 html: out/test-2.7.html
 
+epub: out/test-2.7.epub
+
 docx: out/test-2.7.docx
+
+tex: out/test-2.7.tex
 
 
 out/test-%.html: test.md $(IMAGES)
@@ -67,17 +66,13 @@ out/test-%.html: test.md $(IMAGES)
 	@if [ ! -d out/img ]; then mkdir -p out/img; fi
 	cp img/fig-?.png out/img
 
+out/test-%.epub: test.md $(IMAGES)
+	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
+	$(PANDOC-$*) $< --filter pandoc-fignos $(HTMLFLAGS) -o $@
+
 out/test-%-py2.7.pdf: test.md $(IMAGES)
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
-	$(PANDOC-$*) $< -t json $(PDFFLAGS) | $(PYTHON-2.7) ../../pandoc_fignos.py latex --pandocversion=$(v$*) | $(PANDOC-$*) -f json $(PDFFLAGS) -o $@
-
-out/test-%-py3.6.pdf: test.md $(IMAGES)
-	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
-	$(PANDOC-$*) $< -t json $(PDFFLAGS) | $(PYTHON-3.6) ../../pandoc_fignos.py latex --pandocversion=$(v$*) | $(PANDOC-$*) -f json $(PDFFLAGS) -o $@
-
-out/test-%-cleveref.pdf: test.md $(IMAGES)
-	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
-	$(PANDOC-$*) $< --filter pandoc-fignos $(PDFFLAGS) --include-in-header=cleveref.tex -o $@
+	$(PANDOC-$*) $< -t json $(PDFFLAGS) -M xnos-warning-level=0 | $(PYTHON-2.7) ../pandoc_fignos.py latex --pandocversion=$(v$*) | $(PANDOC-$*) -f json $(PDFFLAGS) -o $@
 
 out/test-%.pdf: test.md $(IMAGES)
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
@@ -91,6 +86,9 @@ out/test-%.json: test.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(PANDOC-$*) $< --filter pandoc-fignos -o $@
 
+out/test-%.tex: test.md $(IMAGES)
+	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
+	$(PANDOC-$*) $< --filter pandoc-fignos $(PDFFLAGS) -o $@
 
 .PHONY: clean
 

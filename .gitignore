@@ -1,5 +1,5 @@
 build
 dist
 *.egg-info
-test/standard/out/*
-test/integration/out/*
+demos/out/*
+test/out/*

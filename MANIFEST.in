@@ -1,5 +1,5 @@
-include ez_setup.py
 include README.md
+include DEVELOPERS.md
 include LICENSE
 include ChangeLog
 include AUTHORS
