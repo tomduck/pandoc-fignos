@@ -5,8 +5,7 @@ Developer Notes
 Branches
 --------
 
-The next release is developed in the `nextrelease` branch.  When ready, the
-changes are merged into the `master` branch.
+The next release is developed in the `nextrelease` branch.  When ready, the changes are merged into the `master` branch.
 
 A copy of the 1.x release series is maintained in the 1.x branch.
 
@@ -32,24 +31,23 @@ There are a few different options for installing from source:
 
 2) To install from the `nextrelease` branch on github, use
 
-       pip install \
-         git+https://github.com/tomduck/pandoc-fignos.git@nextrelease --user
+       pip install git+https://github.com/tomduck/pandoc-fignos.git@nextrelease --user
 
    (to upgrade use the --upgrade flag).
 
-3) To install from a local source distribution, `cd` into its root and use
+3) To install from a local source distribution, `cd` into its root
+   and use
 
        pip install -e . --user
 
-   Note that any changes made to the source will be automatically reflected
-   when the filter is run (which is useful for development).
+   Note that any changes made to the source will be automatically
+   reflected when the filter is run (which is useful for development).
 
 
 Testing
 -------
 
-Regression tests for pandoc-fignos are provided in test/standard.  Read
-the README.md in that directory for instructions.
+Regression tests for pandoc-fignos are provided in test/standard.  Read the README.md in that directory for instructions.
 
 Integration tests for pandoc-fignos/eqnos/tablenos are provided in
 test/integration.
@@ -69,8 +67,7 @@ Merge the `nextrelease` branch into `master` using
 
 ### Updating Demos ###
 
-Starting from the root of the `master` branch, update demos in the `untracked`
-branch using
+Starting from the root of the `master` branch, update demos in the `untracked` branch using
 
     cd demos
     make -B
@@ -79,14 +76,12 @@ branch using
     git commit --ammend
     git --force push
 
-This procedure ensures that there will only be a single revision of each file
-(see https://stackoverflow.com/a/22827188).
+This procedure ensures that there will only be a single revision of each file (see https://stackoverflow.com/a/22827188).
 
 
 ### Tagging ###
 
-See https://www.python.org/dev/peps/pep-0440/ for numbering conventions,
-including for pre-releases.
+See https://www.python.org/dev/peps/pep-0440/ for numbering conventions, including for pre-releases.
 
 Check that you are in the `master` branch.
 
