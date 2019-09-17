@@ -17,7 +17,7 @@ out/%.pdf: %.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	pandoc $< --filter pandoc-fignos --variable urlcolor=blue -o $@
 
-out/%.html: %.md
+out/%.html: %.md headers/header.html
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	pandoc $< --standalone --filter pandoc-fignos --include-in-header=headers/header.html -o $@
 	cp -R img out
