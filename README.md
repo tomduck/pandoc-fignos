@@ -297,8 +297,6 @@ If you have any difficulties with pandoc-fignos, or would like to see a new feat
 Development
 -----------
 
-Full docx support is awaiting input from a knowledgeable expert on how to structure the OOXML.
-
 Pandoc-fignos will continue to support pandoc 1.15-onward and python 2 & 3 for the foreseeable future.  The reasons for this are that a) some users cannot upgrade pandoc and/or python; and b) supporting all versions tends to make pandoc-fignos more robust.
 
 Developer notes are maintained in [DEVELOPERS.md].
