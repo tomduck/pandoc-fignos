@@ -1,4 +1,4 @@
-pandoc-fignos 2.0.0 (unreleased)
+pandoc-fignos 2.0.0 (2019-09-17)
 
     * A warnings system has been added.
     * Meta variable names have been updated.
