@@ -83,8 +83,7 @@ warninglevel = 2        # 0 - no warnings; 1 - some warnings; 2 - all warnings
 # Processing state variables
 cursec = None    # Current section
 Nreferences = 0  # Number of references in current section (or document)
-references = {}  # Maps reference labels to [number/tag, figure secno,
-                 # duplicate flag] list
+references = {}  # Maps reference labels to pandocxnos.Target objects
 
 # Processing flags
 captionname_changed = False     # Flags the caption name changed
@@ -184,11 +183,15 @@ def _process_figure(value, fmt):
             attrs['tag'] = attrs['tag'].strip('"')
         elif attrs['tag'][0] == "'" and attrs['tag'][-1] == "'":
             attrs['tag'] = attrs['tag'].strip("'")
-        references[attrs.id] = \
-          [attrs['tag'], cursec, True if attrs.id in references else False]
+        if attrs.id not in references:
+            references[attrs.id] = pandocxnos.Target(attrs['tag'], cursec)
+        else:
+            references[attrs.id].has_duplicate = True
     else:  # ... then save the figure number
-        references[attrs.id] = \
-          [Nreferences, cursec, True if attrs.id in references else False]
+        if attrs.id not in references:
+            references[attrs.id] = pandocxnos.Target(Nreferences, cursec)
+        else:
+            references[attrs.id].has_duplicate = True
         Nreferences += 1  # Increment the global reference counter
 
     return fig
@@ -208,20 +211,21 @@ def _adjust_caption(fmt, fig, value):
         sep = {'none':'', 'colon':':', 'period':'.', 'space':' ',
                'quad':u'\u2000', 'newline':'\n'}[separator]
 
-        if isinstance(references[attrs.id][0], int):  # Numbered reference
+        if not references[attrs.id][0].is_tagged:  # Numbered reference
             if fmt in ['html', 'html5', 'epub', 'epub2', 'epub3']:
                 value[0]['c'][1] = [RawInline('html', r'<span>'),
                                     Str(captionname), Space(),
-                                    Str('%d%s'%(references[attrs.id][0], sep)),
+                                    Str('%s%s' % \
+                                        (str(references[attrs.id]), sep)),
                                     RawInline('html', r'</span>')]
             else:
                 value[0]['c'][1] = [Str(captionname),
                                     Space(),
-                                    Str('%d%s'%(references[attrs.id][0], sep))]
+                                    Str('%s%s' % \
+                                        (str(references[attrs.id]), sep))]
             value[0]['c'][1] += [Space()] + list(caption)
         else:  # Tagged reference
-            assert isinstance(references[attrs.id][0], STRTYPES)
-            text = references[attrs.id][0]
+            text = str(references[attrs.id])
             if text.startswith('$') and text.endswith('$'):  # Math
                 math = text.replace(' ', r'\ ')[1:-1]
                 els = [Math({"t":"InlineMath", "c":[]}, math), Str(sep)]
@@ -624,16 +628,14 @@ def main(stdin=STDIN, stdout=STDOUT, stderr=STDERR):
                                 detach_attrs_image], blocks)
 
     # Second pass
-    process_refs = process_refs_factory('pandoc-fignos', LABEL_PATTERN,
+    process_refs = process_refs_factory(LABEL_PATTERN,
                                         references.keys(), warninglevel)
-    replace_refs = replace_refs_factory(references,
-                                        cleveref, False,
+    replace_refs = replace_refs_factory(references, cleveref, False,
                                         plusname if not capitalise \
                                         or plusname_changed else
                                         [name.title() for name in plusname],
                                         starname)
-    attach_attrs_span = attach_attrs_factory('pandoc-fignos', Span,
-                                             warninglevel, replace=True)
+    attach_attrs_span = attach_attrs_factory(Span, warninglevel, replace=True)
     altered = functools.reduce(lambda x, action: walk(x, action, fmt, meta),
                                [repair_refs, process_refs, replace_refs,
                                 attach_attrs_span],
