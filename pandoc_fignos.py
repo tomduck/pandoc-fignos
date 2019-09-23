@@ -83,7 +83,8 @@ warninglevel = 2        # 0 - no warnings; 1 - some warnings; 2 - all warnings
 # Processing state variables
 cursec = None    # Current section
 Nreferences = 0  # Number of references in current section (or document)
-references = {}  # Maps reference labels to [number/tag, figure secno]
+references = {}  # Maps reference labels to [number/tag, figure secno,
+                 # duplicate flag] list
 
 # Processing flags
 captionname_changed = False     # Flags the caption name changed
@@ -183,9 +184,11 @@ def _process_figure(value, fmt):
             attrs['tag'] = attrs['tag'].strip('"')
         elif attrs['tag'][0] == "'" and attrs['tag'][-1] == "'":
             attrs['tag'] = attrs['tag'].strip("'")
-        references[attrs.id] = [attrs['tag'], cursec]
+        references[attrs.id] = \
+          [attrs['tag'], cursec, True if attrs.id in references else False]
     else:  # ... then save the figure number
-        references[attrs.id] = [Nreferences, cursec]
+        references[attrs.id] = \
+          [Nreferences, cursec, True if attrs.id in references else False]
         Nreferences += 1  # Increment the global reference counter
 
     return fig
