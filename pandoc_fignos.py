@@ -66,7 +66,7 @@ if sys.version_info > (3,):
 else:
     from urllib import unquote  # pylint: disable=no-name-in-module
 
-# Pattern for matching labels
+# Compiled regular expression for matching labels
 LABEL_PATTERN = re.compile(r'(fig:[\w/-]*)')
 
 # Meta variables; may be reset elsewhere
@@ -83,7 +83,7 @@ warninglevel = 2        # 0 - no warnings; 1 - some warnings; 2 - all warnings
 # Processing state variables
 cursec = None    # Current section
 Nreferences = 0  # Number of references in current section (or document)
-references = {}  # Maps reference labels to pandocxnos.Target objects
+references = {}  # Global references tracker
 
 # Processing flags
 captionname_changed = False     # Flags the caption name changed
@@ -99,11 +99,11 @@ PANDOCVERSION = None
 # Actions --------------------------------------------------------------------
 
 def _extract_attrs(x, n):
-    """Extracts attributes for an image.  n is the index where the
-    attributes begin in the element list x.  Extracted elements are deleted
+    """Extracts attributes for an image in the element list `x`.  The
+    attributes begin at index `n`.  Extracted elements are deleted
     from the list.
     """
-    try:
+    try:  #  Try the standard call from pandocxnos first
         return extract_attrs(x, n)
 
     except (ValueError, IndexError):
@@ -126,7 +126,13 @@ def _extract_attrs(x, n):
 
 
 def _process_figure(value, fmt):
-    """Processes a figure.  Returns a dict containing figure properties."""
+    """Processes a figure.  Returns a dict containing figure properties.
+
+    Parameters:
+
+      value - the content of the figure
+      fmt - the output format ('tex', 'html', ...)
+    """
 
     # pylint: disable=global-statement
     global cursec        # Current section being processed
@@ -175,7 +181,7 @@ def _process_figure(value, fmt):
             attrs['tag'] = str(cursec+secoffset) + '.' + str(Nreferences)
             Nreferences += 1
 
-    # Save reference information
+    # Update the global references tracker
     fig['is_tagged'] = 'tag' in attrs
     if fig['is_tagged']:  # ... then save the tag
         # Remove any surrounding quotes
@@ -183,19 +189,14 @@ def _process_figure(value, fmt):
             attrs['tag'] = attrs['tag'].strip('"')
         elif attrs['tag'][0] == "'" and attrs['tag'][-1] == "'":
             attrs['tag'] = attrs['tag'].strip("'")
-        if attrs.id not in references:
-            references[attrs.id] = pandocxnos.Target(attrs['tag'], cursec)
-        else:
-            references[attrs.id].has_duplicate = True
+        references[attrs.id] = pandocxnos.Target(attrs['tag'], cursec,
+                                                 attrs['tag'] in references)
     else:  # ... then save the figure number
-        if attrs.id not in references:
-            references[attrs.id] = pandocxnos.Target(Nreferences, cursec)
-        else:
-            references[attrs.id].has_duplicate = True
+        references[attrs.id] = pandocxnos.Target(Nreferences, cursec,
+                                                 attrs.id in references)
         Nreferences += 1  # Increment the global reference counter
 
     return fig
-
 
 def _adjust_caption(fmt, fig, value):
     """Adjusts the caption."""
@@ -211,21 +212,19 @@ def _adjust_caption(fmt, fig, value):
         sep = {'none':'', 'colon':':', 'period':'.', 'space':' ',
                'quad':u'\u2000', 'newline':'\n'}[separator]
 
-        if not references[attrs.id][0].is_tagged:  # Numbered reference
+        text = str(references[attrs.id].id)
+        if isinstance(references[attrs.id].id, int):  # Numbered reference
             if fmt in ['html', 'html5', 'epub', 'epub2', 'epub3']:
                 value[0]['c'][1] = [RawInline('html', r'<span>'),
                                     Str(captionname), Space(),
-                                    Str('%s%s' % \
-                                        (str(references[attrs.id]), sep)),
+                                    Str('%s%s' % (text, sep)),
                                     RawInline('html', r'</span>')]
             else:
                 value[0]['c'][1] = [Str(captionname),
                                     Space(),
-                                    Str('%s%s' % \
-                                        (str(references[attrs.id]), sep))]
+                                    Str('%s%s' % (text, sep))]
             value[0]['c'][1] += [Space()] + list(caption)
         else:  # Tagged reference
-            text = str(references[attrs.id])
             if text.startswith('$') and text.endswith('$'):  # Math
                 math = text.replace(' ', r'\ ')[1:-1]
                 els = [Math({"t":"InlineMath", "c":[]}, math), Str(sep)]
@@ -263,7 +262,7 @@ def _add_markup(fmt, fig, value):
             # Use the tagged-figure environment
             has_tagged_figures = True
             ret = [RawBlock('tex', r'\begin{fignos:tagged-figure}[%s]' % \
-                            references[attrs.id][0]),
+                            str(references[attrs.id].id)),
                    Para(value),
                    RawBlock('tex', r'\end{fignos:tagged-figure}')]
     elif fmt in ('html', 'html5', 'epub', 'epub2', 'epub3'):
@@ -615,8 +614,7 @@ def main(stdin=STDIN, stdout=STDOUT, stderr=STDERR):
 
     # First pass
     replace = PANDOCVERSION >= '1.16'
-    attach_attrs_image = attach_attrs_factory('pandoc-fignos', Image,
-                                              warninglevel,
+    attach_attrs_image = attach_attrs_factory(Image, warninglevel,
                                               extract_attrs=_extract_attrs,
                                               replace=replace)
     detach_attrs_image = detach_attrs_factory(Image)
