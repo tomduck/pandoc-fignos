@@ -190,7 +190,7 @@ def _process_figure(value, fmt):
         elif attrs['tag'][0] == "'" and attrs['tag'][-1] == "'":
             attrs['tag'] = attrs['tag'].strip("'")
         references[attrs.id] = pandocxnos.Target(attrs['tag'], cursec,
-                                                 attrs['tag'] in references)
+                                                 attrs.id in references)
     else:  # ... then save the figure number
         references[attrs.id] = pandocxnos.Target(Nreferences, cursec,
                                                  attrs.id in references)
@@ -212,24 +212,24 @@ def _adjust_caption(fmt, fig, value):
         sep = {'none':'', 'colon':':', 'period':'.', 'space':' ',
                'quad':u'\u2000', 'newline':'\n'}[separator]
 
-        text = str(references[attrs.id].id)
-        if isinstance(references[attrs.id].id, int):  # Numbered reference
+        num = references[attrs.id].num
+        if isinstance(num, int):  # Numbered reference
             if fmt in ['html', 'html5', 'epub', 'epub2', 'epub3']:
                 value[0]['c'][1] = [RawInline('html', r'<span>'),
                                     Str(captionname), Space(),
-                                    Str('%s%s' % (text, sep)),
+                                    Str('%d%s' % (num, sep)),
                                     RawInline('html', r'</span>')]
             else:
                 value[0]['c'][1] = [Str(captionname),
                                     Space(),
-                                    Str('%s%s' % (text, sep))]
+                                    Str('%d%s' % (num, sep))]
             value[0]['c'][1] += [Space()] + list(caption)
         else:  # Tagged reference
-            if text.startswith('$') and text.endswith('$'):  # Math
-                math = text.replace(' ', r'\ ')[1:-1]
+            if num.startswith('$') and num.endswith('$'):  # Math
+                math = num.replace(' ', r'\ ')[1:-1]
                 els = [Math({"t":"InlineMath", "c":[]}, math), Str(sep)]
             else:  # Text
-                els = [Str(text+sep)]
+                els = [Str(num+sep)]
             if fmt in ['html', 'html5', 'epub', 'epub2', 'epub3']:
                 value[0]['c'][1] = \
                   [RawInline('html', r'<span>'),
@@ -262,7 +262,7 @@ def _add_markup(fmt, fig, value):
             # Use the tagged-figure environment
             has_tagged_figures = True
             ret = [RawBlock('tex', r'\begin{fignos:tagged-figure}[%s]' % \
-                            str(references[attrs.id].id)),
+                            str(references[attrs.id].num)),
                    Para(value),
                    RawBlock('tex', r'\end{fignos:tagged-figure}')]
     elif fmt in ('html', 'html5', 'epub', 'epub2', 'epub3'):
