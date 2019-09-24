@@ -1,6 +1,6 @@
-pandoc-fignos 2.1.0 (2019-09-23)
+pandoc-fignos 2.1.0 (2019-09-24)
 
-    * Checks for and warns about duplicate reference targets.
+    * Warns about duplicate reference targets.
 
 
 pandoc-fignos 2.0.0 (2019-09-17)
