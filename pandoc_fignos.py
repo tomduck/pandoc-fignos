@@ -401,6 +401,7 @@ def process(meta):
     for name in ['fignos-warning-level', 'xnos-warning-level']:
         if name in meta:
             warninglevel = int(get_meta(meta, name))
+            pandocxnos.set_warning_level(warninglevel)
             break
 
     metanames = ['fignos-warning-level', 'xnos-warning-level',
@@ -522,8 +523,7 @@ def add_tex(meta):
             \\usepackage%s{cleveref}
         """ % ('[capitalise]' if capitalise else '')
         pandocxnos.add_to_header_includes(
-            meta, 'tex', tex, warninglevel,
-            r'\\usepackage(\[[\w\s,]*\])?\{cleveref\}')
+            meta, 'tex', tex, regex=r'\\usepackage(\[[\w\s,]*\])?\{cleveref\}')
 
     if has_unnumbered_figures or (separator_changed and references):
         tex = """
@@ -531,47 +531,44 @@ def add_tex(meta):
             \\usepackage{caption}
         """
         pandocxnos.add_to_header_includes(
-            meta, 'tex', tex, warninglevel,
-            r'\\usepackage(\[[\w\s,]*\])?\{caption\}')
+            meta, 'tex', tex, regex=r'\\usepackage(\[[\w\s,]*\])?\{caption\}')
 
     if plusname_changed and references:
         tex = """
             %%%% pandoc-fignos: change cref names
             \\crefname{figure}{%s}{%s}
         """ % (plusname[0], plusname[1])
-        pandocxnos.add_to_header_includes(meta, 'tex', tex, warninglevel)
+        pandocxnos.add_to_header_includes(meta, 'tex', tex)
 
     if starname_changed and references:
         tex = """
             %%%% pandoc-fignos: change Cref names
             \\Crefname{figure}{%s}{%s}
         """ % (starname[0], starname[1])
-        pandocxnos.add_to_header_includes(meta, 'tex', tex, warninglevel)
+        pandocxnos.add_to_header_includes(meta, 'tex', tex)
 
     if has_unnumbered_figures:
         pandocxnos.add_to_header_includes(
-            meta, 'tex', NO_PREFIX_CAPTION_ENV_TEX, warninglevel)
+            meta, 'tex', NO_PREFIX_CAPTION_ENV_TEX)
 
     if has_tagged_figures and references:
-        pandocxnos.add_to_header_includes(
-            meta, 'tex', TAGGED_FIGURE_ENV_TEX, warninglevel)
+        pandocxnos.add_to_header_includes(meta, 'tex', TAGGED_FIGURE_ENV_TEX)
 
     if captionname_changed and references:
         pandocxnos.add_to_header_includes(
-            meta, 'tex', CAPTION_NAME_TEX % captionname, warninglevel)
+            meta, 'tex', CAPTION_NAME_TEX % captionname)
 
     if separator_changed and references:
         pandocxnos.add_to_header_includes(
-            meta, 'tex', CAPTION_SEPARATOR_TEX % separator, warninglevel)
+            meta, 'tex', CAPTION_SEPARATOR_TEX % separator)
 
     if numbersections and references:
-        pandocxnos.add_to_header_includes(
-            meta, 'tex', NUMBER_BY_SECTION_TEX, warninglevel)
+        pandocxnos.add_to_header_includes(meta, 'tex', NUMBER_BY_SECTION_TEX)
 
     if secoffset and references:
         pandocxnos.add_to_header_includes(
-            meta, 'tex', SECOFFSET_TEX % secoffset, warninglevel,
-            r'\\setcounter\{section\}')
+            meta, 'tex', SECOFFSET_TEX % secoffset,
+            regex=r'\\setcounter\{section\}')
 
     if warnings:
         STDERR.write('\n')
@@ -614,7 +611,7 @@ def main(stdin=STDIN, stdout=STDOUT, stderr=STDERR):
 
     # First pass
     replace = PANDOCVERSION >= '1.16'
-    attach_attrs_image = attach_attrs_factory(Image, warninglevel,
+    attach_attrs_image = attach_attrs_factory(Image,
                                               extract_attrs=_extract_attrs,
                                               replace=replace)
     detach_attrs_image = detach_attrs_factory(Image)
@@ -626,14 +623,13 @@ def main(stdin=STDIN, stdout=STDOUT, stderr=STDERR):
                                 detach_attrs_image], blocks)
 
     # Second pass
-    process_refs = process_refs_factory(LABEL_PATTERN,
-                                        references.keys(), warninglevel)
+    process_refs = process_refs_factory(LABEL_PATTERN, references.keys())
     replace_refs = replace_refs_factory(references, cleveref, False,
                                         plusname if not capitalise \
                                         or plusname_changed else
                                         [name.title() for name in plusname],
                                         starname)
-    attach_attrs_span = attach_attrs_factory(Span, warninglevel, replace=True)
+    attach_attrs_span = attach_attrs_factory(Span, replace=True)
     altered = functools.reduce(lambda x, action: walk(x, action, fmt, meta),
                                [repair_refs, process_refs, replace_refs,
                                 attach_attrs_span],
