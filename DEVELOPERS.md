@@ -92,7 +92,7 @@ Tagging  (update the version number):
 
 Create source and binary distributions using
 
-    $ python3 setup.py sdist bdist_wheel
+    python3 setup.py sdist bdist_wheel
 
 (see https://packaging.python.org/tutorials/packaging-projects/).
     
