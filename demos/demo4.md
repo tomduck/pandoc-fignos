@@ -16,17 +16,19 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
     \centering
     \includegraphics[width=\textwidth]{img/fig-1.png}
     \caption{The number one.}
+    \label{fig:1a}
   \end{subfigure}
   \begin{subfigure}[b]{0.3\textwidth}
     \centering
     \includegraphics[width=\textwidth]{img/fig-2.png}
     \caption{The number two.}
+    \label{fig:1b}
   \end{subfigure}
   \caption{Two numbers.}
   \label{fig:1}
 \end{figure}
 
-References to @fig:1, {@fig:1}a, and {@fig:1}b.
+References to @fig:1, @fig:1a, and @fig:1b.
 
 ![The number three.](img/fig-3.png){#fig: width=1in}
 
