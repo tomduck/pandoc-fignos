@@ -3,15 +3,15 @@ extensions = .pdf .html .epub .tex .docx
 
 dest = $(addprefix out/demo,$(extensions)) \
        $(addprefix out/demo2,$(extensions)) \
-       $(addprefix out/demo3,$(extensions))
-
+       $(addprefix out/demo3,$(extensions)) \
+       out/demo4.pdf
 
 all: $(dest)
-
 
 $(filter out/demo.%,$(dest)): demo.md
 $(filter out/demo2.%,$(dest)): demo2.md
 $(filter out/demo3.%,$(dest)): demo3.md
+$(filter out/demo4.%,$(dest)): demo4.md
 
 out/%.pdf: %.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
