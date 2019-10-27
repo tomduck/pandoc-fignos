@@ -166,6 +166,7 @@ LaTeX subfigures may be coded manually and referenced as shown in [demo4.md].  P
 Because raw LaTeX is used, this approach only works for LaTeX and pdf output formats.
 
 [demo4.md]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/demo4.md
+[demo4.pdf]: https://raw.githack.com/tomduck/pandoc-fignos/demos/demo4.pdf
 
 
 Customization
