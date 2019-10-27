@@ -494,7 +494,7 @@ def process(meta):
         secoffset = int(get_meta(meta, 'xnos-number-offset'))
 
 def add_tex(meta):
-    """Adds text to the meta data."""
+    """Adds tex to the meta data."""
 
     # pylint: disable=too-many-boolean-expressions
     warnings = warninglevel == 2 and references and \
