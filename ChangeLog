@@ -1,3 +1,8 @@
+pandoc-fignos 2.1.2 (2019-10-27)
+
+    * LaTeX subfigures support documented (Issue #50).
+
+
 pandoc-fignos 2.1.1 (2019-09-26)
 
     * Warns about duplicate reference targets.
