@@ -1,5 +1,5 @@
 
-**New in 2.1.2:** LaTeX subfigures support (in documentation).
+**New in 2.2.0:** Subfigures support.
 
 **New in 2.1.1:** Warnings are given for duplicate reference targets.
 
@@ -8,7 +8,7 @@
 [more...](#whats-new)
 
 
-pandoc-fignos 2.1.2
+pandoc-fignos 2.2.0
 ===================
 
 *pandoc-fignos* is a [pandoc] filter for numbering figures and their references when converting from markdown to other formats.  It is part of the [pandoc-xnos] filter suite.  LaTeX/pdf, html, and epub output have native support.  Native support for docx output is a work in progress.
@@ -159,14 +159,20 @@ To disable a link on a reference, set `nolink=True` in the reference's attribute
     @fig:id{nolink=True}
 
 
-### Subfigures (LaTeX/pdf only) ###
+### Subfigures ###
 
-LaTeX subfigures may be coded manually and referenced as shown in [demo4.md].  Processing with pandoc + pandoc-fignos gives [demo4.pdf].  Warnings that arise when using this approach can be safely ignored.
+Pandoc does not provide syntactical support for subfigures.  However, subfigures of arbitrary complexity assembled using the native capabilities of each output format may still be referenced.
 
-Because raw LaTeX is used, this approach only works for LaTeX and pdf output formats.
+*LaTeX/pdf* subfigures may be coded and referenced as shown in [demo4.md].  Processing with pandoc + pandoc-fignos gives [demo4.pdf].  This technique uses capabilities provided by the [subcaption] package.  "Bad reference" warnings involving subfigures may be ignored when using this approach.
+
+*Html/epub* subfigures may be coded and referenced as shown in [demo5.md].  Processing with pandoc + pandoc-fignos gives [demo5.html].  This technique uses pandoc [divs].  Divs may be nested and styled as required with css.  Note that pandoc requires figures to be in their own paragraph (i.e., with a blank line above and below).
 
 [demo4.md]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/demo4.md
 [demo4.pdf]: https://raw.githack.com/tomduck/pandoc-fignos/demos/demo4.pdf
+[subcaption]: 
+[demo5.md]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/demo5.md
+[demo5.html]: https://raw.githack.com/tomduck/pandoc-fignos/demos/demo5.html
+[divs]: https://pandoc.org/MANUAL.html#divs-and-spans
 
 
 Customization
@@ -320,6 +326,8 @@ Developer notes are maintained in [DEVELOPERS.md].
 
 What's New
 ----------
+
+**New in 2.2.0:** Added html/epub subfigures support.
 
 **New in 2.1.2:** LaTeX subfigures support.  Documentation is provided to show how to reference LaTeX subfigures.  No changes to existing code were required.
 

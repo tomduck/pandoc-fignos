@@ -3,7 +3,7 @@
 """pandoc-fignos: a pandoc filter that inserts figure nos. and refs."""
 
 
-__version__ = '2.1.2'
+__version__ = '2.2.0'
 
 
 # Copyright 2015-2019 Thomas J. Duck.
@@ -29,7 +29,7 @@ __version__ = '2.1.2'
 #   1. Insert text for the figure number in each figure caption.
 #      For LaTeX, insert \label{...} instead.  The figure ids
 #      and associated figure numbers are stored in the global
-#      references tracker.
+#      target tracker.
 #
 #   2. Replace each reference with a figure number.  For LaTeX,
 #      replace with \ref{...} instead.
@@ -50,7 +50,8 @@ import textwrap
 import uuid
 
 from pandocfilters import walk
-from pandocfilters import Image, Math, Str, Space, Para, RawBlock, RawInline
+from pandocfilters import Image, Div
+from pandocfilters import Math, Str, Space, Para, RawBlock, RawInline
 from pandocfilters import Span
 
 import pandocxnos
@@ -81,9 +82,9 @@ secoffset = 0           # Section number offset
 warninglevel = 2        # 0 - no warnings; 1 - some warnings; 2 - all warnings
 
 # Processing state variables
-cursec = None    # Current section
-Nreferences = 0  # Number of references in current section (or document)
-references = {}  # Global references tracker
+cursec = None  # Current section
+Ntargets = 0   # Number of targets in current section (or document)
+targets = {}   # Global targets tracker
 
 # Processing flags
 captionname_changed = False     # Flags the caption name changed
@@ -125,18 +126,19 @@ def _extract_attrs(x, n):
         raise
 
 
-def _process_figure(value, fmt):
+def _process_figure(key, value, fmt):
     """Processes a figure.  Returns a dict containing figure properties.
 
     Parameters:
 
+      key - 'Para' (for a normal figure) or 'Div'
       value - the content of the figure
       fmt - the output format ('tex', 'html', ...)
     """
 
     # pylint: disable=global-statement
-    global cursec        # Current section being processed
-    global Nreferences   # Number of refs in current section (or document)
+    global cursec    # Current section being processed
+    global Ntargets  # Number of targets in current section (or document)
     global has_unnumbered_figures  # Flags that unnumbered figures were found
 
     # Initialize the return value
@@ -145,14 +147,16 @@ def _process_figure(value, fmt):
            'is_tagged': False}
 
     # Bail out if there are no attributes
-    if len(value[0]['c']) == 2:
+    if key == 'Para' and len(value[0]['c']) == 2:
         has_unnumbered_figures = True
         fig.update({'is_unnumbered': True, 'is_unreferenceable': True})
         return fig
 
     # Parse the figure
-    attrs = fig['attrs'] = PandocAttributes(value[0]['c'][0], 'pandoc')
-    fig['caption'] = value[0]['c'][1]
+    attrs = fig['attrs'] = \
+      PandocAttributes(value[0]['c'][0] if key == 'Para' else value[0],
+                       'pandoc')
+    fig['caption'] = value[0]['c'][1] if key == 'Para' else None
 
     # Bail out if the label does not conform to expectations
     if not LABEL_PATTERN.match(attrs.id):
@@ -168,7 +172,7 @@ def _process_figure(value, fmt):
     # Update the current section number
     if attrs['secno'] != cursec:  # The section number changed
         cursec = attrs['secno']   # Update the global section tracker
-        Nreferences = 1           # Resets the global reference counter
+        Ntargets = 1              # Resets the global target counter
 
     # Pandoc's --number-sections supports section numbering latex/pdf, html,
     # epub, and docx
@@ -178,10 +182,10 @@ def _process_figure(value, fmt):
         # tags.
         if fmt in ['html', 'html5', 'epub', 'epub2', 'epub3', 'docx'] and \
           'tag' not in attrs:
-            attrs['tag'] = str(cursec+secoffset) + '.' + str(Nreferences)
-            Nreferences += 1
+            attrs['tag'] = str(cursec+secoffset) + '.' + str(Ntargets)
+            Ntargets += 1
 
-    # Update the global references tracker
+    # Update the global targets tracker
     fig['is_tagged'] = 'tag' in attrs
     if fig['is_tagged']:  # ... then save the tag
         # Remove any surrounding quotes
@@ -189,12 +193,12 @@ def _process_figure(value, fmt):
             attrs['tag'] = attrs['tag'].strip('"')
         elif attrs['tag'][0] == "'" and attrs['tag'][-1] == "'":
             attrs['tag'] = attrs['tag'].strip("'")
-        references[attrs.id] = pandocxnos.Target(attrs['tag'], cursec,
-                                                 attrs.id in references)
+        targets[attrs.id] = pandocxnos.Target(attrs['tag'], cursec,
+                                              attrs.id in targets)
     else:  # ... then save the figure number
-        references[attrs.id] = pandocxnos.Target(Nreferences, cursec,
-                                                 attrs.id in references)
-        Nreferences += 1  # Increment the global reference counter
+        targets[attrs.id] = pandocxnos.Target(Ntargets, cursec,
+                                              attrs.id in targets)
+        Ntargets += 1  # Increment the global targets counter
 
     return fig
 
@@ -212,8 +216,8 @@ def _adjust_caption(fmt, fig, value):
         sep = {'none':'', 'colon':':', 'period':'.', 'space':' ',
                'quad':u'\u2000', 'newline':'\n'}[separator]
 
-        num = references[attrs.id].num
-        if isinstance(num, int):  # Numbered reference
+        num = targets[attrs.id].num
+        if isinstance(num, int):  # Numbered target
             if fmt in ['html', 'html5', 'epub', 'epub2', 'epub3']:
                 value[0]['c'][1] = [RawInline('html', r'<span>'),
                                     Str(captionname), Space(),
@@ -224,7 +228,7 @@ def _adjust_caption(fmt, fig, value):
                                     Space(),
                                     Str('%d%s' % (num, sep))]
             value[0]['c'][1] += [Space()] + list(caption)
-        else:  # Tagged reference
+        else:  # Tagged target
             if num.startswith('$') and num.endswith('$'):  # Math
                 math = num.replace(' ', r'\ ')[1:-1]
                 els = [Math({"t":"InlineMath", "c":[]}, math), Str(sep)]
@@ -238,7 +242,6 @@ def _adjust_caption(fmt, fig, value):
             else:
                 value[0]['c'][1] = [Str(captionname), Space()] + els
             value[0]['c'][1] += [Space()] + list(caption)
-
 
 def _add_markup(fmt, fig, value):
     """Adds markup to the output."""
@@ -262,7 +265,7 @@ def _add_markup(fmt, fig, value):
             # Use the tagged-figure environment
             has_tagged_figures = True
             ret = [RawBlock('tex', r'\begin{fignos:tagged-figure}[%s]' % \
-                            str(references[attrs.id].num)),
+                            str(targets[attrs.id].num)),
                    Para(value),
                    RawBlock('tex', r'\end{fignos:tagged-figure}')]
     elif fmt in ('html', 'html5', 'epub', 'epub2', 'epub3'):
@@ -283,8 +286,7 @@ def _add_markup(fmt, fig, value):
           RawBlock('openxml', '<w:bookmarkEnd w:id="0"/>')
         ret = [bookmarkstart, Para(value), bookmarkend]
     return ret
-
-
+    
 def process_figures(key, value, fmt, meta):  # pylint: disable=unused-argument
     """Processes the figures."""
 
@@ -293,11 +295,14 @@ def process_figures(key, value, fmt, meta):  # pylint: disable=unused-argument
       value[0]['t'] == 'Image' and value[0]['c'][-1][1].startswith('fig:'):
 
         # Process the figure and add markup
-        fig = _process_figure(value, fmt)
+        fig = _process_figure(key, value, fmt)
         if 'attrs' in fig:
             _adjust_caption(fmt, fig, value)
         return _add_markup(fmt, fig, value)
 
+    if key == 'Div' and LABEL_PATTERN.match(value[0][0]):
+        fig = _process_figure(key, value, fmt)
+    
     return None
 
 
@@ -497,7 +502,7 @@ def add_tex(meta):
     """Adds tex to the meta data."""
 
     # pylint: disable=too-many-boolean-expressions
-    warnings = warninglevel == 2 and references and \
+    warnings = warninglevel == 2 and targets and \
       (pandocxnos.cleveref_required() or has_unnumbered_figures or
        plusname_changed or starname_changed or has_tagged_figures or
        captionname_changed or numbersections or secoffset)
@@ -517,7 +522,7 @@ def add_tex(meta):
     # is a known issue and is owing to a design decision in pandoc.
     # See https://github.com/jgm/pandoc/issues/3139.
 
-    if pandocxnos.cleveref_required() and references:
+    if pandocxnos.cleveref_required() and targets:
         tex = """
             %%%% pandoc-fignos: required package
             \\usepackage%s{cleveref}
@@ -525,7 +530,7 @@ def add_tex(meta):
         pandocxnos.add_to_header_includes(
             meta, 'tex', tex, regex=r'\\usepackage(\[[\w\s,]*\])?\{cleveref\}')
 
-    if has_unnumbered_figures or (separator_changed and references):
+    if has_unnumbered_figures or (separator_changed and targets):
         tex = """
             %%%% pandoc-fignos: required package
             \\usepackage{caption}
@@ -533,14 +538,14 @@ def add_tex(meta):
         pandocxnos.add_to_header_includes(
             meta, 'tex', tex, regex=r'\\usepackage(\[[\w\s,]*\])?\{caption\}')
 
-    if plusname_changed and references:
+    if plusname_changed and targets:
         tex = """
             %%%% pandoc-fignos: change cref names
             \\crefname{figure}{%s}{%s}
         """ % (plusname[0], plusname[1])
         pandocxnos.add_to_header_includes(meta, 'tex', tex)
 
-    if starname_changed and references:
+    if starname_changed and targets:
         tex = """
             %%%% pandoc-fignos: change Cref names
             \\Crefname{figure}{%s}{%s}
@@ -551,21 +556,21 @@ def add_tex(meta):
         pandocxnos.add_to_header_includes(
             meta, 'tex', NO_PREFIX_CAPTION_ENV_TEX)
 
-    if has_tagged_figures and references:
+    if has_tagged_figures and targets:
         pandocxnos.add_to_header_includes(meta, 'tex', TAGGED_FIGURE_ENV_TEX)
 
-    if captionname_changed and references:
+    if captionname_changed and targets:
         pandocxnos.add_to_header_includes(
             meta, 'tex', CAPTION_NAME_TEX % captionname)
 
-    if separator_changed and references:
+    if separator_changed and targets:
         pandocxnos.add_to_header_includes(
             meta, 'tex', CAPTION_SEPARATOR_TEX % separator)
 
-    if numbersections and references:
+    if numbersections and targets:
         pandocxnos.add_to_header_includes(meta, 'tex', NUMBER_BY_SECTION_TEX)
 
-    if secoffset and references:
+    if secoffset and targets:
         pandocxnos.add_to_header_includes(
             meta, 'tex', SECOFFSET_TEX % secoffset,
             regex=r'\\setcounter\{section\}')
@@ -615,16 +620,20 @@ def main(stdin=STDIN, stdout=STDOUT, stderr=STDERR):
                                               extract_attrs=_extract_attrs,
                                               replace=replace)
     detach_attrs_image = detach_attrs_factory(Image)
-    insert_secnos = insert_secnos_factory(Image)
-    delete_secnos = delete_secnos_factory(Image)
+    insert_secnos_img = insert_secnos_factory(Image)
+    delete_secnos_img = delete_secnos_factory(Image)
+    insert_secnos_div = insert_secnos_factory(Div)
+    delete_secnos_div = delete_secnos_factory(Div)
     altered = functools.reduce(lambda x, action: walk(x, action, fmt, meta),
-                               [attach_attrs_image, insert_secnos,
-                                process_figures, delete_secnos,
+                               [attach_attrs_image,
+                                insert_secnos_img, insert_secnos_div,
+                                process_figures,
+                                delete_secnos_img, delete_secnos_div,
                                 detach_attrs_image], blocks)
 
     # Second pass
-    process_refs = process_refs_factory(LABEL_PATTERN, references.keys())
-    replace_refs = replace_refs_factory(references, cleveref, False,
+    process_refs = process_refs_factory(LABEL_PATTERN, targets.keys())
+    replace_refs = replace_refs_factory(targets, cleveref, False,
                                         plusname if not capitalise \
                                         or plusname_changed else
                                         [name.title() for name in plusname],

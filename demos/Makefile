@@ -4,7 +4,8 @@ extensions = .pdf .html .epub .tex .docx
 dest = $(addprefix out/demo,$(extensions)) \
        $(addprefix out/demo2,$(extensions)) \
        $(addprefix out/demo3,$(extensions)) \
-       out/demo4.pdf
+       out/demo4.pdf out/demo4.tex\
+       out/demo5.html out/demo5.epub
 
 all: $(dest)
 
@@ -12,6 +13,7 @@ $(filter out/demo.%,$(dest)): demo.md
 $(filter out/demo2.%,$(dest)): demo2.md
 $(filter out/demo3.%,$(dest)): demo3.md
 $(filter out/demo4.%,$(dest)): demo4.md
+$(filter out/demo5.%,$(dest)): demo5.md
 
 out/%.pdf: %.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
@@ -24,7 +26,7 @@ out/%.html: %.md headers/header.html
 
 out/%.epub: %.md
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
-	pandoc $< -t epub3 --filter pandoc-fignos -o $@
+	pandoc $< -t epub3 --filter pandoc-fignos --include-in-header=headers/header.html -o $@
 
 out/%:
 	@if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
