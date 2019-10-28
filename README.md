@@ -161,7 +161,7 @@ To disable a link on a reference, set `nolink=True` in the reference's attribute
 
 ### Subfigures ###
 
-Pandoc does not provide syntactical support for subfigures.  However, subfigures of arbitrary complexity assembled using the native capabilities of each output format may still be referenced.
+Pandoc does not provide syntactical support for subfigures.  However, subfigures of arbitrary complexity may be assembled using the native capabilities of each output format, and referenced using pandoc-fignos.
 
 *LaTeX/pdf* subfigures may be coded and referenced as shown in [demo4.md].  Processing with pandoc + pandoc-fignos gives [demo4.pdf].  This technique uses capabilities provided by the [subcaption] package.  "Bad reference" warnings involving subfigures may be ignored when using this approach.
 
