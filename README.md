@@ -169,7 +169,7 @@ Pandoc does not provide syntactical support for subfigures.  However, subfigures
 
 [demo4.md]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/demo4.md
 [demo4.pdf]: https://raw.githack.com/tomduck/pandoc-fignos/demos/demo4.pdf
-[subcaption]: 
+[subcaption]: https://ctan.org/pkg/subcaption
 [demo5.md]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/demo5.md
 [demo5.html]: https://raw.githack.com/tomduck/pandoc-fignos/demos/demo5.html
 [divs]: https://pandoc.org/MANUAL.html#divs-and-spans
