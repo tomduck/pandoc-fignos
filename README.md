@@ -167,6 +167,8 @@ Pandoc does not provide syntactical support for subfigures.  However, subfigures
 
 *Html/epub* subfigures may be coded and referenced as shown in [demo5.md].  Processing with pandoc + pandoc-fignos gives [demo5.html].  This technique uses pandoc's [fenced divs].  Fenced divs may be nested and styled as required with css.  Note that pandoc requires figures to be in their own paragraph (i.e., with a blank line above and below).
 
+The above demos use certain customizations, described next.
+
 [demo4.md]: https://raw.githubusercontent.com/tomduck/pandoc-fignos/master/demos/demo4.md
 [demo4.pdf]: https://raw.githack.com/tomduck/pandoc-fignos/demos/demo4.pdf
 [subcaption]: https://ctan.org/pkg/subcaption
