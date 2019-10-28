@@ -1,7 +1,7 @@
 
 **New in 2.2.0:** Subfigures support.
 
-**New in 2.1.1:** Warnings are given for duplicate reference targets.
+**New in 2.1.1:** Warnings for duplicate reference targets.
 
 **New in 2.0.0:** This is a major release which is easier to use at the cost of minor incompatibilities with previous versions.
 
@@ -327,11 +327,11 @@ Developer notes are maintained in [DEVELOPERS.md].
 What's New
 ----------
 
-**New in 2.2.0:** Added html/epub subfigures support.
+**New in 2.2.0:** Html/epub subfigures support.
 
 **New in 2.1.2:** LaTeX subfigures support.  Documentation is provided to show how to reference LaTeX subfigures.  No changes to existing code were required.
 
-**New in 2.1.1:** Warnings are given for duplicate reference targets.
+**New in 2.1.1:** Warnings for duplicate reference targets.
 
 **New in 2.0.0:**  This version represents a major revision of pandoc-fignos.  While the interface is similar to that of the 1.x series, some users may encounter minor compatibility issues.
 
