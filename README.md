@@ -1,4 +1,6 @@
 
+**New in 2.3.0:** 
+
 **New in 2.2.0:** Subfigures support.
 
 **New in 2.1.1:** Warnings for duplicate reference targets.
@@ -8,14 +10,14 @@
 [more...](#whats-new)
 
 
-pandoc-fignos 2.2.0
+pandoc-fignos 2.3.0
 ===================
 
 *pandoc-fignos* is a [pandoc] filter for numbering figures and their references when converting from markdown to other formats.  It is part of the [pandoc-xnos] filter suite.  LaTeX/pdf, html, and epub output have native support.  Native support for docx output is a work in progress.
 
 Demonstration: Processing [demo3.md] with pandoc + pandoc-fignos gives numbered figures and references in [pdf][pdf3], [tex][tex3], [html][html3], [epub][epub3], [docx][docx3] and other formats.
 
-This version of pandoc-fignos was tested using pandoc 1.15.2 - 2.7.3,<sup>[1](#footnote1)</sup> and may be used with linux, macOS, and Windows. Bug reports and feature requests may be posted on the project's [Issues tracker].  If you find pandoc-fignos useful, then please kindly give it a star [on GitHub].
+This version of pandoc-fignos was tested using pandoc 1.15.2 - 2.10.1,<sup>[1](#footnote1)</sup> and may be used with linux, macOS, and Windows. Bug reports and feature requests may be posted on the project's [Issues tracker].  If you find pandoc-fignos useful, then please kindly give it a star [on GitHub].
 
 See also: [pandoc-eqnos], [pandoc-tablenos], [pandoc-secnos] \
 Other filters: [pandoc-comments], [pandoc-latex-extensions]
