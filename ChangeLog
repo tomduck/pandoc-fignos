@@ -1,6 +1,7 @@
 pandoc-fignos 2.3.0 (unreleased)
 
     * Updated to work with pandoc 2.10.
+    * Fixed figure number reset problem for html, docx (Issue #76).
 
 
 pandoc-fignos 2.2.0 (2019-10-27)
