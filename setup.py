@@ -1,6 +1,6 @@
 """setup.py - install script for pandoc-fignos."""
 
-# Copyright 2015-2019 Thomas J. Duck.
+# Copyright 2015-2020 Thomas J. Duck.
 # All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,8 +17,13 @@
 
 import re
 import io
+import textwrap
+import sys
+import shutil
 
 from setuptools import setup
+
+# pylint: disable=invalid-name
 
 DESCRIPTION = """\
 A pandoc filter for numbering figures and their references
@@ -59,3 +64,13 @@ setup(
         'Programming Language :: Python'
         ],
 )
+
+
+# Check that the pandoc-fignos script is on the PATH
+if not shutil.which('pandoc-xnos'):
+    msg = """
+          ERROR: `pandoc-fignos` script not found.  You will need to find
+          the script and ensure it is on your PATH.  Please file an Issue at
+          https://github.com/tomduck/pandoc-fignos/issues.\n"""
+    print(textwrap.dedent(msg))
+    sys.exit(-1)
