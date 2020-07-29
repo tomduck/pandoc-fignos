@@ -286,7 +286,7 @@ def _add_markup(fmt, fig, value):
           RawBlock('openxml', '<w:bookmarkEnd w:id="0"/>')
         ret = [bookmarkstart, Para(value), bookmarkend]
     return ret
-    
+
 def process_figures(key, value, fmt, meta):  # pylint: disable=unused-argument
     """Processes the figures."""
 
@@ -302,7 +302,7 @@ def process_figures(key, value, fmt, meta):  # pylint: disable=unused-argument
 
     if key == 'Div' and LABEL_PATTERN.match(value[0][0]):
         fig = _process_figure(key, value, fmt)
-    
+
     return None
 
 
