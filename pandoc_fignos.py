@@ -185,7 +185,8 @@ def _process_figure(key, value, fmt):
         # Latex/pdf supports equation numbers by section natively.  For the
         # other formats we must hard-code in figure numbers by section as
         # tags.
-        if fmt in ['html', 'html5', 'epub', 'epub2', 'epub3', 'docx'] and \
+        if fmt in ['html', 'html4', 'html5', 'epub', 'epub2', 'epub3',
+                   'docx'] and \
           'tag' not in attrs:
             attrs['tag'] = str(cursec+secoffset) + '.' + str(Ntargets)
 
@@ -221,7 +222,7 @@ def _adjust_caption(fmt, fig, value):
 
         num = targets[attrs.id].num
         if isinstance(num, int):  # Numbered target
-            if fmt in ['html', 'html5', 'epub', 'epub2', 'epub3']:
+            if fmt in ['html', 'html4', 'html5', 'epub', 'epub2', 'epub3']:
                 value[0]['c'][1] = [RawInline('html', r'<span>'),
                                     Str(captionname), Space(),
                                     Str('%d%s' % (num, sep)),
@@ -237,7 +238,7 @@ def _adjust_caption(fmt, fig, value):
                 els = [Math({"t":"InlineMath", "c":[]}, math), Str(sep)]
             else:  # Text
                 els = [Str(num+sep)]
-            if fmt in ['html', 'html5', 'epub', 'epub2', 'epub3']:
+            if fmt in ['html', 'html4', 'html5', 'epub', 'epub2', 'epub3']:
                 value[0]['c'][1] = \
                   [RawInline('html', r'<span>'),
                    Str(captionname),
@@ -271,7 +272,7 @@ def _add_markup(fmt, fig, value):
                             str(targets[attrs.id].num)),
                    Para(value),
                    RawBlock('tex', r'\end{fignos:tagged-figure}')]
-    elif fmt in ('html', 'html5', 'epub', 'epub2', 'epub3'):
+    elif fmt in ('html', 'html4', 'html5', 'epub', 'epub2', 'epub3'):
         if LABEL_PATTERN.match(attrs.id):
             pre = RawBlock('html', '<div id="%s" class="fignos">'%attrs.id)
             post = RawBlock('html', '</div>')
