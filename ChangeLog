@@ -1,3 +1,10 @@
+pandoc-fignos 2.X.X (unreleased)
+
+    * Fixed "Failed reading: not a valid json" error when using
+      python 2.7 (pandoc-tablenos Issue #19 and pandoc-eqnos
+      Issue #45).
+
+
 pandoc-fignos 2.3.0 (2020-07-30)
 
     * Updated to work with pandoc 2.10.
