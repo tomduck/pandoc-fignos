@@ -1,10 +1,10 @@
 
-**New in 2.3.0:** Updated for pandoc 2.10.1. 
+**New in 2.3.1:** Updated for pandoc 2.10.1. 
 
 [more...](#whats-new)
 
 
-pandoc-fignos 2.3.0
+pandoc-fignos 2.3.1
 ===================
 
 *pandoc-fignos* is a [pandoc] filter for numbering figures and their references when converting from markdown to other formats.  It is part of the [pandoc-xnos] filter suite.  LaTeX/pdf, html, and epub output have native support.  Native support for docx output is a work in progress.
@@ -325,7 +325,7 @@ Developer notes are maintained in [DEVELOPERS.md].
 What's New
 ----------
 
-**New in 2.3.0:** Updated for pandoc 2.10.1. 
+**New in 2.3.1:** Updated for pandoc 2.10.1. 
 
 **New in 2.2.0:** Html/epub subfigures support.
 
