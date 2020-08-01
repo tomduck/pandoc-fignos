@@ -43,13 +43,13 @@ Contents
 Installation
 ------------
 
-Pandoc-fignos requires [python], a programming language that comes pre-installed on macOS and linux.  It is easily installed on Windows -- see [here](https://realpython.com/installing-python/).  Either python 2.7 or 3.x will do.
+Pandoc-fignos requires [python].  It is easily installed -- see [here](https://realpython.com/installing-python/). <sup>[2](#footnote2)</sup>  Either python 2.7 or 3.x will do.
 
 Pandoc-fignos may be installed using the shell command
 
     pip install pandoc-fignos --user
 
-and upgraded by appending `--upgrade` to the above command.  Pip is a program that downloads and installs software from the Python Package Index, [PyPI].  It normally comes installed with a python distribution.<sup>[2](#footnote2)</sup>
+and upgraded by appending `--upgrade` to the above command.  Pip is a program that downloads and installs software from the Python Package Index, [PyPI].  It normally comes installed with a python distribution.<sup>[3](#footnote3)</sup>
 
 Instructions for installing from source are given in [DEVELOPERS.md].
 
@@ -123,7 +123,7 @@ to have the reference name (i.e., "fig.") automatically generated.  The above fo
 
      *@fig:id
 
-instead.  If clever references are enabled by default (see [Customization](#customization), below), then users may disable it for a given reference using<sup>[3](#footnote3)</sup>
+instead.  If clever references are enabled by default (see [Customization](#customization), below), then users may disable it for a given reference using<sup>[4](#footnote4)</sup>
 
     !@fig:id
 
@@ -366,8 +366,10 @@ Epub support is generally improved.
 
 <a name="footnote1">1</a>: Pandoc 2.4 [broke](https://github.com/jgm/pandoc/issues/5099) how references are parsed, and so is not supported.
 
-<a name="footnote2">2</a>: Anaconda users may be tempted to use `conda` instead.  This is not advised.  The packages distributed on the Anaconda cloud are unofficial, are not posted by me, and in some cases are ancient.  Some tips on using `pip` in a `conda` environment may be found [here](https://www.anaconda.com/using-pip-in-a-conda-environment/).
+<a name="footnote1">2</a>: For MacOS, my preferred install method is to use the Installer package [available from python.org](https://www.python.org/downloads/).
 
-<a name="footnote3">3</a>: The disabling modifier "!" is used instead of "-" because [pandoc unnecessarily drops minus signs] in front of references.
+<a name="footnote3">3</a>: Anaconda users may be tempted to use `conda` instead.  This is not advised.  The packages distributed on the Anaconda cloud are unofficial, are not posted by me, and in some cases are ancient.  Some tips on using `pip` in a `conda` environment may be found [here](https://www.anaconda.com/using-pip-in-a-conda-environment/).
+
+<a name="footnote4">4</a>: The disabling modifier "!" is used instead of "-" because [pandoc unnecessarily drops minus signs] in front of references.
 
 [pandoc unnecessarily drops minus signs]: https://github.com/jgm/pandoc/issues/2901
