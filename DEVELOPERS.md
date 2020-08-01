@@ -1,7 +1,23 @@
 
 Developer Notes
 ===============
-    
+
+Contributions
+-------------
+
+Contributions to pandoc-fignos are welcome.  Before implementing a new feature, it is best to discuss it in an Issue so that any potential problems can be resolved.  Pull Requests should be linked into the Issue when ready.
+
+
+Design Philosophy
+-----------------
+
+1. This should be easy.
+
+2. Features should be supported for *ALL* output formats.
+
+3. The native capabilities of each output format should be employed.
+
+
 Branches
 --------
 
