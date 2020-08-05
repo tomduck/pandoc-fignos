@@ -57,6 +57,7 @@ from pandocfilters import Span
 import pandocxnos
 from pandocxnos import PandocAttributes
 from pandocxnos import STRTYPES, STDIN, STDOUT, STDERR
+from pandocxnos import NBSP
 from pandocxnos import elt, check_bool, get_meta, extract_attrs
 from pandocxnos import repair_refs, process_refs_factory, replace_refs_factory
 from pandocxnos import attach_attrs_factory, detach_attrs_factory
@@ -224,14 +225,12 @@ def _adjust_caption(fmt, fig, value):
         if isinstance(num, int):  # Numbered target
             if fmt in ['html', 'html4', 'html5', 'epub', 'epub2', 'epub3']:
                 value[0]['c'][1] = [RawInline('html', r'<span>'),
-                                    Str(captionname), Space(),
+                                    Str(captionname+NBSP),
                                     Str('%d%s' % (num, sep)),
                                     RawInline('html', r'</span>')]
             else:
-                value[0]['c'][1] = [Str(captionname),
-                                    Space(),
+                value[0]['c'][1] = [Str(captionname+NBSP),
                                     Str('%d%s' % (num, sep))]
-            value[0]['c'][1] += [Space()] + list(caption)
         else:  # Tagged target
             if num.startswith('$') and num.endswith('$'):  # Math
                 math = num.replace(' ', r'\ ')[1:-1]
@@ -240,12 +239,11 @@ def _adjust_caption(fmt, fig, value):
                 els = [Str(num+sep)]
             if fmt in ['html', 'html4', 'html5', 'epub', 'epub2', 'epub3']:
                 value[0]['c'][1] = \
-                  [RawInline('html', r'<span>'),
-                   Str(captionname),
-                   Space()] + els + [RawInline('html', r'</span>')]
+                  [RawInline('html', r'<span>'), Str(captionname+NBSP)] + \
+                  els + [RawInline('html', r'</span>')]
             else:
-                value[0]['c'][1] = [Str(captionname), Space()] + els
-            value[0]['c'][1] += [Space()] + list(caption)
+                value[0]['c'][1] = [Str(captionname+NBSP)] + els
+        value[0]['c'][1] += [Space()] + list(caption)
 
 def _add_markup(fmt, fig, value):
     """Adds markup to the output."""
