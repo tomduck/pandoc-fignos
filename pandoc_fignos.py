@@ -62,6 +62,7 @@ from pandocxnos import elt, check_bool, get_meta, extract_attrs
 from pandocxnos import repair_refs, process_refs_factory, replace_refs_factory
 from pandocxnos import attach_attrs_factory, detach_attrs_factory
 from pandocxnos import insert_secnos_factory, delete_secnos_factory
+from pandocxnos import version
 
 if sys.version_info > (3,):
     from urllib.request import unquote
@@ -110,7 +111,7 @@ def _extract_attrs(x, n):
 
     except (ValueError, IndexError):
 
-        if PANDOCVERSION < '1.16':
+        if version(PANDOCVERSION) < version('1.16'):
             # Look for attributes attached to the image path, as occurs with
             # image references for pandoc < 1.16 (pandoc-fignos Issue #14).
             # See http://pandoc.org/MANUAL.html#images for the syntax.
@@ -211,7 +212,8 @@ def _adjust_caption(fmt, fig, value):
     """Adjusts the caption."""
     attrs, caption = fig['attrs'], fig['caption']
     if fmt in ['latex', 'beamer']:  # Append a \label if this is referenceable
-        if PANDOCVERSION < '1.17' and not fig['is_unreferenceable']:
+        if version(PANDOCVERSION) < version('1.17') and \
+          not fig['is_unreferenceable']:
             # pandoc >= 1.17 installs \label for us
             value[0]['c'][1] += \
               [RawInline('tex', r'\protect\label{%s}'%attrs.id)]
@@ -606,18 +608,20 @@ def main(stdin=STDIN, stdout=STDOUT, stderr=STDERR):
     PANDOCVERSION = pandocxnos.init(args.pandocversion, doc)
 
     # Element primitives
-    if PANDOCVERSION < '1.16':
+    if version(PANDOCVERSION) < version('1.16'):
         Image = elt('Image', 2)
 
     # Chop up the doc
-    meta = doc['meta'] if PANDOCVERSION >= '1.18' else doc[0]['unMeta']
-    blocks = doc['blocks'] if PANDOCVERSION >= '1.18' else doc[1:]
+    meta = doc['meta'] if version(PANDOCVERSION) >= version('1.18') \
+      else doc[0]['unMeta']
+    blocks = doc['blocks'] if version(PANDOCVERSION) >= version('1.18') \
+      else doc[1:]
 
     # Process the metadata variables
     process(meta)
 
     # First pass
-    replace = PANDOCVERSION >= '1.16'
+    replace = version(PANDOCVERSION) >= version('1.16')
     attach_attrs_image = attach_attrs_factory(Image,
                                               extract_attrs=_extract_attrs,
                                               replace=replace)
@@ -650,7 +654,7 @@ def main(stdin=STDIN, stdout=STDOUT, stderr=STDERR):
         add_tex(meta)
 
     # Update the doc
-    if PANDOCVERSION >= '1.18':
+    if version(PANDOCVERSION) >= version('1.18'):
         doc['blocks'] = altered
     else:
         doc = doc[:1] + altered
