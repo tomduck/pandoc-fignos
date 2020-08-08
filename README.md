@@ -43,7 +43,7 @@ Contents
 Installation
 ------------
 
-Pandoc-fignos requires [python].  It is easily installed -- see [here](https://realpython.com/installing-python/). <sup>[2](#footnote2)</sup>  Either python 2.7 or 3.x will do.
+Pandoc-fignos requires [python].  It is easily installed -- see [here](https://realpython.com/installing-python/).<sup>[2](#footnote2)</sup>  Either python 2.7 or 3.x will do.
 
 Pandoc-fignos may be installed using the shell command
 
@@ -370,6 +370,6 @@ Epub support is generally improved.
 
 <a name="footnote3">3</a>: Anaconda users may be tempted to use `conda` instead.  This is not advised.  The packages distributed on the Anaconda cloud are unofficial, are not posted by me, and in some cases are ancient.  Some tips on using `pip` in a `conda` environment may be found [here](https://www.anaconda.com/using-pip-in-a-conda-environment/).
 
-<a name="footnote4">4</a>: The disabling modifier "!" is used instead of "-" because [pandoc unnecessarily drops minus signs] in front of references.
+<a name="footnote4">4</a>: The disabling modifier "!" is used instead of "-" because [pandoc drops minus signs] in front of references.
 
-[pandoc unnecessarily drops minus signs]: https://github.com/jgm/pandoc/issues/2901
+[pandoc drops minus signs]: https://github.com/jgm/pandoc/issues/2901
