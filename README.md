@@ -366,7 +366,7 @@ Epub support is generally improved.
 
 <a name="footnote1">1</a>: Pandoc 2.4 [broke](https://github.com/jgm/pandoc/issues/5099) how references are parsed, and so is not supported.
 
-<a name="footnote2">2</a>: For MacOS, my preferred install method is to use the Installer package [available from python.org](https://www.python.org/downloads/).
+<a name="footnote2">2</a>: For MacOS, my preferred install method is to use the package [available from python.org](https://www.python.org/downloads/).
 
 <a name="footnote3">3</a>: Anaconda users may be tempted to use `conda` instead.  This is not advised.  The packages distributed on the Anaconda cloud are unofficial, are not posted by me, and in some cases are ancient.  Some tips on using `pip` in a `conda` environment may be found [here](https://www.anaconda.com/using-pip-in-a-conda-environment/).
 
