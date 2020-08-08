@@ -220,7 +220,7 @@ Pandoc-fignos may be customized by setting variables in the [metadata block] or 
     output, this feature should be used together with pandoc's
     `--number-offset`
     [option](https://pandoc.org/MANUAL.html#option--number-sections)
-    set to the same integer value.  For LaTeX/PDF, this option
+    set to the same integer value.  For LaTeX/pdf, this option
     offsets the actual section numbers as required.
 
 
@@ -241,11 +241,11 @@ Demonstration: Processing [demo3.md] with pandoc + pandoc-fignos gives numbered 
 Technical Details
 -----------------
 
-### TeX/pdf Output ###
+### LaTeX/pdf Output ###
 
-During processing, pandoc-fignos inserts packages and supporting TeX into the `header-includes` metadata field.  To see what is inserted, set the `fignos-warning-level` meta variable to `2`.  Note that any use of pandoc's `--include-in-header` option [overrides](https://github.com/jgm/pandoc/issues/3139) all `header-includes`.
+During processing, pandoc-fignos inserts packages and supporting LaTeX into the `header-includes` metadata field.  To see what is inserted, set the `fignos-warning-level` meta variable to `2`.  Note that any use of pandoc's `--include-in-header` option [overrides](https://github.com/jgm/pandoc/issues/3139) all `header-includes`.
 
-An example reference in TeX looks like
+An example reference in LaTeX looks like
 
 ~~~latex
 See \cref{fig:1}.
@@ -342,13 +342,13 @@ Meta variable names have been updated.  Deprecated names have been removed, and 
 The basic filter and library codes have been refactored and improved with a view toward maintainability.  While extensive tests have been performed, some problems may have slipped through unnoticed.  Bug reports should be submitted to our [Issues tracker].
 
 
-*TeX/PDF:*
+*LaTeX/PDF:*
 
-TeX codes produced by pandoc-fignos are massively improved.  The hacks used before were causing some users problems.  The new approach provides more flexibility and better compatibility with the LaTeX system.
+LaTeX codes produced by pandoc-fignos are massively improved.  The hacks used before were causing some users problems.  The new approach provides more flexibility and better compatibility with the LaTeX system.
 
-Supporting TeX is now written to the `header-includes` meta data.  Users no longer need to include LaTeX commands in the `header-includes` to get basic pandoc-fignos functions to work.  Use `fignos-warning-level: 2` to see what pandoc-fignos adds to the `header-includes`.
+Supporting LaTeX is now written to the `header-includes` meta data.  Users no longer need to include LaTeX commands in the `header-includes` to get basic pandoc-fignos functions to work.  Use `fignos-warning-level: 2` to see what pandoc-fignos adds to the `header-includes`.
 
-A word of warning: Pandoc-fignos's additions to the `header-includes` are overridden when pandoc's `--include-in-header` option is used.  This is owing to a [design choice](https://github.com/jgm/pandoc/issues/3139) in pandoc.  Users may choose to deliberately override pandoc-fignos's `header-includes` by providing their own TeX through `--include-in-header`.  If a user needs to include other bits of TeX in this way, then they will need to do the same for the TeX that pandoc-fignos needs.
+A word of warning: Pandoc-fignos's additions to the `header-includes` are overridden when pandoc's `--include-in-header` option is used.  This is owing to a [design choice](https://github.com/jgm/pandoc/issues/3139) in pandoc.  Users may choose to deliberately override pandoc-fignos's `header-includes` by providing their own LaTeX through `--include-in-header`.  If a user needs to include other bits of LaTeX in this way, then they will need to do the same for the LaTeX that pandoc-fignos needs.
 
 Finally, the `\label` tags are now installed where pandoc chooses, which is currently outside the `\caption` field.  Pandoc-fignos previously forced the `\label` to go inside `\caption`.
 
