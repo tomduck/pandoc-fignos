@@ -1,7 +1,9 @@
-pandoc-fignos 2.X.X (unreleased)
+pandoc-fignos 2.4.0 (unreleased)
 
     * Use nonbreaking space between ref name and number in caption
       (pandoc-xnos Issue #14).
+    * Require pandoc-xnos 2.5.0 (updated to work with pandoc 2.11;
+      pandoc-fignos Issue #85).
 
 
 pandoc-fignos 2.3.1 (2020-07-31)
