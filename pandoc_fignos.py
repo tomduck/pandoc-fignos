@@ -221,7 +221,7 @@ def _adjust_caption(fmt, fig, value):
         if fig['is_unnumbered']:
             return
         sep = {'none':'', 'colon':':', 'period':'.', 'space':' ',
-               'quad':u'\u2000', 'newline':'\n'}[separator]
+               'quad':u'\u2000', 'newline':'\n', 'endash':u'\u2013'}[separator]
 
         num = targets[attrs.id].num
         if isinstance(num, int):  # Numbered target
@@ -442,7 +442,7 @@ def process(meta):
             old_separator = separator
             separator = get_meta(meta, name)
             if separator not in \
-              ['none', 'colon', 'period', 'space', 'quad', 'newline']:
+              ['none', 'colon', 'period', 'space', 'quad', 'newline', 'endash']:
                 msg = textwrap.dedent("""
                           pandoc-fignos: caption separator must be one of
                           none, colon, period, space, quad, or newline.
