@@ -446,7 +446,7 @@ def process(meta):
                 msg = textwrap.dedent("""
                           pandoc-fignos: caption separator must be one of
                           none, colon, period, space, quad, or newline.
-                      """ % name)
+                      """)
                 STDERR.write(msg)
                 continue
             separator_changed = separator != old_separator
