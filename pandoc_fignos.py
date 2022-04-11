@@ -80,6 +80,7 @@ capitalise = False      # Flags that plusname should be capitalised
 plusname = ['fig.', 'figs.']      # Sets names for mid-sentence references
 starname = ['Figure', 'Figures']  # Sets names for references at sentence start
 numbersections = False  # Flags that figures should be numbered by section
+sectionseparator = '.'  # Separator for section numbers
 secoffset = 0           # Section number offset
 warninglevel = 2        # 0 - no warnings; 1 - some warnings; 2 - all warnings
 
@@ -106,7 +107,7 @@ def _extract_attrs(x, n):
     attributes begin at index `n`.  Extracted elements are deleted
     from the list.
     """
-    try:  #  Try the standard call from pandocxnos first
+    try:  # Try the standard call from pandocxnos first
         return extract_attrs(x, n)
 
     except (ValueError, IndexError):
@@ -156,8 +157,8 @@ def _process_figure(key, value, fmt):
 
     # Parse the figure
     attrs = fig['attrs'] = \
-      PandocAttributes(value[0]['c'][0] if key == 'Para' else value[0],
-                       'pandoc')
+        PandocAttributes(value[0]['c'][0] if key == 'Para' else value[0],
+                         'pandoc')
     fig['caption'] = value[0]['c'][1] if key == 'Para' else None
 
     # Bail out if the label does not conform to expectations
@@ -189,8 +190,9 @@ def _process_figure(key, value, fmt):
         # tags.
         if fmt in ['html', 'html4', 'html5', 'epub', 'epub2', 'epub3',
                    'docx'] and \
-          'tag' not in attrs:
-            attrs['tag'] = str(cursec+secoffset) + '.' + str(Ntargets)
+                'tag' not in attrs:
+            attrs['tag'] = str(cursec+secoffset) + \
+                sectionseparator + str(Ntargets)
 
     # Update the global targets tracker
     fig['is_tagged'] = 'tag' in attrs
@@ -208,20 +210,21 @@ def _process_figure(key, value, fmt):
 
     return fig
 
+
 def _adjust_caption(fmt, fig, value):
     """Adjusts the caption."""
     attrs, caption = fig['attrs'], fig['caption']
     if fmt in ['latex', 'beamer']:  # Append a \label if this is referenceable
         if version(PANDOCVERSION) < version('1.17') and \
-          not fig['is_unreferenceable']:
+                not fig['is_unreferenceable']:
             # pandoc >= 1.17 installs \label for us
             value[0]['c'][1] += \
-              [RawInline('tex', r'\protect\label{%s}'%attrs.id)]
+                [RawInline('tex', r'\protect\label{%s}' % attrs.id)]
     else:  # Hard-code in the caption name and number/tag
         if fig['is_unnumbered']:
             return
-        sep = {'none':'', 'colon':':', 'period':'.', 'space':' ',
-               'quad':u'\u2000', 'newline':'\n'}[separator]
+        sep = {'none': '', 'colon': ':', 'period': '.', 'space': ' ',
+               'quad': u'\u2000', 'newline': '\n'}[separator]
 
         num = targets[attrs.id].num
         if isinstance(num, int):  # Numbered target
@@ -236,16 +239,17 @@ def _adjust_caption(fmt, fig, value):
         else:  # Tagged target
             if num.startswith('$') and num.endswith('$'):  # Math
                 math = num.replace(' ', r'\ ')[1:-1]
-                els = [Math({"t":"InlineMath", "c":[]}, math), Str(sep)]
+                els = [Math({"t": "InlineMath", "c": []}, math), Str(sep)]
             else:  # Text
                 els = [Str(num+sep)]
             if fmt in ['html', 'html4', 'html5', 'epub', 'epub2', 'epub3']:
                 value[0]['c'][1] = \
-                  [RawInline('html', r'<span>'), Str(captionname+NBSP)] + \
-                  els + [RawInline('html', r'</span>')]
+                    [RawInline('html', r'<span>'), Str(captionname+NBSP)] + \
+                    els + [RawInline('html', r'</span>')]
             else:
                 value[0]['c'][1] = [Str(captionname+NBSP)] + els
         value[0]['c'][1] += [Space()] + list(caption)
+
 
 def _add_markup(fmt, fig, value):
     """Adds markup to the output."""
@@ -268,13 +272,13 @@ def _add_markup(fmt, fig, value):
         if fig['is_tagged']:  # A figure cannot be tagged if it is unnumbered
             # Use the tagged-figure environment
             has_tagged_figures = True
-            ret = [RawBlock('tex', r'\begin{fignos:tagged-figure}[%s]' % \
+            ret = [RawBlock('tex', r'\begin{fignos:tagged-figure}[%s]' %
                             str(targets[attrs.id].num)),
                    Para(value),
                    RawBlock('tex', r'\end{fignos:tagged-figure}')]
     elif fmt in ('html', 'html4', 'html5', 'epub', 'epub2', 'epub3'):
         if LABEL_PATTERN.match(attrs.id):
-            pre = RawBlock('html', '<div id="%s" class="fignos">'%attrs.id)
+            pre = RawBlock('html', '<div id="%s" class="fignos">' % attrs.id)
             post = RawBlock('html', '</div>')
             ret = [pre, Para(value), post]
             # Eliminate the id from the Image
@@ -283,20 +287,21 @@ def _add_markup(fmt, fig, value):
     elif fmt == 'docx':
         # As per http://officeopenxml.com/WPhyperlink.php
         bookmarkstart = \
-          RawBlock('openxml',
-                   '<w:bookmarkStart w:id="0" w:name="%s"/>'
-                   %attrs.id)
+            RawBlock('openxml',
+                     '<w:bookmarkStart w:id="0" w:name="%s"/>'
+                     % attrs.id)
         bookmarkend = \
-          RawBlock('openxml', '<w:bookmarkEnd w:id="0"/>')
+            RawBlock('openxml', '<w:bookmarkEnd w:id="0"/>')
         ret = [bookmarkstart, Para(value), bookmarkend]
     return ret
+
 
 def process_figures(key, value, fmt, meta):  # pylint: disable=unused-argument
     """Processes the figures."""
 
     # Process figures wrapped in Para elements
     if key == 'Para' and len(value) == 1 and \
-      value[0]['t'] == 'Image' and value[0]['c'][-1][1].startswith('fig:'):
+            value[0]['t'] == 'Image' and value[0]['c'][-1][1].startswith('fig:'):
 
         # Process the figure and add markup
         fig = _process_figure(key, value, fmt)
@@ -398,6 +403,7 @@ def process(meta):
     global plusname        # Sets names for mid-sentence references
     global starname        # Sets names for references at sentence start
     global numbersections  # Flags that sections should be numbered by section
+    global sectionseparator  # The section separator
     global secoffset       # Section number offset
     global warninglevel    # 0 - no warnings; 1 - some; 2 - all
     global captionname_changed  # Flags the caption name changed
@@ -420,12 +426,13 @@ def process(meta):
                  'xnos-capitalise', 'xnos-capitalize',
                  'fignos-plus-name', 'fignos-star-name',
                  'fignos-number-by-section', 'xnos-number-by-section',
+                 'fignos-section-separator', 'xnos-section-separator',
                  'xnos-number-offset']
 
     if warninglevel:
         for name in meta:
             if (name.startswith('fignos') or name.startswith('xnos')) and \
-              name not in metanames:
+                    name not in metanames:
                 msg = textwrap.dedent("""
                           pandoc-fignos: unknown meta variable "%s"
                       """ % name)
@@ -442,7 +449,7 @@ def process(meta):
             old_separator = separator
             separator = get_meta(meta, name)
             if separator not in \
-              ['none', 'colon', 'period', 'space', 'quad', 'newline']:
+                    ['none', 'colon', 'period', 'space', 'quad', 'newline']:
                 msg = textwrap.dedent("""
                           pandoc-fignos: caption separator must be one of
                           none, colon, period, space, quad, or newline.
@@ -499,17 +506,23 @@ def process(meta):
             numbersections = check_bool(get_meta(meta, name))
             break
 
+    for name in ['fignos-section-separator', 'xnos-section-separator']:
+        if name in meta:
+            sectionseparator = get_meta(meta, name)
+            break
+
     if 'xnos-number-offset' in meta:
         secoffset = int(get_meta(meta, 'xnos-number-offset'))
+
 
 def add_tex(meta):
     """Adds tex to the meta data."""
 
     # pylint: disable=too-many-boolean-expressions
     warnings = warninglevel == 2 and targets and \
-      (pandocxnos.cleveref_required() or has_unnumbered_figures or
-       plusname_changed or starname_changed or has_tagged_figures or
-       captionname_changed or numbersections or secoffset)
+        (pandocxnos.cleveref_required() or has_unnumbered_figures or
+         plusname_changed or starname_changed or has_tagged_figures or
+         captionname_changed or numbersections or secoffset)
     if warnings:
         msg = textwrap.dedent("""\
                   pandoc-fignos: Wrote the following blocks to
@@ -583,6 +596,8 @@ def add_tex(meta):
         STDERR.write('\n')
 
 # pylint: disable=too-many-locals, unused-argument
+
+
 def main(stdin=STDIN, stdout=STDOUT, stderr=STDERR):
     """Filters the document AST."""
 
@@ -591,11 +606,11 @@ def main(stdin=STDIN, stdout=STDOUT, stderr=STDERR):
     global Image
 
     # Read the command-line arguments
-    parser = argparse.ArgumentParser(\
-      description='Pandoc figure numbers filter.')
-    parser.add_argument(\
-      '--version', action='version',
-      version='%(prog)s {version}'.format(version=__version__))
+    parser = argparse.ArgumentParser(
+        description='Pandoc figure numbers filter.')
+    parser.add_argument(
+        '--version', action='version',
+        version='%(prog)s {version}'.format(version=__version__))
     parser.add_argument('fmt')
     parser.add_argument('--pandocversion', help='The pandoc version.')
     args = parser.parse_args()
@@ -613,9 +628,9 @@ def main(stdin=STDIN, stdout=STDOUT, stderr=STDERR):
 
     # Chop up the doc
     meta = doc['meta'] if version(PANDOCVERSION) >= version('1.18') \
-      else doc[0]['unMeta']
+        else doc[0]['unMeta']
     blocks = doc['blocks'] if version(PANDOCVERSION) >= version('1.18') \
-      else doc[1:]
+        else doc[1:]
 
     # Process the metadata variables
     process(meta)
@@ -640,7 +655,7 @@ def main(stdin=STDIN, stdout=STDOUT, stderr=STDERR):
     # Second pass
     process_refs = process_refs_factory(LABEL_PATTERN, targets.keys())
     replace_refs = replace_refs_factory(targets, cleveref, False,
-                                        plusname if not capitalise \
+                                        plusname if not capitalise
                                         or plusname_changed else
                                         [name.title() for name in plusname],
                                         starname)
@@ -664,6 +679,7 @@ def main(stdin=STDIN, stdout=STDOUT, stderr=STDERR):
 
     # Flush stdout
     stdout.flush()
+
 
 if __name__ == '__main__':
     main()
